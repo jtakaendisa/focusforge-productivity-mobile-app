@@ -1,23 +1,46 @@
-import { StyleSheet, View, Text } from 'react-native';
-import { Button } from 'tamagui';
+import { useRef } from 'react';
+import { styled, View } from 'tamagui';
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { FlatList } from 'react-native-reanimated/lib/typescript/Animated';
 
-export default function TabOneScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <Button>Button</Button>
-    </View>
-  );
-}
+import { data, OnboardingData } from '@/data';
+import RenderItem from '../components/RenderItem';
 
-const styles = StyleSheet.create({
-  container: {
+const HomeScreen = () => {
+  const flatlistRef = useRef<FlatList<OnboardingData>>(null);
+  const x = useSharedValue(0);
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      x.value = event.contentOffset.x;
+    },
+  });
+
+  const Container = styled(View, {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-});
+  });
+
+  return (
+    <Container>
+      <Animated.FlatList
+        ref={flatlistRef}
+        data={data}
+        renderItem={({ item, index }) => {
+          return <RenderItem item={item} index={index} x={x} />;
+        }}
+        keyExtractor={(item) => item.id}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        horizontal
+        pagingEnabled
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+      />
+    </Container>
+  );
+};
+
+export default HomeScreen;
