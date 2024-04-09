@@ -65,6 +65,7 @@ function RootLayoutNav({ onboarded }: { onboarded: boolean }) {
   return (
     <TamaguiProvider config={config}>
       <Stack initialRouteName={onboarded ? '(tabs)' : 'onboarding'}>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
