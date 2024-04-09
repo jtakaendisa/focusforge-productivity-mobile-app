@@ -15,14 +15,14 @@ interface Props {
   x: SharedValue<number>;
 }
 
-const RenderItem = ({ item, index, x }: Props) => {
+const OnboardingCard = ({ item, index, x }: Props) => {
   const { animation, backgroundColor, text, textColor } = item;
-  const { width } = useWindowDimensions();
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
 
   const circleAnimation = useAnimatedStyle(() => {
     const scale = interpolate(
       x.value,
-      [(index - 1) * width, (index + 1) * width],
+      [(index - 1) * SCREEN_WIDTH, (index + 1) * SCREEN_WIDTH],
       [1, 4, 4],
       Extrapolation.CLAMP
     );
@@ -35,7 +35,7 @@ const RenderItem = ({ item, index, x }: Props) => {
   const lottieAnimation = useAnimatedStyle(() => {
     const translateY = interpolate(
       x.value,
-      [(index - 1) * width, index * width, (index + 1) * width],
+      [(index - 1) * SCREEN_WIDTH, index * SCREEN_WIDTH, (index + 1) * SCREEN_WIDTH],
       [200, 0, -200],
       Extrapolation.CLAMP
     );
@@ -49,7 +49,7 @@ const RenderItem = ({ item, index, x }: Props) => {
     flex: 1,
     justifyContent: 'space-around',
     alignItems: 'center',
-    width,
+    width: SCREEN_WIDTH,
     marginBottom: 120,
   });
 
@@ -64,8 +64,8 @@ const RenderItem = ({ item, index, x }: Props) => {
   });
 
   const LottieImage = styled(LottieView, {
-    width: width * 0.9,
-    height: width * 0.9,
+    width: SCREEN_WIDTH * 0.9,
+    height: SCREEN_WIDTH * 0.9,
   });
 
   const OnboardingText = styled(Text, {
@@ -77,20 +77,19 @@ const RenderItem = ({ item, index, x }: Props) => {
     marginHorizontal: 20,
   });
 
+  const Circle = styled(View, {
+    width: SCREEN_WIDTH * 1.2,
+    height: SCREEN_WIDTH * 1.2,
+    backgroundColor,
+    borderRadius: SCREEN_WIDTH / 2,
+  });
+
+  const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
   return (
     <Container>
       <CircleContainer>
-        <Animated.View
-          style={[
-            {
-              width,
-              height: width,
-              backgroundColor,
-              borderRadius: width / 2,
-            },
-            circleAnimation,
-          ]}
-        />
+        <AnimatedCircle style={circleAnimation} />
       </CircleContainer>
       <Animated.View style={lottieAnimation}>
         <LottieImage
@@ -103,4 +102,4 @@ const RenderItem = ({ item, index, x }: Props) => {
   );
 };
 
-export default RenderItem;
+export default OnboardingCard;

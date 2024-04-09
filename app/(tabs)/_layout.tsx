@@ -10,7 +10,7 @@ function TabBarIcon(props: {
   return <AntDesign size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-export default function TabLayout() {
+const TabLayout = () => {
   return (
     <Tabs
       screenOptions={{
@@ -47,4 +47,6 @@ export default function TabLayout() {
       />
     </Tabs>
   );
-}
+};
+
+export default TabLayout;

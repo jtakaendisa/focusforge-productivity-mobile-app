@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { TamaguiProvider } from 'tamagui';
@@ -20,11 +21,28 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [onboarded, setOnboarded] = useState(false);
+
   const [loaded, error] = useFonts({
     Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
     InterLight: require('@tamagui/font-inter/otf/Inter-Light.otf'),
     InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
   });
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem('onboarded');
+        if (value !== null) {
+          setOnboarded(JSON.parse(value));
+        }
+      } catch (e) {
+        console.log('error', e);
+      }
+    };
+
+    getData();
+  }, []);
 
   useEffect(() => {
     if (error) throw error;
@@ -40,14 +58,15 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return <RootLayoutNav onboarded={onboarded} />;
 }
 
-function RootLayoutNav() {
+function RootLayoutNav({ onboarded }: { onboarded: boolean }) {
   return (
     <TamaguiProvider config={config}>
-      <Stack>
+      <Stack initialRouteName={onboarded ? '(tabs)' : 'onboarding'}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </TamaguiProvider>
