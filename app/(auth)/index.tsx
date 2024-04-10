@@ -1,6 +1,8 @@
 import { TextInput, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { router } from 'expo-router';
 import { Button, Image, Text, View, styled, useWindowDimensions } from 'tamagui';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 const SigninScreen = () => {
   const { height: SCREEN_HEIGHT } = useWindowDimensions();
@@ -39,10 +41,6 @@ const SigninScreen = () => {
     paddingBottom: 10,
   });
 
-  // const TitleContainer = styled(View, {
-  //   alignItems: 'center',
-  // });
-
   const Title = styled(Text, {
     fontWeight: 'bold',
     fontSize: 42,
@@ -80,37 +78,56 @@ const SigninScreen = () => {
     justifyContent: 'center',
   });
 
+  const AnimatedLargeLight = Animated.createAnimatedComponent(LargeLight);
+  const AnimatedSmallLight = Animated.createAnimatedComponent(SmallLight);
+  const AnimatedTitle = Animated.createAnimatedComponent(Title);
+  const AnimatedInputContainer = Animated.createAnimatedComponent(InputContainer);
+  const AnimatedSubmitButton = Animated.createAnimatedComponent(SubmitButton);
+  const AnimatedSignupContainer = Animated.createAnimatedComponent(SignupContainer);
+
   return (
     <Container>
       <BackgroundImage source={require('@/assets/images/background.png')} />
       <LightsContainer>
-        <LargeLight source={require('@/assets/images/light.png')} />
-        <SmallLight source={require('@/assets/images/light.png')} />
+        <AnimatedLargeLight
+          entering={FadeInUp.delay(200).duration(1000).springify()}
+          source={require('@/assets/images/light.png')}
+        />
+        <AnimatedSmallLight
+          entering={FadeInUp.delay(400).duration(1000).springify()}
+          source={require('@/assets/images/light.png')}
+        />
       </LightsContainer>
       <FormContainer>
-        {/* <TitleContainer> */}
-        <Title>Login</Title>
-        {/* </TitleContainer> */}
+        <AnimatedTitle entering={FadeInUp.duration(1000).springify()}>
+          Login
+        </AnimatedTitle>
         <InputsContainer>
-          <InputContainer>
+          <AnimatedInputContainer entering={FadeInDown.duration(1000).springify()}>
             <TextInput placeholder="Email" placeholderTextColor="gray" />
-          </InputContainer>
-          <InputContainer>
+          </AnimatedInputContainer>
+          <AnimatedInputContainer
+            entering={FadeInDown.delay(200).duration(1000).springify()}
+          >
             <TextInput
               placeholder="Password"
               placeholderTextColor="gray"
               secureTextEntry
             />
-          </InputContainer>
-          <SubmitButton>
+          </AnimatedInputContainer>
+          <AnimatedSubmitButton
+            entering={FadeInDown.delay(400).duration(1000).springify()}
+          >
             <ButtonText>Login</ButtonText>
-          </SubmitButton>
-          <SignupContainer>
+          </AnimatedSubmitButton>
+          <AnimatedSignupContainer
+            entering={FadeInDown.delay(600).duration(1000).springify()}
+          >
             <Text color="black">Don't have an acount? </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/signup')}>
               <Text color="#2892c7">Sign up</Text>
             </TouchableOpacity>
-          </SignupContainer>
+          </AnimatedSignupContainer>
         </InputsContainer>
       </FormContainer>
       <StatusBar style="light" />
