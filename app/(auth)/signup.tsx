@@ -49,7 +49,12 @@ const SignupScreen = () => {
 
   const { height: SCREEN_HEIGHT } = useWindowDimensions();
 
-  const { control, handleSubmit } = useForm<SignupFormData>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitSuccessful },
+  } = useForm<SignupFormData>({
     defaultValues: {
       username: '',
       email: '',
@@ -63,9 +68,21 @@ const SignupScreen = () => {
     console.log({ data });
   };
 
-  const onError: SubmitErrorHandler<SignupFormData> = async (errors) => {
+  const onError: SubmitErrorHandler<SignupFormData> = (errors) => {
     setErrors(errors);
   };
+
+  useEffect(() => {
+    if (playAnimations) {
+      setTimeout(() => {
+        setPlayAnimations(false);
+      }, 2100);
+    }
+  }, [playAnimations]);
+
+  useEffect(() => {
+    reset();
+  }, [isSubmitSuccessful]);
 
   const FormContainer = styled(View, {
     flex: 1,
@@ -73,12 +90,6 @@ const SignupScreen = () => {
     paddingTop: 0.22 * SCREEN_HEIGHT,
     paddingBottom: 10,
   });
-
-  useEffect(() => {
-    if (playAnimations) {
-      setPlayAnimations(false);
-    }
-  }, [playAnimations]);
 
   return (
     <Container>
