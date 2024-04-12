@@ -4,6 +4,11 @@ import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import {
   Controller,
+  DeepRequired,
+  FieldErrorsImpl,
+  FieldValues,
+  GlobalError,
+  IsAny,
   SubmitErrorHandler,
   SubmitHandler,
   useForm,
@@ -32,10 +37,15 @@ import {
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
+type FieldErrors<T extends FieldValues = SignupFormData> = Partial<
+  FieldValues extends IsAny<FieldValues> ? any : FieldErrorsImpl<DeepRequired<T>>
+> & {
+  root?: Record<string, GlobalError> & GlobalError;
+};
+
 const SignupScreen = () => {
-  const [componentMounted, setComponentMounted] = useState(false);
-  const [animationsTriggered, setAnimationsTriggered] = useState(false);
-  const [errors, setErrors] = useState<any>(null);
+  const [playAnimations, setPlayAnimations] = useState(true);
+  const [errors, setErrors] = useState<FieldErrors>({});
 
   const { height: SCREEN_HEIGHT } = useWindowDimensions();
 
@@ -49,7 +59,7 @@ const SignupScreen = () => {
   });
 
   const onSubmit: SubmitHandler<SignupFormData> = async (data) => {
-    setErrors(null);
+    setErrors({});
     console.log({ data });
   };
 
@@ -65,11 +75,10 @@ const SignupScreen = () => {
   });
 
   useEffect(() => {
-    setComponentMounted(true);
-    if (!animationsTriggered) {
-      setAnimationsTriggered(true);
+    if (playAnimations) {
+      setPlayAnimations(false);
     }
-  }, [animationsTriggered]);
+  }, [playAnimations]);
 
   return (
     <Container>
@@ -77,37 +86,27 @@ const SignupScreen = () => {
       <LightsContainer>
         <AnimatedLargeLight
           entering={
-            componentMounted && !animationsTriggered
-              ? FadeInUp.delay(200).duration(1000).springify()
-              : undefined
+            playAnimations ? FadeInUp.delay(200).duration(1000).springify() : undefined
           }
           source={require('@/assets/images/light.png')}
         />
         <AnimatedSmallLight
           entering={
-            componentMounted && !animationsTriggered
-              ? FadeInUp.delay(400).duration(1000).springify()
-              : undefined
+            playAnimations ? FadeInUp.delay(400).duration(1000).springify() : undefined
           }
           source={require('@/assets/images/light.png')}
         />
       </LightsContainer>
       <FormContainer>
         <AnimatedTitle
-          entering={
-            componentMounted && !animationsTriggered
-              ? FadeInUp.duration(1000).springify()
-              : undefined
-          }
+          entering={playAnimations ? FadeInUp.duration(1000).springify() : undefined}
         >
           Sign Up
         </AnimatedTitle>
         <InputsContainer>
           <AnimatedInputContainer
             entering={
-              componentMounted && !animationsTriggered
-                ? FadeInDown.duration(1000).springify()
-                : undefined
+              playAnimations ? FadeInDown.duration(1000).springify() : undefined
             }
           >
             <Controller
@@ -123,13 +122,11 @@ const SignupScreen = () => {
               )}
             />
           </AnimatedInputContainer>
-          {errors?.username?.message?.length > 0 && (
-            <ErrorText>{errors.username.message}</ErrorText>
-          )}
+          {errors?.username && <ErrorText>{errors.username.message}</ErrorText>}
 
           <AnimatedInputContainer
             entering={
-              componentMounted && !animationsTriggered
+              playAnimations
                 ? FadeInDown.delay(200).duration(1000).springify()
                 : undefined
             }
@@ -147,13 +144,11 @@ const SignupScreen = () => {
               )}
             />
           </AnimatedInputContainer>
-          {errors?.email?.message?.length > 0 && (
-            <ErrorText>{errors.email.message}</ErrorText>
-          )}
+          {errors?.email && <ErrorText>{errors.email.message}</ErrorText>}
 
           <AnimatedInputContainer
             entering={
-              componentMounted && !animationsTriggered
+              playAnimations
                 ? FadeInDown.delay(400).duration(1000).springify()
                 : undefined
             }
@@ -172,14 +167,12 @@ const SignupScreen = () => {
               )}
             />
           </AnimatedInputContainer>
-          {errors?.password?.message?.length > 0 && (
-            <ErrorText>{errors.password.message}</ErrorText>
-          )}
+          {errors?.password && <ErrorText>{errors.password.message}</ErrorText>}
 
           <ButtonsContainer>
             <AnimatedSubmitButton
               entering={
-                componentMounted && !animationsTriggered
+                playAnimations
                   ? FadeInDown.delay(600).duration(1000).springify()
                   : undefined
               }
@@ -189,7 +182,7 @@ const SignupScreen = () => {
             </AnimatedSubmitButton>
             <AnimatedSubmitButton
               entering={
-                componentMounted && !animationsTriggered
+                playAnimations
                   ? FadeInDown.delay(800).duration(1000).springify()
                   : undefined
               }
@@ -199,7 +192,7 @@ const SignupScreen = () => {
           </ButtonsContainer>
           <AnimatedSignupContainer
             entering={
-              componentMounted && !animationsTriggered
+              playAnimations
                 ? FadeInDown.delay(1000).duration(1000).springify()
                 : undefined
             }
