@@ -45,6 +45,13 @@ const TabLayout = () => {
           tabBarIcon: ({ color }) => <TabBarIcon name="clockcircleo" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <TabBarIcon name="setting" color={color} />,
+        }}
+      />
     </Tabs>
   );
 };

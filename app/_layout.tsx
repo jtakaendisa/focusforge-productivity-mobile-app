@@ -6,6 +6,13 @@ import * as SplashScreen from 'expo-splash-screen';
 import { TamaguiProvider } from 'tamagui';
 
 import config from '../tamagui.config';
+import { authStateChangeListener, formatAuthUserData } from './services/auth';
+import { User } from 'firebase/auth';
+import { useAuthStore } from './store';
+
+interface RootLayoutNavProps {
+  onboarded: boolean;
+}
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -21,18 +28,26 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [onboarded, setOnboarded] = useState(false);
+  const setAuthUser = useAuthStore((s) => s.setAuthUser);
 
-  const [loaded, error] = useFonts({
+  const [onboarded, setOnboarded] = useState(false);
+  const [loadedAuth, setLoadedAuth] = useState(false);
+
+  const [loadedFonts, error] = useFonts({
     Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
     InterLight: require('@tamagui/font-inter/otf/Inter-Light.otf'),
     InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
   });
 
   useEffect(() => {
+    if (error) throw error;
+  }, [error]);
+
+  useEffect(() => {
     const getData = async () => {
       try {
         const value = await AsyncStorage.getItem('onboarded');
+
         if (value !== null) {
           setOnboarded(JSON.parse(value));
         }
@@ -45,26 +60,43 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
+    if (loadedFonts && loadedAuth) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loadedFonts, loadedAuth]);
 
-  if (!loaded) {
+  useEffect(() => {
+    const unsubscribe = authStateChangeListener(async (user: User) => {
+      try {
+        if (user) {
+          console.log({ user });
+          const formattedAuthUser = await formatAuthUserData(user);
+          console.log({ formattedAuthUser });
+          setAuthUser(formattedAuthUser);
+        }
+        setLoadedAuth(true);
+      } catch (error) {
+        setAuthUser(null);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  if (!loadedFonts || !loadedAuth) {
     return null;
   }
 
   return <RootLayoutNav onboarded={onboarded} />;
 }
 
-function RootLayoutNav({ onboarded }: { onboarded: boolean }) {
+function RootLayoutNav({ onboarded }: RootLayoutNavProps) {
   return (
     <TamaguiProvider config={config}>
-      <Stack initialRouteName={onboarded ? '(tabs)' : 'onboarding'}>
+      <Stack
+        initialRouteName={onboarded ? '(auth)' : 'onboarding'}
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />

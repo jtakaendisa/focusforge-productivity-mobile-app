@@ -39,7 +39,7 @@ const CustomButton = ({ flatlistRef, flatlistIndex, dataLength, x }: Props) => {
       });
     } else {
       await storeData();
-      router.push('/(tabs)');
+      router.replace('/(auth)');
     }
   };
 

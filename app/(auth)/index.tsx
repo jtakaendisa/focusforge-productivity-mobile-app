@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TextInput, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { router } from 'expo-router';
-import { z } from 'zod';
+import { Redirect, router } from 'expo-router';
 import {
   Controller,
   DeepRequired,
@@ -14,10 +13,14 @@ import {
   SubmitHandler,
   useForm,
 } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Text, View, styled, useWindowDimensions } from 'tamagui';
 import { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
+import { useAuthStore } from '../store';
 import { signinSchema } from '../validationSchemas';
+import { signInAuthUser } from '../services/auth';
 import {
   AnimatedInputContainer,
   AnimatedLargeLight,
@@ -33,7 +36,6 @@ import {
   InputsContainer,
   LightsContainer,
 } from './_components';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 type SigninFormData = z.infer<typeof signinSchema>;
 
@@ -44,15 +46,12 @@ type FieldErrors<T extends FieldValues = SigninFormData> = Partial<
 };
 
 const SigninScreen = () => {
+  const authUser = useAuthStore((s) => s.authUser);
+
   const [playAnimations, setPlayAnimations] = useState(true);
   const [errors, setErrors] = useState<FieldErrors>({});
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { isSubmitSuccessful },
-  } = useForm<SigninFormData>({
+  const { control, handleSubmit, reset } = useForm<SigninFormData>({
     defaultValues: {
       email: '',
       password: '',
@@ -63,8 +62,17 @@ const SigninScreen = () => {
   const { height: SCREEN_HEIGHT } = useWindowDimensions();
 
   const onSubmit: SubmitHandler<SigninFormData> = async (data) => {
+    const { email, password } = data;
+
     setErrors({});
-    console.log({ data });
+
+    try {
+      await signInAuthUser(email, password);
+      reset();
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.log('user sign in encountered an error', (error as Error).message);
+    }
   };
 
   const onError: SubmitErrorHandler<SigninFormData> = (errors) => {
@@ -79,16 +87,16 @@ const SigninScreen = () => {
     }
   }, [playAnimations]);
 
-  useEffect(() => {
-    reset();
-  }, [isSubmitSuccessful]);
-
   const FormContainer = styled(View, {
     flex: 1,
     justifyContent: 'space-around',
     paddingTop: 0.22 * SCREEN_HEIGHT,
     paddingBottom: 10,
   });
+
+  if (authUser) {
+    return <Redirect href="/(tabs)" />;
+  }
 
   return (
     <Container>

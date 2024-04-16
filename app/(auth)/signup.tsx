@@ -19,6 +19,7 @@ import { Text, View, styled, useWindowDimensions } from 'tamagui';
 import { FadeInUp, FadeInDown } from 'react-native-reanimated';
 
 import { signupSchema } from '../validationSchemas';
+import { createAuthUser, createUserDocument } from '../services/auth';
 import {
   AnimatedInputContainer,
   AnimatedLargeLight,
@@ -49,12 +50,7 @@ const SignupScreen = () => {
 
   const { height: SCREEN_HEIGHT } = useWindowDimensions();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { isSubmitSuccessful },
-  } = useForm<SignupFormData>({
+  const { control, handleSubmit, reset } = useForm<SignupFormData>({
     defaultValues: {
       username: '',
       email: '',
@@ -64,8 +60,20 @@ const SignupScreen = () => {
   });
 
   const onSubmit: SubmitHandler<SignupFormData> = async (data) => {
+    const { username, email, password } = data;
+
     setErrors({});
-    console.log({ data });
+
+    try {
+      const user = await createAuthUser(email, password);
+      if (user) {
+        await createUserDocument(user, username);
+        reset();
+        router.replace('/(tabs)');
+      }
+    } catch (error) {
+      console.log('user creation encountered an error', (error as Error).message);
+    }
   };
 
   const onError: SubmitErrorHandler<SignupFormData> = (errors) => {
@@ -79,10 +87,6 @@ const SignupScreen = () => {
       }, 2100);
     }
   }, [playAnimations]);
-
-  useEffect(() => {
-    reset();
-  }, [isSubmitSuccessful]);
 
   const FormContainer = styled(View, {
     flex: 1,
