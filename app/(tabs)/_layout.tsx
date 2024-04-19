@@ -39,6 +39,13 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
+        name="todo"
+        options={{
+          title: 'Todos',
+          tabBarIcon: ({ color }) => <TabBarIcon name="checksquareo" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="timer"
         options={{
           title: 'Timer',

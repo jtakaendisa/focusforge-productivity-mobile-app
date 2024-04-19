@@ -1,7 +1,11 @@
 import { User } from 'firebase/auth';
 
-type AuthUser = User & {
+export type AuthUser = User & {
   username?: string;
 };
 
-export { AuthUser };
+export interface Todo {
+  id: number;
+  title: string;
+  isFinished: boolean;
+}

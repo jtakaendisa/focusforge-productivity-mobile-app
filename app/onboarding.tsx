@@ -7,9 +7,9 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { data, OnboardingData } from '@/data';
-import OnboardingCard from './components/OnboardingCard';
-import Pagination from './components/Pagination';
-import CustomButton from './components/CustomButton';
+import OnboardingCard from './components/onboarding/OnboardingCard';
+import Pagination from './components/onboarding/Pagination';
+import CustomButton from './components/onboarding/CustomButton';
 
 const OnboardingScreen = () => {
   const flatlistRef = useRef(null);

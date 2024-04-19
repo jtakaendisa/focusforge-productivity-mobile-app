@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Stack } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { User } from 'firebase/auth';
 import { TamaguiProvider } from 'tamagui';
 
+import { useAuthStore } from './store';
 import config from '../tamagui.config';
 import { authStateChangeListener, formatAuthUserData } from './services/auth';
-import { User } from 'firebase/auth';
-import { useAuthStore } from './store';
 
 interface RootLayoutNavProps {
   onboarded: boolean;
@@ -69,9 +69,7 @@ export default function RootLayout() {
     const unsubscribe = authStateChangeListener(async (user: User) => {
       try {
         if (user) {
-          console.log({ user });
           const formattedAuthUser = await formatAuthUserData(user);
-          console.log({ formattedAuthUser });
           setAuthUser(formattedAuthUser);
         }
         setLoadedAuth(true);

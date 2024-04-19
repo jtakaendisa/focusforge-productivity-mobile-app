@@ -34,7 +34,7 @@ import {
   ErrorText,
   InputsContainer,
   LightsContainer,
-} from './_components';
+} from '../components/auth/styled';
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
