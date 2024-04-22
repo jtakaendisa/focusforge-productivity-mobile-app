@@ -1,5 +1,6 @@
 import { TextInput, TextInputComponent } from 'react-native';
 import { View, Text, styled } from 'tamagui';
+import { Animated, View as RNView } from 'react-native';
 
 //Todo Screen
 const Container = styled(View, {
@@ -21,7 +22,18 @@ const TaskContainer = styled(View, {
 
 const Title = styled(Text, {
   fontSize: 16,
-  color: '#303137',
+  variants: {
+    isFinished: {
+      true: {
+        color: '#898a8f',
+        textDecorationLine: 'line-through',
+      },
+      false: {
+        color: '#303137',
+        textDecorationLine: 'none',
+      },
+    } as const,
+  },
 });
 
 // CreateTodoItem

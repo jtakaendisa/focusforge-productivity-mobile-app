@@ -1,3 +1,4 @@
+import { Animated } from 'react-native';
 import { User } from 'firebase/auth';
 
 export type AuthUser = User & {
@@ -9,3 +10,5 @@ export interface Todo {
   title: string;
   isFinished: boolean;
 }
+
+export type AnimatedInterpolation = Animated.AnimatedInterpolation<string | number>;

@@ -1,7 +1,8 @@
-import React from 'react';
 import { Pressable } from 'react-native';
-import { Link, Tabs } from 'expo-router';
+import { Link, Redirect, Tabs } from 'expo-router';
 import AntDesign from '@expo/vector-icons/AntDesign';
+
+import { useAuthStore } from '../store';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof AntDesign>['name'];
@@ -11,6 +12,12 @@ function TabBarIcon(props: {
 }
 
 const TabLayout = () => {
+  const authUser = useAuthStore((s) => s.authUser);
+
+  if (!authUser) {
+    return <Redirect href="/(auth)" />;
+  }
+
   return (
     <Tabs
       screenOptions={{

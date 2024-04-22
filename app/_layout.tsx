@@ -92,10 +92,11 @@ export default function RootLayout() {
 function RootLayoutNav({ onboarded }: RootLayoutNavProps) {
   return (
     <TamaguiProvider config={config}>
-      <Stack screenOptions={{ headerShown: false }}>
-        {!onboarded && (
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        )}
+      <Stack
+        initialRouteName={!onboarded ? 'onboarding' : '(auth)'}
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

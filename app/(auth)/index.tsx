@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TextInput, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Redirect, router } from 'expo-router';
+import { router } from 'expo-router';
 import {
   Controller,
   DeepRequired,
@@ -18,7 +18,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Text, View, styled, useWindowDimensions } from 'tamagui';
 import { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
-import { useAuthStore } from '../store';
 import { signinSchema } from '../validationSchemas';
 import { signInAuthUser } from '../services/auth';
 import {
@@ -46,8 +45,6 @@ type FieldErrors<T extends FieldValues = SigninFormData> = Partial<
 };
 
 const SigninScreen = () => {
-  const authUser = useAuthStore((s) => s.authUser);
-
   const [playAnimations, setPlayAnimations] = useState(true);
   const [errors, setErrors] = useState<FieldErrors>({});
 
@@ -93,10 +90,6 @@ const SigninScreen = () => {
     paddingTop: 0.22 * SCREEN_HEIGHT,
     paddingBottom: 10,
   });
-
-  if (authUser) {
-    return <Redirect href="/(tabs)" />;
-  }
 
   return (
     <Container>
