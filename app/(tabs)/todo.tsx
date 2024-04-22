@@ -1,9 +1,9 @@
-import { FlatList } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 
 import { useTodoStore } from '../store';
 import TodoItem from '../components/tabs/todo/TodoItem';
 import CreateTodoItem from '../components/tabs/todo/CreateTodoItem';
-import { Container } from '../components/tabs/todo/styled';
+import { Container, ItemSeparator } from '../components/tabs/todo/styled';
 
 const TodoScreen = () => {
   const todos = useTodoStore((s) => s.todos);
@@ -23,12 +23,14 @@ const TodoScreen = () => {
 
   return (
     <Container>
-      <FlatList
+      <FlashList
         data={todos}
         renderItem={({ item }) => <TodoItem todo={item} onPress={handleTaskPress} />}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{ gap: 6 }}
-        ListHeaderComponent={<CreateTodoItem listLength={todos.length} />}
+        ItemSeparatorComponent={ItemSeparator}
+        estimatedItemSize={20}
+        ListHeaderComponent={() => <CreateTodoItem listLength={todos.length} />}
+        contentContainerStyle={{ padding: 10 }}
       />
     </Container>
   );

@@ -14,6 +14,8 @@ const CreateTodoItem = ({ listLength }: Props) => {
   const [newTodo, setNewTodo] = useState('');
 
   const handleTodoSubmit = () => {
+    if (!newTodo.length) return;
+
     const newFormattedTodo = {
       id: listLength,
       title: newTodo,

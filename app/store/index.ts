@@ -39,6 +39,81 @@ const dummyTodos = [
     title: 'Seperate into 2 tabs, ongoing and complete ',
     isFinished: false,
   },
+  {
+    id: 5,
+    title: 'Setup todo list structure',
+    isFinished: true,
+  },
+  {
+    id: 6,
+    title: 'Render a list of tasks',
+    isFinished: false,
+  },
+  {
+    id: 7,
+    title: 'Add a new task',
+    isFinished: false,
+  },
+  {
+    id: 8,
+    title: 'Change the status of a task',
+    isFinished: false,
+  },
+  {
+    id: 9,
+    title: 'Seperate into 2 tabs, ongoing and complete ',
+    isFinished: false,
+  },
+  {
+    id: 10,
+    title: 'Setup todo list structure',
+    isFinished: true,
+  },
+  {
+    id: 11,
+    title: 'Render a list of tasks',
+    isFinished: false,
+  },
+  {
+    id: 12,
+    title: 'Add a new task',
+    isFinished: false,
+  },
+  {
+    id: 13,
+    title: 'Change the status of a task',
+    isFinished: false,
+  },
+  {
+    id: 14,
+    title: 'Seperate into 2 tabs, ongoing and complete ',
+    isFinished: false,
+  },
+  {
+    id: 15,
+    title: 'Setup todo list structure',
+    isFinished: true,
+  },
+  {
+    id: 16,
+    title: 'Render a list of tasks',
+    isFinished: false,
+  },
+  {
+    id: 17,
+    title: 'Add a new task',
+    isFinished: false,
+  },
+  {
+    id: 18,
+    title: 'Change the status of a task',
+    isFinished: false,
+  },
+  {
+    id: 19,
+    title: 'Seperate into 2 tabs, ongoing and complete ',
+    isFinished: false,
+  },
 ];
 
 const useAuthStore = create<AuthStore>((set) => ({

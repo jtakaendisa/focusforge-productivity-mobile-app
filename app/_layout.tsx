@@ -28,6 +28,7 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const authUser = useAuthStore((s) => s.authUser);
   const setAuthUser = useAuthStore((s) => s.setAuthUser);
 
   const [onboarded, setOnboarded] = useState(false);
@@ -91,13 +92,12 @@ export default function RootLayout() {
 function RootLayoutNav({ onboarded }: RootLayoutNavProps) {
   return (
     <TamaguiProvider config={config}>
-      <Stack
-        initialRouteName={onboarded ? '(auth)' : 'onboarding'}
-        screenOptions={{ headerShown: false }}
-      >
+      <Stack screenOptions={{ headerShown: false }}>
+        {!onboarded && (
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        )}
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </TamaguiProvider>

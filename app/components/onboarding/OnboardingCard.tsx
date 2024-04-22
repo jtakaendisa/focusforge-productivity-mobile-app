@@ -57,7 +57,7 @@ const OnboardingCard = ({ item, index, x }: Props) => {
     position: 'absolute',
     top: 0,
     left: 0,
-    right: 0,
+    right: -0.25 * SCREEN_WIDTH,
     bottom: 0,
     justifyContent: 'flex-end',
     alignItems: 'center',
@@ -92,10 +92,7 @@ const OnboardingCard = ({ item, index, x }: Props) => {
         <AnimatedCircle style={circleAnimation} />
       </CircleContainer>
       <Animated.View style={lottieAnimation}>
-        <LottieImage
-          source={animation}
-          // autoPlay loop
-        />
+        <LottieImage source={animation} autoPlay loop />
       </Animated.View>
       <OnboardingText>{text}</OnboardingText>
     </Container>
