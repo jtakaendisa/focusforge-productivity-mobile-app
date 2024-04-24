@@ -6,9 +6,16 @@ import { AnimatedInterpolation } from '@/app/entities';
 interface Props {
   progressAnimatedValue: AnimatedInterpolation;
   dragAnimatedValue: AnimatedInterpolation;
+  id: number;
+  onDelete: (id: number) => void;
 }
 
-const TodoItemRightActions = ({ progressAnimatedValue, dragAnimatedValue }: Props) => {
+const TodoItemRightActions = ({
+  progressAnimatedValue,
+  dragAnimatedValue,
+  id,
+  onDelete,
+}: Props) => {
   const dragAnimation = {
     transform: [
       {
@@ -25,7 +32,12 @@ const TodoItemRightActions = ({ progressAnimatedValue, dragAnimatedValue }: Prop
 
   return (
     <AnimatedContainer style={[styles.bin, dragAnimation]}>
-      <MaterialCommunityIcons name="delete" size={24} color="gainsboro" />
+      <MaterialCommunityIcons
+        onPress={() => onDelete(id)}
+        name="delete"
+        size={24}
+        color="white"
+      />
     </AnimatedContainer>
   );
 };
@@ -35,8 +47,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'crimson',
     justifyContent: 'center',
     paddingHorizontal: 10,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
   },
 });
 

@@ -1,6 +1,5 @@
 import { TextInput, TextInputComponent } from 'react-native';
 import { View, Text, styled } from 'tamagui';
-import { Animated, View as RNView } from 'react-native';
 
 //Todo Screen
 const Container = styled(View, {
@@ -13,6 +12,7 @@ const ItemSeparator = styled(View, {
 });
 
 // TodoItem
+
 const TaskContainer = styled(View, {
   flexDirection: 'row',
   alignItems: 'center',

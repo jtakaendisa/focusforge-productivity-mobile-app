@@ -3,13 +3,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { useTodoStore } from '@/app/store';
 import { Input, TaskContainer } from './styled';
+import { Todo } from '@/app/entities';
 
 interface Props {
-  listLength: number;
+  todos: Todo[];
 }
 
-const CreateTodoItem = ({ listLength }: Props) => {
-  const addTodo = useTodoStore((s) => s.addTodo);
+const CreateTodoItem = ({ todos }: Props) => {
+  const setTodos = useTodoStore((s) => s.setTodos);
 
   const [newTodo, setNewTodo] = useState('');
 
@@ -17,12 +18,13 @@ const CreateTodoItem = ({ listLength }: Props) => {
     if (!newTodo.length) return;
 
     const newFormattedTodo = {
-      id: listLength,
+      id: todos.length,
       title: newTodo,
       isFinished: false,
     };
+    const updatedTodos = [...todos, newFormattedTodo];
 
-    addTodo(newFormattedTodo);
+    setTodos(updatedTodos);
     setNewTodo('');
   };
 
