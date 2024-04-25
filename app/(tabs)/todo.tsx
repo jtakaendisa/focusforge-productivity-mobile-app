@@ -1,16 +1,18 @@
+import { useEffect, useState } from 'react';
 import { FlashList } from '@shopify/flash-list';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useTodoStore } from '../store';
-import TodoItem from '../components/tabs/todo/TodoItem';
 import CreateTodoItem from '../components/tabs/todo/CreateTodoItem';
-import { Container, ItemSeparator } from '../components/tabs/todo/styled';
+import TodoItem from '../components/tabs/todo/TodoItem';
 import SearchBar from '../components/tabs/todo/SearchBar';
-import { useEffect, useState } from 'react';
+import FilterBar from '../components/tabs/todo/FilterBar';
+import { Container, ItemSeparator } from '../components/tabs/todo/styled';
 
 const TodoScreen = () => {
   const todos = useTodoStore((s) => s.todos);
   const searchQuery = useTodoStore((s) => s.searchQuery);
+  const filter = useTodoStore((s) => s.filter);
   const setTodos = useTodoStore((s) => s.setTodos);
 
   const [filteredTodos, setFilteredTodos] = useState(todos);
@@ -44,9 +46,31 @@ const TodoScreen = () => {
     }
   }, [searchQuery, todos]);
 
+  useEffect(() => {
+    let filteredTodos;
+
+    switch (filter) {
+      case 'all':
+        filteredTodos = todos;
+        break;
+      case 'open':
+        filteredTodos = todos.filter((todo) => todo.isFinished === false);
+        break;
+      case 'finished':
+        filteredTodos = todos.filter((todo) => todo.isFinished === true);
+        break;
+      default:
+        filteredTodos = todos;
+        break;
+    }
+
+    setFilteredTodos(filteredTodos);
+  }, [filter, todos]);
+
   return (
     <Container>
       <SearchBar />
+      <FilterBar />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <FlashList
           data={filteredTodos}

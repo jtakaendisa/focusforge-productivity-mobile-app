@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { AuthUser, Todo } from '../entities';
+import { AuthUser, Filter, Todo } from '../entities';
 
 interface AuthStore {
   authUser: AuthUser | null;
@@ -10,8 +10,10 @@ interface AuthStore {
 interface TodoStore {
   todos: Todo[];
   searchQuery: string;
+  filter: Filter;
   setTodos: (todos: Todo[]) => void;
   setSearchQuery: (searchQuery: string) => void;
+  setFilter: (filter: Filter) => void;
 }
 
 const dummyTodos = [
@@ -50,8 +52,10 @@ const useAuthStore = create<AuthStore>((set) => ({
 const useTodoStore = create<TodoStore>((set) => ({
   todos: dummyTodos,
   searchQuery: '',
+  filter: 'all',
   setTodos: (todos) => set((state) => ({ ...state, todos })),
   setSearchQuery: (searchQuery) => set((state) => ({ ...state, searchQuery })),
+  setFilter: (filter) => set((state) => ({ ...state, filter })),
 }));
 
 export { useAuthStore, useTodoStore };
