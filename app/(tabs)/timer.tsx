@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Vibration,
-  StatusBar,
-  Easing,
   TextInput,
   Dimensions,
   Animated,
   TouchableOpacity,
-  FlatList,
-  Text,
   View,
+  Text,
   StyleSheet,
+  Easing,
 } from 'react-native';
 const { width, height } = Dimensions.get('window');
 const colors = {
@@ -19,7 +17,9 @@ const colors = {
   text: '#ffffff',
 };
 
-const timers = [...Array(13).keys()].map((i) => (i === 0 ? 1 : i * 5));
+let timers = [...Array(13).keys()].map((i) => (i === 0 ? 1 : i * 5));
+timers = timers.slice(1);
+
 const ITEM_SIZE = width * 0.38;
 const ITEM_SPACING = (width - ITEM_SIZE) / 2;
 
@@ -29,7 +29,9 @@ const TimerScreen = () => {
   const textInputAnimation = useRef(new Animated.Value(0)).current;
   const buttonAnimation = useRef(new Animated.Value(0)).current;
   const inputRef = useRef<TextInput>(null);
+
   const [duration, setDuration] = useState(timers[0]);
+  const [countingDown, setCountingDown] = useState(false);
 
   const animation = useCallback(() => {
     textInputAnimation.setValue(duration);
@@ -47,12 +49,14 @@ const TimerScreen = () => {
       Animated.parallel([
         Animated.timing(textInputAnimation, {
           toValue: 0,
-          duration: duration * 1000,
+          duration: duration * 1000 * 60,
+          easing: Easing.linear,
           useNativeDriver: true,
         }),
         Animated.timing(timerAnimation, {
           toValue: height,
-          duration: duration * 1000,
+          duration: duration * 1000 * 60,
+          easing: Easing.linear,
           useNativeDriver: true,
         }),
       ]),
@@ -66,6 +70,7 @@ const TimerScreen = () => {
         duration: 300,
         useNativeDriver: true,
       }).start();
+      setCountingDown(false);
     });
   }, [duration]);
 
@@ -79,10 +84,21 @@ const TimerScreen = () => {
     outputRange: [0, 1],
   });
 
+  const handleCountdown = () => {
+    setCountingDown(true);
+    animation();
+  };
+
   useEffect(() => {
     const listener = textInputAnimation.addListener(({ value }) => {
+      const totalSeconds = value * 60;
+      const minutes = Math.floor(totalSeconds / 60);
+      const remainingSeconds = Math.floor(totalSeconds % 60);
+
       inputRef?.current?.setNativeProps({
-        text: Math.ceil(value).toString(),
+        text: `${minutes.toString().padStart(2, '0')}:${remainingSeconds
+          .toString()
+          .padStart(2, '0')}`,
       });
     });
 
@@ -91,7 +107,6 @@ const TimerScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
       <Animated.View
         style={[
           StyleSheet.absoluteFillObject,
@@ -102,7 +117,7 @@ const TimerScreen = () => {
             transform: [{ translateY: timerAnimation }],
           },
         ]}
-      ></Animated.View>
+      />
       <Animated.View
         style={[
           StyleSheet.absoluteFillObject,
@@ -113,8 +128,10 @@ const TimerScreen = () => {
           },
         ]}
       >
-        <TouchableOpacity onPress={animation}>
-          <View style={styles.roundButton} />
+        <TouchableOpacity onPress={handleCountdown}>
+          <View style={styles.roundButton}>
+            <Text style={{ color: 'white' }}>{countingDown ? 'pause' : 'start'}</Text>
+          </View>
         </TouchableOpacity>
       </Animated.View>
       <View
@@ -218,9 +235,11 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 80,
     backgroundColor: colors.red,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   text: {
-    fontSize: ITEM_SIZE * 0.8,
+    fontSize: ITEM_SIZE * 0.3,
     color: colors.text,
     fontWeight: '900',
   },
