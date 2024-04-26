@@ -9,8 +9,11 @@ import {
   Text,
   StyleSheet,
   Easing,
+  LayoutChangeEvent,
 } from 'react-native';
+
 const { width, height } = Dimensions.get('window');
+
 const colors = {
   black: '#323F4E',
   red: '#F76A6A',
@@ -20,18 +23,22 @@ const colors = {
 let timers = [...Array(13).keys()].map((i) => (i === 0 ? 1 : i * 5));
 timers = timers.slice(1);
 
+timers = [1, 2, 5];
+
 const ITEM_SIZE = width * 0.38;
 const ITEM_SPACING = (width - ITEM_SIZE) / 2;
 
 const TimerScreen = () => {
+  const [duration, setDuration] = useState(timers[0]);
+  const [countingDown, setCountingDown] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [containerHeight, setContainerHeight] = useState(height);
+
   const scrollX = useRef(new Animated.Value(0)).current;
-  const timerAnimation = useRef(new Animated.Value(height)).current;
+  const timerAnimation = useRef(new Animated.Value(containerHeight)).current;
   const textInputAnimation = useRef(new Animated.Value(0)).current;
   const buttonAnimation = useRef(new Animated.Value(0)).current;
   const inputRef = useRef<TextInput>(null);
-
-  const [duration, setDuration] = useState(timers[0]);
-  const [countingDown, setCountingDown] = useState(false);
 
   const animation = useCallback(() => {
     textInputAnimation.setValue(duration);
@@ -54,7 +61,7 @@ const TimerScreen = () => {
           useNativeDriver: true,
         }),
         Animated.timing(timerAnimation, {
-          toValue: height,
+          toValue: containerHeight,
           duration: duration * 1000 * 60,
           easing: Easing.linear,
           useNativeDriver: true,
@@ -62,17 +69,19 @@ const TimerScreen = () => {
       ]),
       Animated.delay(400),
     ]).start(() => {
-      Vibration.cancel();
-      Vibration.vibrate();
-      textInputAnimation.setValue(duration);
-      Animated.timing(buttonAnimation, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-      setCountingDown(false);
+      if (!resetting) {
+        Vibration.cancel();
+        Vibration.vibrate();
+        textInputAnimation.setValue(duration);
+        Animated.timing(buttonAnimation, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+        setCountingDown(false);
+      }
     });
-  }, [duration]);
+  }, [duration, resetting, containerHeight]);
 
   const opacity = buttonAnimation.interpolate({
     inputRange: [0, 1],
@@ -84,9 +93,23 @@ const TimerScreen = () => {
     outputRange: [0, 1],
   });
 
+  const handleLayout = (event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout;
+    setContainerHeight(height);
+  };
+
   const handleCountdown = () => {
     setCountingDown(true);
+    setResetting(false);
     animation();
+  };
+
+  const handleReset = () => {
+    setResetting(true);
+    textInputAnimation.setValue(duration);
+    timerAnimation.setValue(containerHeight);
+    buttonAnimation.setValue(0);
+    setCountingDown(false);
   };
 
   useEffect(() => {
@@ -106,7 +129,7 @@ const TimerScreen = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onLayout={handleLayout}>
       <Animated.View
         style={[
           StyleSheet.absoluteFillObject,
@@ -128,16 +151,16 @@ const TimerScreen = () => {
           },
         ]}
       >
-        <TouchableOpacity onPress={handleCountdown}>
+        <TouchableOpacity onPress={countingDown ? handleReset : handleCountdown}>
           <View style={styles.roundButton}>
-            <Text style={{ color: 'white' }}>{countingDown ? 'pause' : 'start'}</Text>
+            <Text style={{ color: 'white' }}>{countingDown ? 'reset' : 'start'}</Text>
           </View>
         </TouchableOpacity>
       </Animated.View>
       <View
         style={{
           position: 'absolute',
-          top: height / 3,
+          top: containerHeight / 3,
           left: 0,
           right: 0,
           flex: 1,
