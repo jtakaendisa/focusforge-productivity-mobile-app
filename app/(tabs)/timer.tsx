@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Vibration,
   TextInput,
@@ -12,37 +12,74 @@ import {
   LayoutChangeEvent,
 } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
-
 const colors = {
   black: '#323F4E',
   red: '#F76A6A',
   text: '#ffffff',
 };
 
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
 let timers = [...Array(13).keys()].map((i) => (i === 0 ? 1 : i * 5));
 timers = timers.slice(1);
 
 timers = [1, 2, 5];
 
-const ITEM_SIZE = width * 0.38;
-const ITEM_SPACING = (width - ITEM_SIZE) / 2;
+const ITEM_SIZE = SCREEN_WIDTH * 0.38;
+const ITEM_SPACING = (SCREEN_WIDTH - ITEM_SIZE) / 2;
 
 const TimerScreen = () => {
-  const [duration, setDuration] = useState(timers[0]);
-  const [countingDown, setCountingDown] = useState(false);
-  const [resetting, setResetting] = useState(false);
-  const [containerHeight, setContainerHeight] = useState(height);
-
   const scrollX = useRef(new Animated.Value(0)).current;
-  const timerAnimation = useRef(new Animated.Value(containerHeight)).current;
+  const timerAnimation = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const textInputAnimation = useRef(new Animated.Value(0)).current;
   const buttonAnimation = useRef(new Animated.Value(0)).current;
   const inputRef = useRef<TextInput>(null);
+  const animation = useRef<Animated.CompositeAnimation | null>(null);
 
-  const animation = useCallback(() => {
+  const [duration, setDuration] = useState(timers[0]);
+  const [countingDown, setCountingDown] = useState(false);
+  const [containerHeight, setContainerHeight] = useState<number | null>(null);
+
+  const opacity = buttonAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0],
+  });
+
+  const textOpacity = buttonAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
+
+  const handleStartCountdown = () => {
+    setCountingDown(true);
     textInputAnimation.setValue(duration);
-    Animated.sequence([
+    animation?.current?.start(() => {
+      Vibration.cancel();
+      Vibration.vibrate();
+      textInputAnimation.setValue(duration);
+      Animated.timing(buttonAnimation, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+      setCountingDown(false);
+    });
+  };
+
+  const handleResetCountdown = () => {
+    animation?.current?.reset();
+    setCountingDown(false);
+  };
+
+  const handleLayout = (event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout;
+    setContainerHeight(height);
+  };
+
+  useEffect(() => {
+    if (!containerHeight) return;
+
+    animation.current = Animated.sequence([
       Animated.timing(buttonAnimation, {
         toValue: 1,
         duration: 200,
@@ -68,49 +105,8 @@ const TimerScreen = () => {
         }),
       ]),
       Animated.delay(400),
-    ]).start(() => {
-      if (!resetting) {
-        Vibration.cancel();
-        Vibration.vibrate();
-        textInputAnimation.setValue(duration);
-        Animated.timing(buttonAnimation, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-        setCountingDown(false);
-      }
-    });
-  }, [duration, resetting, containerHeight]);
-
-  const opacity = buttonAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0],
-  });
-
-  const textOpacity = buttonAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  });
-
-  const handleLayout = (event: LayoutChangeEvent) => {
-    const { height } = event.nativeEvent.layout;
-    setContainerHeight(height);
-  };
-
-  const handleCountdown = () => {
-    setCountingDown(true);
-    setResetting(false);
-    animation();
-  };
-
-  const handleReset = () => {
-    setResetting(true);
-    textInputAnimation.setValue(duration);
-    timerAnimation.setValue(containerHeight);
-    buttonAnimation.setValue(0);
-    setCountingDown(false);
-  };
+    ]);
+  }, [containerHeight]);
 
   useEffect(() => {
     const listener = textInputAnimation.addListener(({ value }) => {
@@ -134,8 +130,8 @@ const TimerScreen = () => {
         style={[
           StyleSheet.absoluteFillObject,
           {
-            width,
-            height,
+            width: SCREEN_WIDTH,
+            height: SCREEN_HEIGHT,
             backgroundColor: colors.red,
             transform: [{ translateY: timerAnimation }],
           },
@@ -151,8 +147,15 @@ const TimerScreen = () => {
           },
         ]}
       >
-        <TouchableOpacity onPress={countingDown ? handleReset : handleCountdown}>
-          <View style={styles.roundButton}>
+        <TouchableOpacity
+          onPress={countingDown ? handleResetCountdown : handleStartCountdown}
+        >
+          <View
+            style={[
+              styles.roundButton,
+              { backgroundColor: countingDown ? colors.black : colors.red },
+            ]}
+          >
             <Text style={{ color: 'white' }}>{countingDown ? 'reset' : 'start'}</Text>
           </View>
         </TouchableOpacity>
@@ -160,7 +163,7 @@ const TimerScreen = () => {
       <View
         style={{
           position: 'absolute',
-          top: containerHeight / 3,
+          top: SCREEN_HEIGHT / 3,
           left: 0,
           right: 0,
           flex: 1,
@@ -257,7 +260,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 80,
-    backgroundColor: colors.red,
     justifyContent: 'center',
     alignItems: 'center',
   },
