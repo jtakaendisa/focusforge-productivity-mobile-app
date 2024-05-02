@@ -1,16 +1,6 @@
 import { TextInput, TextInputComponent } from 'react-native';
 import { View, Text, styled } from 'tamagui';
 
-//Todo Screen
-const Container = styled(View, {
-  flex: 1,
-  backgroundColor: 'white',
-});
-
-const ItemSeparator = styled(View, {
-  height: 6,
-});
-
 // TodoItem
 
 const TaskContainer = styled(View, {
@@ -47,4 +37,4 @@ const Input = styled(
   TextInputComponent
 );
 
-export { Container, ItemSeparator, TaskContainer, Title, Input };
+export { TaskContainer, Title, Input };
