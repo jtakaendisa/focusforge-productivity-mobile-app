@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { Todo } from '@/app/entities';
 import { useTodoStore } from '@/app/store';
 import { Input, TaskContainer } from './styled';
-import { Todo } from '@/app/entities';
 
 interface Props {
   todos: Todo[];

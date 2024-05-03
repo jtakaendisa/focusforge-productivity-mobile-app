@@ -16,6 +16,12 @@ interface TodoStore {
   setFilter: (filter: Filter) => void;
 }
 
+enum PriorityType {
+  low = 'Low',
+  normal = 'Normal',
+  high = 'High',
+}
+
 const dummyTodos = [
   {
     id: 0,
@@ -44,6 +50,24 @@ const dummyTodos = [
   },
 ];
 
+const categoryArray = [
+  'Task',
+  'Quit a bad habit',
+  'Art',
+  'Meditation',
+  'Study',
+  'Sports',
+  'Entertainment',
+  'Social',
+  'Finance',
+  'Health',
+  'Work',
+  'Nutrition',
+  'Home',
+  'Outdoor',
+  'Other',
+] as const;
+
 const useAuthStore = create<AuthStore>((set) => ({
   authUser: null,
   setAuthUser: (authUser) => set((state) => ({ ...state, authUser })),
@@ -58,4 +82,4 @@ const useTodoStore = create<TodoStore>((set) => ({
   setFilter: (filter) => set((state) => ({ ...state, filter })),
 }));
 
-export { useAuthStore, useTodoStore };
+export { useAuthStore, useTodoStore, categoryArray, PriorityType };

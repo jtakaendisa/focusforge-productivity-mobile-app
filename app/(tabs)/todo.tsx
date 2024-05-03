@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Pressable } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { FlashList } from '@shopify/flash-list';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { View, Text, styled } from 'tamagui';
 
 import { Todo } from '../entities';
@@ -99,8 +100,12 @@ const TodoScreen = () => {
       </Pressable>
       {isOpen && (
         <>
-          <Backdrop onPress={() => setIsOpen((prev) => !prev)} />
-          <FrequencySelector />
+          <AnimatedBackdrop
+            entering={FadeIn}
+            exiting={FadeOut}
+            onPress={() => setIsOpen((prev) => !prev)}
+          />
+          <FrequencySelector onClose={() => setIsOpen((prev) => !prev)} />
         </>
       )}
     </Container>
@@ -138,5 +143,7 @@ const Backdrop = styled(View, {
   zIndex: 1,
   backgroundColor: 'rgba(0, 0, 0, 0.3)',
 });
+
+const AnimatedBackdrop = Animated.createAnimatedComponent(Backdrop);
 
 export default TodoScreen;
