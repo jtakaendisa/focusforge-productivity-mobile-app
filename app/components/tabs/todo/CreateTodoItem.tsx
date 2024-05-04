@@ -1,26 +1,25 @@
 import { useState } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import uuid from 'react-native-uuid';
 
 import { Todo } from '@/app/entities';
-import { useTodoStore } from '@/app/store';
 import { Input, TaskContainer } from './styled';
 
 interface Props {
   todos: Todo[];
+  setTodos: (todos: Todo[]) => void;
 }
 
-const CreateTodoItem = ({ todos }: Props) => {
-  const setTodos = useTodoStore((s) => s.setTodos);
-
+const CreateTodoItem = ({ todos, setTodos }: Props) => {
   const [newTodo, setNewTodo] = useState('');
 
   const handleTodoSubmit = () => {
     if (!newTodo.length) return;
 
     const newFormattedTodo = {
-      id: todos.length,
-      title: newTodo,
-      isFinished: false,
+      id: uuid.v4() as string,
+      task: newTodo,
+      isCompleted: false,
     };
     const updatedTodos = [...todos, newFormattedTodo];
 

@@ -4,9 +4,9 @@ import { User } from 'firebase/auth';
 import { PriorityType, categoryArray } from '../store';
 
 export interface Todo {
-  id: number;
-  title: string;
-  isFinished: boolean;
+  id: string;
+  task: string;
+  isCompleted: boolean;
 }
 
 export type AuthUser = User & {
@@ -15,7 +15,7 @@ export type AuthUser = User & {
 
 export type AnimatedInterpolation = Animated.AnimatedInterpolation<string | number>;
 
-export type Filter = 'all' | 'open' | 'finished';
+export type Filter = 'all' | 'open' | 'completed';
 
 export type Category = (typeof categoryArray)[number];
 

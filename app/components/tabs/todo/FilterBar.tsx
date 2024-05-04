@@ -12,8 +12,8 @@ const FilterBar = () => {
       <Text onPress={() => setFilter('open')} color="black">
         Open
       </Text>
-      <Text onPress={() => setFilter('finished')} color="black">
-        Finished
+      <Text onPress={() => setFilter('completed')} color="black">
+        Completed
       </Text>
     </Container>
   );

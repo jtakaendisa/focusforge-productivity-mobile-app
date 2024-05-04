@@ -24,29 +24,29 @@ enum PriorityType {
 
 const dummyTodos = [
   {
-    id: 0,
-    title: 'Setup todo list structure',
-    isFinished: true,
+    id: '0',
+    task: 'Setup todo list structure',
+    isCompleted: true,
   },
   {
-    id: 1,
-    title: 'Render a list of tasks',
-    isFinished: false,
+    id: '1',
+    task: 'Render a list of tasks',
+    isCompleted: false,
   },
   {
-    id: 2,
-    title: 'Add a new task',
-    isFinished: false,
+    id: '2',
+    task: 'Add a new task',
+    isCompleted: false,
   },
   {
-    id: 3,
-    title: 'Change the status of a task',
-    isFinished: false,
+    id: '3',
+    task: 'Change the status of a task',
+    isCompleted: false,
   },
   {
-    id: 4,
-    title: 'Seperate into 2 tabs, ongoing and complete ',
-    isFinished: false,
+    id: '4',
+    task: 'Seperate into 2 tabs, ongoing and complete ',
+    isCompleted: false,
   },
 ];
 

@@ -9,12 +9,12 @@ import { TaskContainer, Title } from './styled';
 
 interface Props {
   todo: Todo;
-  onPress: (id: number) => void;
-  onDelete: (id: number) => void;
+  onPress: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 const TodoItem = ({ todo, onPress, onDelete }: Props) => {
-  const { id, title, isFinished } = todo;
+  const { id, task, isCompleted } = todo;
 
   return (
     <Animated.View entering={FadeInLeft} exiting={FadeOutLeft}>
@@ -32,14 +32,14 @@ const TodoItem = ({ todo, onPress, onDelete }: Props) => {
           <TaskContainer>
             <MaterialCommunityIcons
               name={
-                isFinished
+                isCompleted
                   ? 'checkbox-marked-circle-outline'
                   : 'checkbox-blank-circle-outline'
               }
               size={24}
-              color={isFinished ? 'green' : 'dimgray'}
+              color={isCompleted ? 'green' : 'dimgray'}
             />
-            <Title isFinished={isFinished}>{title}</Title>
+            <Title isCompleted={isCompleted}>{task}</Title>
           </TaskContainer>
         </Pressable>
       </Swipeable>

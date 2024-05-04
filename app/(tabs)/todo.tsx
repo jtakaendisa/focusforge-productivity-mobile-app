@@ -7,7 +7,6 @@ import { View, Text, styled } from 'tamagui';
 
 import { Todo } from '../entities';
 import { useTodoStore } from '../store';
-import CreateTodoItem from '../components/tabs/todo/CreateTodoItem';
 import TodoItem from '../components/tabs/todo/TodoItem';
 import SearchBar from '../components/tabs/todo/SearchBar';
 import FilterBar from '../components/tabs/todo/FilterBar';
@@ -22,12 +21,12 @@ const TodoScreen = () => {
   const [filteredTodos, setFilteredTodos] = useState(todos);
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleTaskPress = (id: number) => {
+  const handleTaskPress = (id: string) => {
     const updatedTodos = todos.map((todo) => {
       if (todo.id === id) {
         return {
           ...todo,
-          isFinished: !todo.isFinished,
+          isCompleted: !todo.isCompleted,
         };
       }
       return todo;
@@ -35,7 +34,7 @@ const TodoScreen = () => {
     setTodos(updatedTodos);
   };
 
-  const handleTaskDelete = (id: number) => {
+  const handleTaskDelete = (id: string) => {
     const filteredTodos = todos.filter((todo) => todo.id !== id);
     setTodos(filteredTodos);
   };
@@ -43,7 +42,7 @@ const TodoScreen = () => {
   useEffect(() => {
     if (searchQuery.length) {
       const filteredTodos = todos.filter((todo) =>
-        todo.title.toLowerCase().includes(searchQuery)
+        todo.task.toLowerCase().includes(searchQuery)
       );
       setFilteredTodos(filteredTodos);
     } else {
@@ -59,10 +58,10 @@ const TodoScreen = () => {
         filteredTodos = todos;
         break;
       case 'open':
-        filteredTodos = todos.filter((todo) => todo.isFinished === false);
+        filteredTodos = todos.filter((todo) => todo.isCompleted === false);
         break;
-      case 'finished':
-        filteredTodos = todos.filter((todo) => todo.isFinished === true);
+      case 'completed':
+        filteredTodos = todos.filter((todo) => todo.isCompleted === true);
         break;
       default:
         filteredTodos = todos;
@@ -86,10 +85,9 @@ const TodoScreen = () => {
               onDelete={handleTaskDelete}
             />
           )}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id}
           ItemSeparatorComponent={ItemSeparator}
           estimatedItemSize={20}
-          ListHeaderComponent={() => <CreateTodoItem todos={todos} />}
           contentContainerStyle={{ padding: 10 }}
         />
       </GestureHandlerRootView>

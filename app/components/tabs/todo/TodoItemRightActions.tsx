@@ -6,8 +6,8 @@ import { AnimatedInterpolation } from '@/app/entities';
 interface Props {
   progressAnimatedValue: AnimatedInterpolation;
   dragAnimatedValue: AnimatedInterpolation;
-  id: number;
-  onDelete: (id: number) => void;
+  id: string;
+  onDelete: (id: string) => void;
 }
 
 const TodoItemRightActions = ({

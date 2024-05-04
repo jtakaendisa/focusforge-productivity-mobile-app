@@ -1,47 +1,75 @@
-import React, { useState } from 'react';
-import { KeyboardAvoidingView, TextInput } from 'react-native';
+import { useRef, useState } from 'react';
+import { TextInput } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import {
+  DateTimePickerAndroid,
+  DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
 import { styled, Text, View } from 'tamagui';
 
 import { PriorityType } from './store';
 import { toFormattedDateString } from './utils';
 import { taskSchema } from './validationSchemas';
 import CategoryModal from './components/tabs/todo/modals/CategoryModal';
+import ChecklistModal from './components/tabs/todo/modals/ChecklistModal';
 import PriorityModal from './components/tabs/todo/modals/PriorityModal';
 import NoteModal from './components/tabs/todo/modals/NoteModal';
 
 export type NewTaskData = z.infer<typeof taskSchema>;
 
+const TODAYS_DATE = toFormattedDateString(new Date());
+
 const NewTaskScreen = () => {
   const [modalState, setModalState] = useState({
     categoryIsOpen: false,
-    dateIsOpen: false,
+    checklistIsOpen: false,
     priorityIsOpen: false,
     noteIsOpen: false,
   });
+
+  const setDueDateRef = useRef<((...event: any[]) => void) | null>(null);
 
   const { control, handleSubmit, reset, watch } = useForm<NewTaskData>({
     defaultValues: {
       task: '',
       category: 'Task',
-      dueDate: toFormattedDateString(new Date()),
+      dueDate: TODAYS_DATE,
       priority: PriorityType.normal,
+      checklist: [],
       note: '',
-      isPending: true,
+      isCarriedOver: true,
     },
     resolver: zodResolver(taskSchema),
   });
 
   const watchAllFields = watch();
 
-  const { categoryIsOpen, dateIsOpen, noteIsOpen, priorityIsOpen } = modalState;
+  const handleDateSelect = (
+    event: DateTimePickerEvent,
+    selectedDate: Date | undefined
+  ) => {
+    if (selectedDate) {
+      setDueDateRef.current?.(toFormattedDateString(selectedDate));
+    }
+  };
 
-  const { category, dueDate, priority, note } = watchAllFields;
+  const showMode = () => {
+    DateTimePickerAndroid.open({
+      value: new Date(),
+      onChange: handleDateSelect,
+      is24Hour: true,
+    });
+  };
+
+  const { categoryIsOpen, checklistIsOpen, priorityIsOpen, noteIsOpen } = modalState;
+
+  const { category, dueDate, checklist, priority, note, isCarriedOver } =
+    watchAllFields;
 
   return (
     <Container>
@@ -79,21 +107,34 @@ const NewTaskScreen = () => {
           <OptionIcon></OptionIcon>
           <OptionHeading>Date</OptionHeading>
         </OptionInfo>
-        <OptionValuePicker
-          onPress={() => setModalState({ ...modalState, dateIsOpen: true })}
-        ></OptionValuePicker>
+        <OptionValuePicker onPress={() => showMode()}>
+          <Controller
+            control={control}
+            name="dueDate"
+            render={({ field: { onChange } }) => {
+              setDueDateRef.current = onChange;
+              return (
+                <Text color="black">{dueDate === TODAYS_DATE ? 'Today' : dueDate}</Text>
+              );
+            }}
+          />
+        </OptionValuePicker>
       </OptionContainer>
       <Separator />
-
-      {/* <OptionContainer>
+      <OptionContainer>
         <OptionInfo>
           <OptionIcon></OptionIcon>
           <OptionHeading>Checklist</OptionHeading>
         </OptionInfo>
-        <OptionValuePicker></OptionValuePicker>
+        <OptionValuePicker
+          onPress={() => setModalState({ ...modalState, checklistIsOpen: true })}
+        >
+          <Text color="black">
+            {checklist.length} sub {checklist.length === 1 ? 'task' : 'tasks'}
+          </Text>
+        </OptionValuePicker>
       </OptionContainer>
-      <Separator /> */}
-
+      <Separator />
       <OptionContainer>
         <OptionInfo>
           <OptionIcon></OptionIcon>
@@ -130,7 +171,7 @@ const NewTaskScreen = () => {
         <OptionValuePicker>
           <Controller
             control={control}
-            name="isPending"
+            name="isCarriedOver"
             render={({ field: { onChange } }) => (
               <BouncyCheckbox
                 size={25}
@@ -138,6 +179,7 @@ const NewTaskScreen = () => {
                 unFillColor="#FFFFFF"
                 iconStyle={{ borderColor: 'red' }}
                 innerIconStyle={{ borderWidth: 2 }}
+                isChecked={isCarriedOver}
                 onPress={(isChecked) => onChange(isChecked)}
               />
             )}
@@ -161,16 +203,12 @@ const NewTaskScreen = () => {
           closeModal={() => setModalState({ ...modalState, categoryIsOpen: false })}
         />
       )}
-      {/* {dateIsOpen && (
-        <Modal
-          dismissKeyboard
-          closeModal={() => setModalState({ ...modalState, dateIsOpen: false })}
-        >
-          <ModalHeading>
-            <Text>Select a category</Text>
-          </ModalHeading>
-        </Modal>
-      )} */}
+      {checklistIsOpen && (
+        <ChecklistModal
+          control={control}
+          closeModal={() => setModalState({ ...modalState, checklistIsOpen: false })}
+        />
+      )}
       {priorityIsOpen && (
         <PriorityModal
           dismissKeyboard
@@ -251,7 +289,7 @@ const Separator = styled(View, {
   marginLeft: '-5%',
 });
 
-const ButtonsContainer = styled(KeyboardAvoidingView, {
+const ButtonsContainer = styled(View, {
   flexDirection: 'row',
   position: 'absolute',
   bottom: 0,
@@ -260,6 +298,7 @@ const ButtonsContainer = styled(KeyboardAvoidingView, {
   paddingVertical: 20,
   borderTopWidth: 1,
   borderColor: '#ccc',
+  backgroundColor: 'white',
 });
 
 const Button = styled(View, {

@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Control, Controller } from 'react-hook-form';
 import { Text, View, styled } from 'tamagui';
 
@@ -5,7 +6,6 @@ import { Priority } from '@/app/entities';
 import { PriorityType } from '@/app/store';
 import { NewTaskData } from '@/app/newTask';
 import ModalContainer, { ModalHeading } from './ModalContainer';
-import { useRef } from 'react';
 
 interface Props {
   control: Control<NewTaskData>;
