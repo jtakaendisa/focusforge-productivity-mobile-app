@@ -5,6 +5,7 @@ import { Priority } from '@/app/entities';
 import { PriorityType } from '@/app/store';
 import { NewTaskData } from '@/app/newTask';
 import ModalContainer, { ModalHeading } from './ModalContainer';
+import { useRef } from 'react';
 
 interface Props {
   control: Control<NewTaskData>;
@@ -19,6 +20,9 @@ const PriorityModal = ({
   dismissKeyboard,
   closeModal,
 }: Props) => {
+  const previousPriorityRef = useRef<Priority>(currentPriority);
+  const restorePreviousPriorityRef = useRef<((...event: any[]) => void) | null>(null);
+
   return (
     <ModalContainer dismissKeyboard={dismissKeyboard} closeModal={closeModal}>
       <ModalHeading>
@@ -29,48 +33,61 @@ const PriorityModal = ({
           <Controller
             control={control}
             name="priority"
-            render={({ field: { onChange } }) => (
-              <>
-                <PriorityButton
-                  style={{
-                    borderRightWidth: 1,
-                    backgroundColor:
-                      currentPriority === PriorityType.low ? 'red' : '#a5a3a3',
-                  }}
-                  onPress={() => onChange(PriorityType.low)}
-                >
-                  <Text>{PriorityType.low}</Text>
-                </PriorityButton>
-                <PriorityButton
-                  style={{
-                    backgroundColor:
-                      currentPriority === PriorityType.normal ? 'red' : '#a5a3a3',
-                  }}
-                  onPress={() => onChange(PriorityType.normal)}
-                >
-                  <Text>{PriorityType.normal}</Text>
-                </PriorityButton>
-                <PriorityButton
-                  style={{
-                    borderLeftWidth: 1,
-                    backgroundColor:
-                      currentPriority === PriorityType.high ? 'red' : '#a5a3a3',
-                  }}
-                  onPress={() => onChange(PriorityType.high)}
-                >
-                  <Text>{PriorityType.high}</Text>
-                </PriorityButton>
-              </>
-            )}
+            render={({ field: { onChange } }) => {
+              restorePreviousPriorityRef.current = onChange;
+              return (
+                <>
+                  <PriorityButton
+                    style={{
+                      borderRightWidth: 1,
+                      backgroundColor:
+                        currentPriority === PriorityType.low ? 'red' : '#a5a3a3',
+                    }}
+                    onPress={() => onChange(PriorityType.low)}
+                  >
+                    <Text>{PriorityType.low}</Text>
+                  </PriorityButton>
+                  <PriorityButton
+                    style={{
+                      backgroundColor:
+                        currentPriority === PriorityType.normal ? 'red' : '#a5a3a3',
+                    }}
+                    onPress={() => onChange(PriorityType.normal)}
+                  >
+                    <Text>{PriorityType.normal}</Text>
+                  </PriorityButton>
+                  <PriorityButton
+                    style={{
+                      borderLeftWidth: 1,
+                      backgroundColor:
+                        currentPriority === PriorityType.high ? 'red' : '#a5a3a3',
+                    }}
+                    onPress={() => onChange(PriorityType.high)}
+                  >
+                    <Text>{PriorityType.high}</Text>
+                  </PriorityButton>
+                </>
+              );
+            }}
           />
         </PrioritiesRow>
       </PrioritiesContainer>
       <PriorityInfo>
         <Text>Higher priority activities will be displayed higher in the list</Text>
       </PriorityInfo>
-      <CloseButton onPress={() => closeModal()}>
-        <Text color="red">CLOSE</Text>
-      </CloseButton>
+      <ButtonsContainer>
+        <Button
+          onPress={() => {
+            restorePreviousPriorityRef.current?.(previousPriorityRef.current);
+            closeModal();
+          }}
+        >
+          <Text>CANCEL</Text>
+        </Button>
+        <Button onPress={() => closeModal()}>
+          <Text color="red">OK</Text>
+        </Button>
+      </ButtonsContainer>
     </ModalContainer>
   );
 };
@@ -101,10 +118,15 @@ const PriorityInfo = styled(View, {
   padding: 8,
 });
 
-const CloseButton = styled(View, {
+const ButtonsContainer = styled(View, {
+  flexDirection: 'row',
+  padding: 8,
+});
+
+const Button = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
-  padding: 8,
+  width: '50%',
 });
 
 export default PriorityModal;

@@ -50,8 +50,7 @@ const Backdrop = styled(View, {
 });
 
 const Modal = styled(View, {
-  minWidth: '60%',
-  maxWidth: '80%',
+  width: '80%',
   padding: 16,
   paddingTop: 0,
   borderRadius: 12,

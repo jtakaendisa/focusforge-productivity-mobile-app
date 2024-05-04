@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import { styled, Text, View } from 'tamagui';
 
 import { PriorityType } from './store';
@@ -12,6 +13,7 @@ import { toFormattedDateString } from './utils';
 import { taskSchema } from './validationSchemas';
 import CategoryModal from './components/tabs/todo/modals/CategoryModal';
 import PriorityModal from './components/tabs/todo/modals/PriorityModal';
+import NoteModal from './components/tabs/todo/modals/NoteModal';
 
 export type NewTaskData = z.infer<typeof taskSchema>;
 
@@ -39,7 +41,7 @@ const NewTaskScreen = () => {
 
   const { categoryIsOpen, dateIsOpen, noteIsOpen, priorityIsOpen } = modalState;
 
-  const { category, dueDate, priority, note, isPending } = watchAllFields;
+  const { category, dueDate, priority, note } = watchAllFields;
 
   return (
     <Container>
@@ -111,7 +113,13 @@ const NewTaskScreen = () => {
         </OptionInfo>
         <OptionValuePicker
           onPress={() => setModalState({ ...modalState, noteIsOpen: true })}
-        ></OptionValuePicker>
+        >
+          <Text color="black">
+            {note.length > 0
+              ? note.substring(0, 8) + (note.length >= 8 ? '...' : '')
+              : ''}
+          </Text>
+        </OptionValuePicker>
       </OptionContainer>
       <Separator />
       <OptionContainer>
@@ -119,7 +127,22 @@ const NewTaskScreen = () => {
           <OptionIcon></OptionIcon>
           <OptionHeading>Pending Task</OptionHeading>
         </OptionInfo>
-        <OptionValuePicker></OptionValuePicker>
+        <OptionValuePicker>
+          <Controller
+            control={control}
+            name="isPending"
+            render={({ field: { onChange } }) => (
+              <BouncyCheckbox
+                size={25}
+                fillColor="red"
+                unFillColor="#FFFFFF"
+                iconStyle={{ borderColor: 'red' }}
+                innerIconStyle={{ borderWidth: 2 }}
+                onPress={(isChecked) => onChange(isChecked)}
+              />
+            )}
+          />
+        </OptionValuePicker>
       </OptionContainer>
       <Separator />
       <ButtonsContainer>
@@ -150,17 +173,19 @@ const NewTaskScreen = () => {
       )} */}
       {priorityIsOpen && (
         <PriorityModal
-          currentPriority={priority}
           dismissKeyboard
+          currentPriority={priority}
           control={control}
           closeModal={() => setModalState({ ...modalState, priorityIsOpen: false })}
         />
       )}
-      {/* {noteIsOpen && (
-        <Modal closeModal={() => setModalState({ ...modalState, noteIsOpen: false })}>
-          <Text>Note</Text>
-        </Modal>
-      )} */}
+      {noteIsOpen && (
+        <NoteModal
+          control={control}
+          previousNote={note}
+          closeModal={() => setModalState({ ...modalState, noteIsOpen: false })}
+        />
+      )}
     </Container>
   );
 };
