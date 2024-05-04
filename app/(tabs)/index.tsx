@@ -1,15 +1,26 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dimensions, FlatList } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { FlashList } from '@shopify/flash-list';
 import moment from 'moment';
 import { View, Text, styled } from 'tamagui';
 
+import { Todo } from '../entities';
+import { useTodoStore } from '../store';
 import CalendarCard from '../components/tabs/home/CalendarCard';
+import TodoItem from '../components/tabs/todo/TodoItem';
+import { toFormattedDateString } from '../utils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+const TODAYS_DATE = new Date();
+
 const HomeScreen = () => {
-  const [value, setValue] = useState<Date>(new Date());
+  const todos = useTodoStore((s) => s.todos);
+
+  const [value, setValue] = useState<Date>(TODAYS_DATE);
   const [week, setWeek] = useState(0);
+  const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
 
   const flatListRef = useRef<FlatList | null>(null);
 
@@ -52,10 +63,21 @@ const HomeScreen = () => {
     }, 1);
   };
 
+  useEffect(() => {
+    const filteredTodos = todos.filter(
+      (todo) => todo.dueDate === toFormattedDateString(value)
+    );
+    setFilteredTodos(filteredTodos);
+  }, [todos, value]);
+
   return (
     <Container>
       <TitleContainer>
-        <Title>Your Schedule</Title>
+        <Title>
+          {TODAYS_DATE.toDateString() === value.toDateString()
+            ? 'Today'
+            : value.toDateString()}
+        </Title>
       </TitleContainer>
       <DatePickerContainer>
         <DatePickerRow>
@@ -79,9 +101,24 @@ const HomeScreen = () => {
           />
         </DatePickerRow>
       </DatePickerContainer>
-      <DateHeading>
-        <Text color="#1d1d1d">{value.toDateString()}</Text>
-      </DateHeading>
+      <TodosContainer>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <FlashList
+            data={filteredTodos}
+            renderItem={({ item }) => (
+              <TodoItem
+                todo={item}
+                // onPress={handleTaskPress}
+                // onDelete={handleTaskDelete}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            ItemSeparatorComponent={ItemSeparator}
+            estimatedItemSize={20}
+            contentContainerStyle={{ padding: 10 }}
+          />
+        </GestureHandlerRootView>
+      </TodosContainer>
     </Container>
   );
 };
@@ -92,6 +129,7 @@ const Container = styled(View, {
 
 const TitleContainer = styled(View, {
   paddingHorizontal: 16,
+  marginVertical: 4,
 });
 
 const Title = styled(Text, {
@@ -111,10 +149,13 @@ const DatePickerRow = styled(View, {
   paddingHorizontal: 16,
 });
 
-const DateHeading = styled(View, {
+const TodosContainer = styled(View, {
   flex: 1,
-  paddingVertical: 24,
-  paddingHorizontal: 16,
+  marginTop: 30,
+});
+
+const ItemSeparator = styled(View, {
+  height: 6,
 });
 
 export default HomeScreen;

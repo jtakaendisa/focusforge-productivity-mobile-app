@@ -1,6 +1,6 @@
 import { Pressable } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
+import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
 import Animated, { FadeInLeft, FadeOutLeft } from 'react-native-reanimated';
 
 import { Todo } from '@/app/entities';
@@ -30,14 +30,14 @@ const TodoItem = ({ todo, onPress, onDelete }: Props) => {
       >
         <Pressable onPress={() => onPress(id)}>
           <TaskContainer>
-            <MaterialCommunityIcons
-              name={
-                isCompleted
-                  ? 'checkbox-marked-circle-outline'
-                  : 'checkbox-blank-circle-outline'
-              }
-              size={24}
-              color={isCompleted ? 'green' : 'dimgray'}
+            <BouncyCheckbox
+              size={20}
+              fillColor="green"
+              unFillColor="#FFFFFF"
+              iconStyle={{ borderColor: 'green' }}
+              innerIconStyle={{ borderWidth: 2 }}
+              isChecked={isCompleted}
+              onPress={(isChecked) => onPress(id)}
             />
             <Title isCompleted={isCompleted}>{task}</Title>
           </TaskContainer>

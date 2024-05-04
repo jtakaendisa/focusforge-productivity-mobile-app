@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TextInput } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -10,9 +10,10 @@ import {
   DateTimePickerAndroid,
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
+import uuid from 'react-native-uuid';
 import { styled, Text, View } from 'tamagui';
 
-import { PriorityType } from './store';
+import { PriorityType, useTodoStore } from './store';
 import { toFormattedDateString } from './utils';
 import { taskSchema } from './validationSchemas';
 import CategoryModal from './components/tabs/todo/modals/CategoryModal';
@@ -25,6 +26,9 @@ export type NewTaskData = z.infer<typeof taskSchema>;
 const TODAYS_DATE = toFormattedDateString(new Date());
 
 const NewTaskScreen = () => {
+  const todos = useTodoStore((s) => s.todos);
+  const setTodos = useTodoStore((s) => s.setTodos);
+
   const [modalState, setModalState] = useState({
     categoryIsOpen: false,
     checklistIsOpen: false,
@@ -34,7 +38,13 @@ const NewTaskScreen = () => {
 
   const setDueDateRef = useRef<((...event: any[]) => void) | null>(null);
 
-  const { control, handleSubmit, reset, watch } = useForm<NewTaskData>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isSubmitSuccessful },
+  } = useForm<NewTaskData>({
     defaultValues: {
       task: '',
       category: 'Task',
@@ -58,13 +68,30 @@ const NewTaskScreen = () => {
     }
   };
 
-  const showMode = () => {
+  const showDatePicker = () => {
     DateTimePickerAndroid.open({
       value: new Date(),
       onChange: handleDateSelect,
       is24Hour: true,
     });
   };
+
+  const onSubmit: SubmitHandler<NewTaskData> = (data) => {
+    const newTodo = {
+      id: uuid.v4() as string,
+      isCompleted: false,
+      ...data,
+    };
+    const updatedTodos = [...todos, newTodo];
+    setTodos(updatedTodos);
+  };
+
+  useEffect(() => {
+    if (!isSubmitSuccessful) return;
+
+    reset();
+    router.replace('/(tabs)/todo');
+  }, [isSubmitSuccessful]);
 
   const { categoryIsOpen, checklistIsOpen, priorityIsOpen, noteIsOpen } = modalState;
 
@@ -81,7 +108,7 @@ const NewTaskScreen = () => {
         name="task"
         render={({ field: { onChange, onBlur, value } }) => (
           <TaskInputField
-            placeholder="Username"
+            placeholder="Task Title..."
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
@@ -107,7 +134,7 @@ const NewTaskScreen = () => {
           <OptionIcon></OptionIcon>
           <OptionHeading>Date</OptionHeading>
         </OptionInfo>
-        <OptionValuePicker onPress={() => showMode()}>
+        <OptionValuePicker onPress={() => showDatePicker()}>
           <Controller
             control={control}
             name="dueDate"
@@ -191,7 +218,7 @@ const NewTaskScreen = () => {
         <Button onPress={() => router.replace('/(tabs)/todo')}>
           <Text color="gray">CANCEL</Text>
         </Button>
-        <Button>
+        <Button onPress={handleSubmit(onSubmit)}>
           <Text color="red">CONFIRM</Text>
         </Button>
       </ButtonsContainer>

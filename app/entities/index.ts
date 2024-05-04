@@ -1,13 +1,7 @@
 import { Animated } from 'react-native';
 import { User } from 'firebase/auth';
 
-import { PriorityType, categoryArray } from '../store';
-
-export interface Todo {
-  id: string;
-  task: string;
-  isCompleted: boolean;
-}
+import { categoryArray } from '../store';
 
 export type AuthUser = User & {
   username?: string;
@@ -19,4 +13,22 @@ export type Filter = 'all' | 'open' | 'completed';
 
 export type Category = (typeof categoryArray)[number];
 
-export type Priority = PriorityType.low | PriorityType.normal | PriorityType.high;
+export type Priority = 'Low' | 'Normal' | 'High';
+
+type ChecklistItem = {
+  id: string;
+  task: string;
+  isCompleted: boolean;
+};
+
+export interface Todo {
+  id: string;
+  task: string;
+  isCompleted: boolean;
+  category: Category;
+  dueDate: string;
+  priority: Priority;
+  note: string;
+  isCarriedOver: boolean;
+  checklist: ChecklistItem[];
+}
