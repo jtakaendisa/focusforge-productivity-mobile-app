@@ -1,11 +1,25 @@
 import { createInterFont } from '@tamagui/font-inter';
 import { createMedia } from '@tamagui/react-native-media-driver';
 import { shorthands } from '@tamagui/shorthands';
-import { themes, tokens } from '@tamagui/themes';
-import { createTamagui } from 'tamagui';
+import { themes, tokens as defaultTokens } from '@tamagui/themes';
+import { createTamagui, createTokens } from 'tamagui';
 
 const headingFont = createInterFont();
 const bodyFont = createInterFont();
+
+const tokens = createTokens({
+  ...defaultTokens,
+  color: {
+    white: '#FFF',
+    black1: '#111111',
+    black2: '#1C1C1C',
+    gray1: '#8C8C8C',
+    gray2: '#262626',
+    red1: '#C73A57',
+    red2: '#C33756',
+    red3: '#962C42',
+  },
+});
 
 const config = createTamagui({
   light: {

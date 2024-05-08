@@ -7,9 +7,9 @@ import { View, Text, styled } from 'tamagui';
 
 import { Todo } from '../entities';
 import { useTodoStore } from '../store';
+import { toFormattedDateString } from '../utils';
 import CalendarCard from '../components/tabs/home/CalendarCard';
 import TodoItem from '../components/tabs/todo/TodoItem';
-import { toFormattedDateString } from '../utils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -17,6 +17,7 @@ const TODAYS_DATE = new Date();
 
 const HomeScreen = () => {
   const todos = useTodoStore((s) => s.todos);
+  const setTodos = useTodoStore((s) => s.setTodos);
 
   const [value, setValue] = useState<Date>(TODAYS_DATE);
   const [week, setWeek] = useState(0);
@@ -61,6 +62,24 @@ const HomeScreen = () => {
       );
       scrollToItem(index);
     }, 1);
+  };
+
+  const handleTaskPress = (id: string) => {
+    const updatedTodos = todos.map((todo) => {
+      if (todo.id === id) {
+        return {
+          ...todo,
+          isCompleted: !todo.isCompleted,
+        };
+      }
+      return todo;
+    });
+    setTodos(updatedTodos);
+  };
+
+  const handleTaskDelete = (id: string) => {
+    const filteredTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(filteredTodos);
   };
 
   useEffect(() => {
@@ -108,8 +127,8 @@ const HomeScreen = () => {
             renderItem={({ item }) => (
               <TodoItem
                 todo={item}
-                // onPress={handleTaskPress}
-                // onDelete={handleTaskDelete}
+                onPress={handleTaskPress}
+                onDelete={handleTaskDelete}
               />
             )}
             keyExtractor={(item) => item.id}
@@ -125,6 +144,7 @@ const HomeScreen = () => {
 
 const Container = styled(View, {
   flex: 1,
+  backgroundColor: '$black1',
 });
 
 const TitleContainer = styled(View, {

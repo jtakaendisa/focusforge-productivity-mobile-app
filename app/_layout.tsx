@@ -28,7 +28,6 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const authUser = useAuthStore((s) => s.authUser);
   const setAuthUser = useAuthStore((s) => s.setAuthUser);
 
   const [onboarded, setOnboarded] = useState(false);

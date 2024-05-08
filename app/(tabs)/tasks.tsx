@@ -12,7 +12,7 @@ import SearchBar from '../components/tabs/todo/SearchBar';
 import FilterBar from '../components/tabs/todo/FilterBar';
 import FrequencySelector from '../components/tabs/todo/FrequencySelector';
 
-const TodoScreen = () => {
+const TasksScreen = () => {
   const todos = useTodoStore((s) => s.todos);
   const searchQuery = useTodoStore((s) => s.searchQuery);
   const filter = useTodoStore((s) => s.filter);
@@ -144,4 +144,4 @@ const Backdrop = styled(View, {
 
 const AnimatedBackdrop = Animated.createAnimatedComponent(Backdrop);
 
-export default TodoScreen;
+export default TasksScreen;
