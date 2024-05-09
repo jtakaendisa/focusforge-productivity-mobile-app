@@ -32,3 +32,5 @@ export interface Todo {
   isCarriedOver: boolean;
   checklist: ChecklistItem[];
 }
+
+export type TabRoute = '' | 'habits' | 'tasks' | 'timer' | 'settings';
