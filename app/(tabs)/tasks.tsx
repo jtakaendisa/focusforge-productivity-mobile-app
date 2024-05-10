@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { FlashList } from '@shopify/flash-list';
@@ -21,6 +21,8 @@ const TasksScreen = () => {
   const [filteredTodos, setFilteredTodos] = useState(todos);
   const [isOpen, setIsOpen] = useState(false);
 
+  const listRef = useRef<FlashList<Todo> | null>(null);
+
   const handleTaskPress = (id: string) => {
     const updatedTodos = todos.map((todo) => {
       if (todo.id === id) {
@@ -37,6 +39,7 @@ const TasksScreen = () => {
   const handleTaskDelete = (id: string) => {
     const filteredTodos = todos.filter((todo) => todo.id !== id);
     setTodos(filteredTodos);
+    listRef.current?.prepareForLayoutAnimationRender();
   };
 
   useEffect(() => {
@@ -48,7 +51,8 @@ const TasksScreen = () => {
     } else {
       setFilteredTodos(todos);
     }
-  }, [searchQuery, todos]);
+    listRef.current?.prepareForLayoutAnimationRender();
+  }, [searchQuery, todos, listRef]);
 
   useEffect(() => {
     let filteredTodos: Todo[] = [];
@@ -69,7 +73,8 @@ const TasksScreen = () => {
     }
 
     setFilteredTodos(filteredTodos);
-  }, [filter, todos]);
+    listRef.current?.prepareForLayoutAnimationRender();
+  }, [filter, todos, listRef]);
 
   return (
     <Container>
@@ -77,6 +82,7 @@ const TasksScreen = () => {
       <FilterBar />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <FlashList
+          ref={listRef}
           data={filteredTodos}
           renderItem={({ item }) => (
             <TodoItem

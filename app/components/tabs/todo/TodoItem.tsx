@@ -1,7 +1,7 @@
-import { Pressable } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import BouncyCheckbox from 'react-native-bouncy-checkbox/build/dist/BouncyCheckbox';
-import Animated, { FadeInLeft, FadeOutLeft } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { View, styled } from 'tamagui';
 
 import { Todo } from '@/app/entities';
 import TodoItemRightActions from './TodoItemRightActions';
@@ -17,7 +17,7 @@ const TodoItem = ({ todo, onPress, onDelete }: Props) => {
   const { id, task, isCompleted } = todo;
 
   return (
-    <Animated.View entering={FadeInLeft} exiting={FadeOutLeft}>
+    <AnimatedContainer entering={FadeIn} exiting={FadeOut}>
       <Swipeable
         renderRightActions={(progressAnimatedValue, dragAnimatedValue) => (
           <TodoItemRightActions
@@ -28,23 +28,23 @@ const TodoItem = ({ todo, onPress, onDelete }: Props) => {
           />
         )}
       >
-        <Pressable onPress={() => onPress(id)}>
-          <TaskContainer>
-            <BouncyCheckbox
-              size={20}
-              fillColor="green"
-              unFillColor="#FFFFFF"
-              iconStyle={{ borderColor: 'green' }}
-              innerIconStyle={{ borderWidth: 2 }}
-              isChecked={isCompleted}
-              onPress={(isChecked) => onPress(id)}
-            />
-            <Title isCompleted={isCompleted}>{task}</Title>
-          </TaskContainer>
-        </Pressable>
+        <TaskContainer onPress={() => onPress(id)}>
+          <BouncyCheckbox
+            size={20}
+            fillColor="green"
+            unFillColor="#FFFFFF"
+            iconStyle={{ borderColor: 'green' }}
+            innerIconStyle={{ borderWidth: 2 }}
+            isChecked={isCompleted}
+            onPress={(isChecked) => onPress(id)}
+          />
+          <Title isCompleted={isCompleted}>{task}</Title>
+        </TaskContainer>
       </Swipeable>
-    </Animated.View>
+    </AnimatedContainer>
   );
 };
+
+const AnimatedContainer = Animated.createAnimatedComponent(View);
 
 export default TodoItem;

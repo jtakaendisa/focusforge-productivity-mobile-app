@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { User } from 'firebase/auth';
 import { TamaguiProvider } from 'tamagui';
 
@@ -95,11 +96,12 @@ function RootLayoutNav({ onboarded }: RootLayoutNavProps) {
         initialRouteName={!onboarded ? 'onboarding' : '(auth)'}
         screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding" />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="newTask" options={{ presentation: 'modal' }} />
       </Stack>
+      <StatusBar />
     </TamaguiProvider>
   );
 }

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { AuthUser, Filter, Todo } from '../entities';
+import { TODAYS_DATE } from '../constants';
 
 interface AuthStore {
   authUser: AuthUser | null;
@@ -11,9 +12,11 @@ interface TodoStore {
   todos: Todo[];
   searchQuery: string;
   filter: Filter;
+  selectedDate: Date;
   setTodos: (todos: Todo[]) => void;
   setSearchQuery: (searchQuery: string) => void;
   setFilter: (filter: Filter) => void;
+  setSelectedDate: (selectedDate: Date) => void;
 }
 
 export enum PriorityType {
@@ -350,9 +353,11 @@ const useTodoStore = create<TodoStore>((set) => ({
   todos: dummyTodos,
   searchQuery: '',
   filter: 'all',
+  selectedDate: TODAYS_DATE,
   setTodos: (todos) => set((state) => ({ ...state, todos })),
   setSearchQuery: (searchQuery) => set((state) => ({ ...state, searchQuery })),
   setFilter: (filter) => set((state) => ({ ...state, filter })),
+  setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
 }));
 
 export { useAuthStore, useTodoStore };

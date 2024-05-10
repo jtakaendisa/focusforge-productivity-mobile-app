@@ -1,29 +1,33 @@
-import { RefObject } from 'react';
+import { MutableRefObject } from 'react';
 import { TouchableWithoutFeedback } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Image, Text, View, styled, useWindowDimensions } from 'tamagui';
-import { FlatList } from 'react-native-reanimated/lib/typescript/Animated';
+import { FlashList } from '@shopify/flash-list';
 import Animated, {
+  Easing,
   SharedValue,
   interpolateColor,
   useAnimatedStyle,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { Image, Text, View, styled } from 'tamagui';
 
 import { OnboardingData } from '@/data';
+import { SCREEN_WIDTH } from '@/app/constants';
 
 interface Props {
-  flatlistRef: RefObject<FlatList<OnboardingData>>;
-  flatlistIndex: SharedValue<number>;
+  listRef: MutableRefObject<FlashList<OnboardingData> | null>;
+  listIndex: SharedValue<number>;
   dataLength: number;
   x: SharedValue<number>;
 }
 
-const CustomButton = ({ flatlistRef, flatlistIndex, dataLength, x }: Props) => {
-  const { width: SCREEN_WIDTH } = useWindowDimensions();
+const animationConfig = {
+  duration: 250,
+  easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+};
 
+const CustomButton = ({ listRef, listIndex, dataLength, x }: Props) => {
   const storeData = async () => {
     try {
       await AsyncStorage.setItem('onboarded', JSON.stringify(true));
@@ -33,9 +37,9 @@ const CustomButton = ({ flatlistRef, flatlistIndex, dataLength, x }: Props) => {
   };
 
   const handlePress = async () => {
-    if (flatlistIndex.value < dataLength - 1) {
-      flatlistRef.current?.scrollToIndex({
-        index: flatlistIndex.value + 1,
+    if (listIndex.value < dataLength - 1) {
+      listRef.current?.scrollToIndex({
+        index: listIndex.value + 1,
       });
     } else {
       await storeData();
@@ -56,56 +60,43 @@ const CustomButton = ({ flatlistRef, flatlistIndex, dataLength, x }: Props) => {
   });
 
   const buttonAnimation = useAnimatedStyle(() => ({
-    width: flatlistIndex.value === dataLength - 1 ? withSpring(140) : withSpring(60),
-    height: 60,
+    width:
+      listIndex.value === dataLength - 1
+        ? withTiming(140, animationConfig)
+        : withTiming(60, animationConfig),
   }));
 
   const buttonTextAnimation = useAnimatedStyle(() => {
     return {
-      opacity: flatlistIndex.value === dataLength - 1 ? withTiming(1) : withTiming(0),
+      opacity:
+        listIndex.value === dataLength - 1
+          ? withTiming(1, animationConfig)
+          : withTiming(0, animationConfig),
       transform: [
         {
           translateX:
-            flatlistIndex.value === dataLength - 1 ? withTiming(0) : withTiming(-100),
+            listIndex.value === dataLength - 1
+              ? withTiming(0, animationConfig)
+              : withTiming(-100, animationConfig),
         },
       ],
     };
   });
 
   const arrowAnimation = useAnimatedStyle(() => ({
-    width: 30,
-    height: 30,
-    opacity: flatlistIndex.value === dataLength - 1 ? withTiming(0) : withTiming(1),
+    opacity:
+      listIndex.value === dataLength - 1
+        ? withTiming(0, animationConfig)
+        : withTiming(1, animationConfig),
     transform: [
       {
         translateX:
-          flatlistIndex.value === dataLength - 1 ? withTiming(100) : withTiming(0),
+          listIndex.value === dataLength - 1
+            ? withTiming(100, animationConfig)
+            : withTiming(0, animationConfig),
       },
     ],
   }));
-
-  const Container = styled(View, {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 60,
-    height: 60,
-    padding: 10,
-    borderRadius: 30,
-    backgroundColor: 'black',
-    overflow: 'hidden',
-  });
-
-  const ButtonText = styled(Text, {
-    position: 'absolute',
-  });
-
-  const Arrow = styled(Image, {
-    position: 'absolute',
-  });
-
-  const AnimatedContainer = Animated.createAnimatedComponent(Container);
-  const AnimatedButtonText = Animated.createAnimatedComponent(ButtonText);
-  const AnimatedArrow = Animated.createAnimatedComponent(Arrow);
 
   return (
     <TouchableWithoutFeedback onPress={handlePress}>
@@ -121,5 +112,30 @@ const CustomButton = ({ flatlistRef, flatlistIndex, dataLength, x }: Props) => {
     </TouchableWithoutFeedback>
   );
 };
+
+const Container = styled(View, {
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 60,
+  height: 60,
+  padding: 10,
+  borderRadius: 30,
+  backgroundColor: 'black',
+  overflow: 'hidden',
+});
+
+const ButtonText = styled(Text, {
+  position: 'absolute',
+});
+
+const Arrow = styled(Image, {
+  position: 'absolute',
+  width: 30,
+  height: 30,
+});
+
+const AnimatedContainer = Animated.createAnimatedComponent(Container);
+const AnimatedButtonText = Animated.createAnimatedComponent(ButtonText);
+const AnimatedArrow = Animated.createAnimatedComponent(Arrow);
 
 export default CustomButton;

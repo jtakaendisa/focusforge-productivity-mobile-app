@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { ViewToken, FlatList, FlatListProps } from 'react-native';
+import { ViewToken } from 'react-native';
 import { styled, View } from 'tamagui';
 import Animated, {
   useAnimatedScrollHandler,
@@ -10,10 +10,11 @@ import { data, OnboardingData } from '@/data';
 import OnboardingCard from './components/onboarding/OnboardingCard';
 import Pagination from './components/onboarding/Pagination';
 import CustomButton from './components/onboarding/CustomButton';
+import { FlashList, FlashListProps } from '@shopify/flash-list';
 
 const OnboardingScreen = () => {
-  const flatlistRef = useRef(null);
-  const flatlistIndex = useSharedValue(0);
+  const listRef = useRef<FlashList<OnboardingData> | null>(null);
+  const listIndex = useSharedValue(0);
   const x = useSharedValue(0);
 
   const handleScroll = useAnimatedScrollHandler({
@@ -28,38 +29,20 @@ const OnboardingScreen = () => {
     viewableItems: ViewToken[];
   }) => {
     if (viewableItems[0] && viewableItems[0].index !== null) {
-      flatlistIndex.value = viewableItems[0].index;
+      listIndex.value = viewableItems[0].index;
     }
   };
 
-  const Container = styled(View, {
-    flex: 1,
-  });
-
-  const PaginationContainer = styled(View, {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    marginHorizontal: 30,
-    paddingVertical: 30,
-  });
-
-  const AnimatedFlatlist =
-    Animated.createAnimatedComponent<FlatListProps<OnboardingData>>(FlatList);
-
   return (
     <Container>
-      <AnimatedFlatlist
-        ref={flatlistRef}
+      <AnimatedFlashList
+        ref={listRef}
         data={data}
         renderItem={({ item, index }) => (
           <OnboardingCard item={item} index={index} x={x} />
         )}
         keyExtractor={(item) => item.id.toString()}
+        estimatedItemSize={3}
         onScroll={handleScroll}
         scrollEventThrottle={16}
         horizontal
@@ -75,8 +58,8 @@ const OnboardingScreen = () => {
       <PaginationContainer>
         <Pagination data={data} x={x} />
         <CustomButton
-          flatlistRef={flatlistRef}
-          flatlistIndex={flatlistIndex}
+          listRef={listRef}
+          listIndex={listIndex}
           dataLength={data.length}
           x={x}
         />
@@ -84,5 +67,24 @@ const OnboardingScreen = () => {
     </Container>
   );
 };
+
+const Container = styled(View, {
+  flex: 1,
+});
+
+const PaginationContainer = styled(View, {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  position: 'absolute',
+  bottom: 20,
+  left: 0,
+  right: 0,
+  marginHorizontal: 30,
+  paddingVertical: 30,
+});
+
+const AnimatedFlashList =
+  Animated.createAnimatedComponent<FlashListProps<OnboardingData>>(FlashList);
 
 export default OnboardingScreen;

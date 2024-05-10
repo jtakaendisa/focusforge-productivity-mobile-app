@@ -12,9 +12,9 @@ const tokens = createTokens({
   color: {
     white: '#FFF',
     black1: '#111111',
-    black2: '#1C1C1C',
     gray1: '#8C8C8C',
     gray2: '#262626',
+    gray3: '#1C1C1C',
     red1: '#C73A57',
     red2: '#C33756',
     red3: '#962C42',

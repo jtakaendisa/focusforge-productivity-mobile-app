@@ -11,7 +11,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const TabLayout = () => {
   const authUser = useAuthStore((s) => s.authUser);
 
-  const black = getTokens().color.$black2.val;
+  const gray = getTokens().color.$gray3.val;
 
   if (!authUser) {
     return <Redirect href="/(auth)" />;
@@ -23,7 +23,7 @@ const TabLayout = () => {
         tabBarButton: TabBarButton,
         tabBarStyle: {
           height: SCREEN_HEIGHT / 12,
-          backgroundColor: black,
+          backgroundColor: gray,
           borderTopWidth: 0,
         },
       }}
@@ -31,6 +31,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="index"
         options={{
+          title: 'Today',
           headerRight: () => (
             <Link href="/" asChild>
               <Pressable>
@@ -46,10 +47,30 @@ const TabLayout = () => {
           ),
         }}
       />
-      <Tabs.Screen name="habits" />
-      <Tabs.Screen name="tasks" />
-      <Tabs.Screen name="timer" />
-      <Tabs.Screen name="settings" />
+      <Tabs.Screen
+        name="habits"
+        options={{
+          title: 'Habits',
+        }}
+      />
+      <Tabs.Screen
+        name="tasks"
+        options={{
+          title: 'Tasks',
+        }}
+      />
+      <Tabs.Screen
+        name="timer"
+        options={{
+          title: 'Timer',
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+        }}
+      />
     </Tabs>
   );
 };
