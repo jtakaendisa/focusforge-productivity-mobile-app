@@ -8,7 +8,6 @@ import { styled, View, Text, getTokens } from 'tamagui';
 
 import { TabRoute } from '@/app/entities';
 import TabBarIcon from './TabBarIcon';
-import { useMemo } from 'react';
 
 interface Props {
   accessibilityState?: AccessibilityState;

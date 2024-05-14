@@ -5,11 +5,13 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { User } from 'firebase/auth';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { TamaguiProvider } from 'tamagui';
 
 import { useAuthStore } from './store';
-import config from '../tamagui.config';
 import { authStateChangeListener, formatAuthUserData } from './services/auth';
+import config from '../tamagui.config';
 
 interface RootLayoutNavProps {
   onboarded: boolean;
@@ -92,16 +94,20 @@ export default function RootLayout() {
 function RootLayoutNav({ onboarded }: RootLayoutNavProps) {
   return (
     <TamaguiProvider config={config}>
-      <Stack
-        initialRouteName={!onboarded ? 'onboarding' : '(auth)'}
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="newTask" options={{ presentation: 'modal' }} />
-      </Stack>
-      <StatusBar />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
+          <Stack
+            initialRouteName={!onboarded ? 'onboarding' : '(auth)'}
+            screenOptions={{ headerShown: false }}
+          >
+            <Stack.Screen name="onboarding" />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="newTask" options={{ presentation: 'modal' }} />
+          </Stack>
+          <StatusBar />
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     </TamaguiProvider>
   );
 }

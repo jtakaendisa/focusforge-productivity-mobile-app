@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
 import Animated, {
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import { styled, View, Text, getTokens } from 'tamagui';
+
+import { DATE_CARD_HEIGHT } from '@/app/constants';
 
 interface Props {
   item: {
@@ -16,7 +19,7 @@ interface Props {
 }
 
 const DateCard = ({ item, selectedDate, onPress }: Props) => {
-  const isSelected = useSharedValue(false);
+  const isSelected = useSharedValue(0);
 
   const white = getTokens().color.$white.val;
   const textGray = getTokens().color.$gray1.val;
@@ -25,25 +28,23 @@ const DateCard = ({ item, selectedDate, onPress }: Props) => {
   const lightRed = getTokens().color.$red1.val;
   const darkRed = getTokens().color.$red3.val;
 
-  // const handleLayout = (event: LayoutChangeEvent) => {
-  //   const width = event.nativeEvent.layout.width;
-  //   itemWidth = width;
-  // };
-
   const textColorAnimation = useAnimatedStyle(() => ({
-    color: isSelected.value ? withTiming(white) : withTiming(textGray),
+    color: interpolateColor(isSelected.value, [0, 1], [textGray, white]),
   }));
 
   const weekdayBackgroundAnimation = useAnimatedStyle(() => ({
-    backgroundColor: isSelected.value ? withTiming(lightRed) : withTiming(darkGray),
+    backgroundColor: interpolateColor(isSelected.value, [0, 1], [darkGray, lightRed]),
   }));
 
   const dateBackgroundAnimation = useAnimatedStyle(() => ({
-    backgroundColor: isSelected.value ? withTiming(darkRed) : withTiming(lightGray),
+    backgroundColor: interpolateColor(isSelected.value, [0, 1], [lightGray, darkRed]),
   }));
 
   useEffect(() => {
-    isSelected.value = selectedDate.toDateString() === item.date.toDateString();
+    isSelected.value =
+      selectedDate.toDateString() === item.date.toDateString()
+        ? withTiming(1)
+        : withTiming(0);
   }, [item.date, selectedDate]);
 
   return (
@@ -67,7 +68,7 @@ const Container = styled(View, {
   flexDirection: 'column',
   alignItems: 'center',
   width: 50,
-  height: 66,
+  height: DATE_CARD_HEIGHT,
   borderRadius: 18,
   overflow: 'hidden',
 });

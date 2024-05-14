@@ -4,7 +4,7 @@ import { Text, View, styled } from 'tamagui';
 
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
 
-const TasksPlaceholder = () => {
+const TaskListPlaceholder = () => {
   return (
     <AnimatedContainer entering={FadeInDown} exiting={FadeOutUp}>
       <Svg
@@ -300,4 +300,4 @@ const SubText = styled(Text, {
 
 const AnimatedContainer = Animated.createAnimatedComponent(Container);
 
-export default TasksPlaceholder;
+export default TaskListPlaceholder;

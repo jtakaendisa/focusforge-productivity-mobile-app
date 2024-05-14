@@ -1,12 +1,11 @@
-import { Dimensions, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { Link, Redirect, Tabs } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import { getTokens } from 'tamagui';
 
 import { useAuthStore } from '../store';
+import { SCREEN_HEIGHT } from '../constants';
 import TabBarButton from '../components/tabs/TabBarButton';
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const TabLayout = () => {
   const authUser = useAuthStore((s) => s.authUser);

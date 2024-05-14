@@ -10,3 +10,10 @@ export const toFormattedDateString = (date: Date) => {
 
   return `${year}-${month}-${day}`;
 };
+
+export const toTruncatedText = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return text.slice(0, maxLength).trim() + '...';
+};

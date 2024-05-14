@@ -48131,24 +48131,31 @@
           "val": "#1C1C1C",
           "variable": ""
         },
+        "green1": {
+          "isVar": true,
+          "key": "$green1",
+          "name": "color-6",
+          "val": "#2A8844",
+          "variable": ""
+        },
         "red1": {
           "isVar": true,
           "key": "$red1",
-          "name": "color-6",
+          "name": "color-7",
           "val": "#C73A57",
           "variable": ""
         },
         "red2": {
           "isVar": true,
           "key": "$red2",
-          "name": "color-7",
+          "name": "color-8",
           "val": "#C33756",
           "variable": ""
         },
         "red3": {
           "isVar": true,
           "key": "$red3",
-          "name": "color-8",
+          "name": "color-9",
           "val": "#962C42",
           "variable": ""
         }
@@ -49032,24 +49039,31 @@
         "val": "#1C1C1C",
         "variable": ""
       },
+      "$color.green1": {
+        "isVar": true,
+        "key": "$green1",
+        "name": "color-6",
+        "val": "#2A8844",
+        "variable": ""
+      },
       "$color.red1": {
         "isVar": true,
         "key": "$red1",
-        "name": "color-6",
+        "name": "color-7",
         "val": "#C73A57",
         "variable": ""
       },
       "$color.red2": {
         "isVar": true,
         "key": "$red2",
-        "name": "color-7",
+        "name": "color-8",
         "val": "#C33756",
         "variable": ""
       },
       "$color.red3": {
         "isVar": true,
         "key": "$red3",
-        "name": "color-8",
+        "name": "color-9",
         "val": "#962C42",
         "variable": ""
       },

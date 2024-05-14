@@ -8,9 +8,9 @@ interface Props {
   isSelected?: boolean;
 }
 
-const TabBarIcon = ({ currentPath, color, isSelected }: Props) => {
-  const SVG_SIZE = 22;
+const SVG_SIZE = 22;
 
+const TabBarIcon = ({ currentPath, color, isSelected }: Props) => {
   switch (currentPath) {
     case '':
       if (isSelected) {

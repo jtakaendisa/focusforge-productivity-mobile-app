@@ -7,10 +7,10 @@ import { View, Text, styled } from 'tamagui';
 
 import { Todo } from '../entities';
 import { useTodoStore } from '../store';
-import TodoItem from '../components/tabs/todo/TodoItem';
-import SearchBar from '../components/tabs/todo/SearchBar';
-import FilterBar from '../components/tabs/todo/FilterBar';
-import FrequencySelector from '../components/tabs/todo/FrequencySelector';
+import TodoItem from '../components/tabs/tasks/TodoItem';
+import SearchBar from '../components/tabs/tasks/SearchBar';
+import FilterBar from '../components/tabs/tasks/FilterBar';
+import FrequencySelector from '../components/tabs/FrequencySelector';
 
 const TasksScreen = () => {
   const todos = useTodoStore((s) => s.todos);

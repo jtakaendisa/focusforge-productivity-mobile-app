@@ -4,7 +4,7 @@ import moment from 'moment';
 import { styled, View } from 'tamagui';
 
 import { useTodoStore } from '@/app/store';
-import { SCREEN_WIDTH } from '@/app/constants';
+import { DATE_CARD_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import DateCard from './DateCard';
 
 const DateCarousel = () => {
@@ -28,20 +28,6 @@ const DateCarousel = () => {
 
   const listRef = useRef<FlashList<(typeof weeks)[number]> | null>(null);
 
-  // const scrollToItem = (index: number) => {
-  //   const offset = index * 50;
-  //   listRef.current?.scrollToOffset({ offset, animated: true });
-  // };
-
-  // const handleLayout = () => {
-  //   setTimeout(() => {
-  //     const index = weeks.findIndex(
-  //       (week) => week.date.toDateString() === selectedDate.toDateString()
-  //     );
-  //     scrollToItem(index);
-  //   }, 1);
-  // };
-
   return (
     <Container>
       <FlashList
@@ -56,6 +42,7 @@ const DateCarousel = () => {
         )}
         keyExtractor={(item) => item.date.toString()}
         estimatedItemSize={40}
+        estimatedListSize={{ height: DATE_CARD_HEIGHT, width: SCREEN_WIDTH }}
         horizontal
         showsHorizontalScrollIndicator={false}
         scrollsToTop={false}

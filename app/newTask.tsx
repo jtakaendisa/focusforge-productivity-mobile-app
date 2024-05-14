@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {
   DateTimePickerAndroid,
   DateTimePickerEvent,
@@ -16,10 +15,10 @@ import { styled, Text, View } from 'tamagui';
 import { PriorityType, useTodoStore } from './store';
 import { toFormattedDateString } from './utils';
 import { taskSchema } from './validationSchemas';
-import CategoryModal from './components/tabs/todo/modals/CategoryModal';
-import ChecklistModal from './components/tabs/todo/modals/ChecklistModal';
-import PriorityModal from './components/tabs/todo/modals/PriorityModal';
-import NoteModal from './components/tabs/todo/modals/NoteModal';
+import CategoryModal from './components/tabs/tasks/modals/CategoryModal';
+import ChecklistModal from './components/tabs/tasks/modals/ChecklistModal';
+import PriorityModal from './components/tabs/tasks/modals/PriorityModal';
+import NoteModal from './components/tabs/tasks/modals/NoteModal';
 
 export type NewTaskData = z.infer<typeof taskSchema>;
 
@@ -90,7 +89,7 @@ const NewTaskScreen = () => {
     if (!isSubmitSuccessful) return;
 
     reset();
-    router.replace('/(tabs)/todo');
+    router.replace('/(tabs)/tasks');
   }, [isSubmitSuccessful]);
 
   const { categoryIsOpen, checklistIsOpen, priorityIsOpen, noteIsOpen } = modalState;
@@ -199,23 +198,13 @@ const NewTaskScreen = () => {
           <Controller
             control={control}
             name="isCarriedOver"
-            render={({ field: { onChange } }) => (
-              <BouncyCheckbox
-                size={25}
-                fillColor="red"
-                unFillColor="#FFFFFF"
-                iconStyle={{ borderColor: 'red' }}
-                innerIconStyle={{ borderWidth: 2 }}
-                isChecked={isCarriedOver}
-                onPress={(isChecked) => onChange(isChecked)}
-              />
-            )}
+            render={({ field: { onChange } }) => <Text>Placeholder Checkbox</Text>}
           />
         </OptionValuePicker>
       </OptionContainer>
       <Separator />
       <ButtonsContainer>
-        <Button onPress={() => router.replace('/(tabs)/todo')}>
+        <Button onPress={() => router.replace('/(tabs)/tasks')}>
           <Text color="gray">CANCEL</Text>
         </Button>
         <Button onPress={handleSubmit(onSubmit)}>
