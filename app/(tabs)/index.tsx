@@ -10,7 +10,7 @@ import DateCarousel from '../components/tabs/home/DateCarousel';
 import TaskListPlaceholder from '../components/tabs/home/TaskListPlaceholder';
 import TaskList from '../components/tabs/home/TaskList';
 import CreateTaskButton from '../components/tabs/CreateTaskButton';
-import FrequencySelector from '../components/tabs/FrequencySelector';
+import TaskFrequencyModal from '../components/tabs/modals/TaskFrequencyModal';
 
 const HomeScreen = () => {
   const todos = useTodoStore((s) => s.todos);
@@ -19,11 +19,11 @@ const HomeScreen = () => {
   const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
 
   const taskListRef = useRef<FlashList<Todo> | null>(null);
-  const frequencySelectorRef = useRef<BottomSheetModal | null>(null);
+  const taskFrequencyRef = useRef<BottomSheetModal | null>(null);
 
   const isTasksEmpty = !filteredTodos.length;
 
-  const handlePresentModalPress = () => frequencySelectorRef.current?.present();
+  const handlePresentModalPress = () => taskFrequencyRef.current?.present();
 
   useEffect(() => {
     const filteredTodos = todos.filter(
@@ -48,7 +48,7 @@ const HomeScreen = () => {
         )}
       </TaskListContainer>
       <CreateTaskButton onPress={handlePresentModalPress} />
-      <FrequencySelector frequencySelectorRef={frequencySelectorRef} />
+      <TaskFrequencyModal taskFrequencyRef={taskFrequencyRef} />
     </Container>
   );
 };

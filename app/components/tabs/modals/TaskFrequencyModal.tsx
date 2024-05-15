@@ -4,16 +4,17 @@ import {
   BottomSheetModal,
   BottomSheetBackdrop,
   BottomSheetView,
+  BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { styled, View, Text } from 'tamagui';
 import TaskFrequencyIcon from './TaskFrequencyIcon';
 
 interface Props {
-  frequencySelectorRef: MutableRefObject<BottomSheetModalMethods | null>;
+  taskFrequencyRef: MutableRefObject<BottomSheetModalMethods | null>;
 }
 
-const renderBackdrop = (props: any) => (
+const renderBackdrop = (props: BottomSheetBackdropProps) => (
   <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />
 );
 
@@ -23,22 +24,25 @@ const options = [
     description:
       'Activity that repeats over time. It has detailed tracking and statistics.',
     icon: 'habit',
+    pathname: '/newTask',
   },
   {
     heading: 'Task',
     description: 'Single instance activity without tracking over time.',
     icon: 'task',
+    pathname: '/newTask',
   },
 ] as const;
 
-const FrequencySelector = ({ frequencySelectorRef }: Props) => {
-  const handleCreateTask = () => {
-    router.push('/newTask');
+const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
+  const handleCreateTask = (pathname: any) => {
+    taskFrequencyRef.current?.dismiss();
+    router.push(pathname);
   };
 
   return (
     <BottomSheetModal
-      ref={frequencySelectorRef}
+      ref={taskFrequencyRef}
       backgroundStyle={{ backgroundColor: '#1C1C1C' }}
       handleIndicatorStyle={{ backgroundColor: 'gray' }}
       backdropComponent={renderBackdrop}
@@ -47,9 +51,9 @@ const FrequencySelector = ({ frequencySelectorRef }: Props) => {
       enablePanDownToClose
     >
       <BottomSheetView>
-        {options.map(({ heading, description, icon }, index) => (
+        {options.map(({ heading, description, icon, pathname }, index) => (
           <>
-            <CardContainer key={heading}>
+            <CardContainer key={heading} onPress={() => handleCreateTask(pathname)}>
               <IconContainer style={{ backgroundColor: 'rgba(150, 44, 66, 0.25)' }}>
                 <TaskFrequencyIcon name={icon} fill="#C73A57" />
               </IconContainer>
@@ -105,4 +109,4 @@ const Separator = styled(View, {
   borderColor: '#262626',
 });
 
-export default FrequencySelector;
+export default TaskFrequencyModal;

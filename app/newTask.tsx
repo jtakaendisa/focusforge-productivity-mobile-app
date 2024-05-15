@@ -15,10 +15,10 @@ import { styled, Text, View } from 'tamagui';
 import { PriorityType, useTodoStore } from './store';
 import { toFormattedDateString } from './utils';
 import { taskSchema } from './validationSchemas';
-import CategoryModal from './components/tabs/tasks/modals/CategoryModal';
-import ChecklistModal from './components/tabs/tasks/modals/ChecklistModal';
-import PriorityModal from './components/tabs/tasks/modals/PriorityModal';
-import NoteModal from './components/tabs/tasks/modals/NoteModal';
+import CategoryModal from './components/tabs/modals/CategoryModal';
+import ChecklistModal from './components/tabs/modals/ChecklistModal';
+import PriorityModal from './components/tabs/modals/PriorityModal';
+import NoteModal from './components/tabs/modals/NoteModal';
 
 export type NewTaskData = z.infer<typeof taskSchema>;
 

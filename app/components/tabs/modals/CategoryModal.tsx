@@ -3,7 +3,7 @@ import { View, Text, styled } from 'tamagui';
 
 import { categoryArray } from '@/app/store';
 import { NewTaskData } from '@/app/newTask';
-import ModalContainer, { ModalHeading } from './ModalContainer';
+import ModalContainer from './ModalContainer';
 
 interface Props {
   control: Control<NewTaskData>;
@@ -14,9 +14,9 @@ interface Props {
 const CategoryModal = ({ control, dismissKeyboard, closeModal }: Props) => {
   return (
     <ModalContainer dismissKeyboard={dismissKeyboard} closeModal={closeModal}>
-      <ModalHeading>
+      <Text>
         <Text>Select a category</Text>
-      </ModalHeading>
+      </Text>
       <CategoriesContainer>
         <Controller
           control={control}

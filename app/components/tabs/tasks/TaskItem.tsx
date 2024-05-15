@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Swipeable } from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
@@ -12,18 +13,22 @@ import { View, Text, styled, getTokens } from 'tamagui';
 
 import { Todo } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
-import TodoItemRightActions from './TodoItemRightActions';
+import TaskItemLeftActions from './TaskItemLeftActions';
+import TaskItemRightActions from './TaskItemRightActions';
 import CategoryIcon from '../CategoryIcon';
 import Checkbox from './Checkbox';
 
 interface Props {
   todo: Todo;
   onPress: (id: string) => void;
-  onDelete: (id: string) => void;
+  onSwipe: (id: string) => void;
+  openModal: (modalName: 'prioritizeIsOpen' | 'deleteIsOpen') => void;
 }
 
-const TodoItem = ({ todo, onPress, onDelete }: Props) => {
+const TaskItem = ({ todo, onPress, onSwipe, openModal }: Props) => {
   const { id, task, isCompleted, note, category } = todo;
+
+  const swipeableRef = useRef<Swipeable | null>(null);
 
   const sharedIsCompleted = useSharedValue(isCompleted ? 1 : 0);
 
@@ -45,6 +50,19 @@ const TodoItem = ({ todo, onPress, onDelete }: Props) => {
     onPress(id);
   };
 
+  const handleSwipeCompletion = (direction: 'left' | 'right') => {
+    if (direction === 'left') {
+      openModal('prioritizeIsOpen');
+    }
+
+    if (direction === 'right') {
+      onSwipe(id);
+      openModal('deleteIsOpen');
+    }
+
+    swipeableRef.current?.close();
+  };
+
   return (
     <AnimatedContainer
       entering={FadeIn}
@@ -52,14 +70,14 @@ const TodoItem = ({ todo, onPress, onDelete }: Props) => {
       onPress={handleTaskCompletion}
     >
       <Swipeable
-        renderRightActions={(progressAnimatedValue, dragAnimatedValue) => (
-          <TodoItemRightActions
-            progressAnimatedValue={progressAnimatedValue}
-            dragAnimatedValue={dragAnimatedValue}
-            id={id}
-            onDelete={onDelete}
-          />
+        ref={swipeableRef}
+        renderLeftActions={(_, dragAnimatedValue) => (
+          <TaskItemLeftActions dragAnimatedValue={dragAnimatedValue} />
         )}
+        renderRightActions={(_, dragAnimatedValue) => (
+          <TaskItemRightActions dragAnimatedValue={dragAnimatedValue} />
+        )}
+        onSwipeableOpen={(direction) => handleSwipeCompletion(direction)}
       >
         <TaskContainer>
           <CheckboxContainer>
@@ -163,4 +181,4 @@ const AnimatedContainer = Animated.createAnimatedComponent(View);
 const AnimatedTitle = Animated.createAnimatedComponent(Title);
 const AnimatedNote = Animated.createAnimatedComponent(Note);
 
-export default TodoItem;
+export default TaskItem;

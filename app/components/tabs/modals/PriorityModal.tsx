@@ -5,7 +5,7 @@ import { Text, View, styled } from 'tamagui';
 import { Priority } from '@/app/entities';
 import { PriorityType } from '@/app/store';
 import { NewTaskData } from '@/app/newTask';
-import ModalContainer, { ModalHeading } from './ModalContainer';
+import ModalContainer from './ModalContainer';
 
 interface Props {
   control: Control<NewTaskData>;
@@ -25,9 +25,9 @@ const PriorityModal = ({
 
   return (
     <ModalContainer dismissKeyboard={dismissKeyboard} closeModal={closeModal}>
-      <ModalHeading>
+      <Text>
         <Text>Set a priority</Text>
-      </ModalHeading>
+      </Text>
       <PrioritiesContainer>
         <PrioritiesRow>
           <Controller

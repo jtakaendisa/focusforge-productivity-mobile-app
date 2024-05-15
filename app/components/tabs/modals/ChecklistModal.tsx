@@ -5,10 +5,10 @@ import { FlashList } from '@shopify/flash-list';
 import { Text, View, styled } from 'tamagui';
 
 import { NewTaskData } from '@/app/newTask';
-import ModalContainer, { ModalHeading } from './ModalContainer';
-import CreateTodoItem from '../CreateTodoItem';
-import TodoItem from '../TodoItem';
+import CreateTodoItem from '../tasks/CreateTodoItem';
+import TaskItem from '../tasks/TaskItem';
 import { Todo } from '@/app/entities';
+import ModalContainer from './ModalContainer';
 
 interface Props {
   control: Control<NewTaskData>;
@@ -44,9 +44,9 @@ const ChecklistModal = ({ control, closeModal }: Props) => {
 
   return (
     <ModalContainer closeModal={closeModal}>
-      <ModalHeading>
+      <Text>
         <Text>Create sub tasks</Text>
-      </ModalHeading>
+      </Text>
       <Controller
         control={control}
         name="checklist"
@@ -59,7 +59,7 @@ const ChecklistModal = ({ control, closeModal }: Props) => {
                 <FlashList
                   data={value}
                   renderItem={({ item }) => (
-                    <TodoItem
+                    <TaskItem
                       todo={item}
                       onPress={handleTaskPress}
                       onDelete={handleTaskDelete}
