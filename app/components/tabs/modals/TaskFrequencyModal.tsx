@@ -8,6 +8,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { styled, View, Text } from 'tamagui';
+
 import TaskFrequencyIcon from './TaskFrequencyIcon';
 
 interface Props {
@@ -24,7 +25,7 @@ const options = [
     description:
       'Activity that repeats over time. It has detailed tracking and statistics.',
     icon: 'habit',
-    pathname: '/newTask',
+    pathname: '/(tabs)',
   },
   {
     heading: 'Task',
