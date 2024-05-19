@@ -15,21 +15,22 @@ export type Category = (typeof categoryArray)[number];
 
 export type Priority = 'Low' | 'Normal' | 'High';
 
-type ChecklistItem = {
+interface ChecklistItem {
   id: string;
-  task: string;
+  title: string;
   isCompleted: boolean;
-};
+}
 
-export interface Todo {
+export interface Task {
   id: string;
-  task: string;
+  title: string;
   isCompleted: boolean;
   category: Category;
-  dueDate: string;
+  dueDate: Date;
   priority: Priority;
   note: string;
   isCarriedOver: boolean;
+  isRecurring: boolean;
   checklist: ChecklistItem[];
 }
 

@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { View, Text, styled, getTokens } from 'tamagui';
 
-import { Todo } from '@/app/entities';
+import { Task } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
 import TaskItemLeftActions from './TaskItemLeftActions';
 import TaskItemRightActions from './TaskItemRightActions';
@@ -19,14 +19,14 @@ import CategoryIcon from '../CategoryIcon';
 import Checkbox from './Checkbox';
 
 interface Props {
-  todo: Todo;
+  task: Task;
   onPress: (id: string) => void;
   onSwipe: (id: string) => void;
   openModal: (modalName: 'prioritizeIsOpen' | 'deleteIsOpen') => void;
 }
 
-const TaskItem = ({ todo, onPress, onSwipe, openModal }: Props) => {
-  const { id, task, isCompleted, note, category } = todo;
+const TaskItem = ({ task, onPress, onSwipe, openModal }: Props) => {
+  const { id, title, isCompleted, note, category } = task;
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
@@ -85,7 +85,7 @@ const TaskItem = ({ todo, onPress, onSwipe, openModal }: Props) => {
           </CheckboxContainer>
           <TextContainer>
             <AnimatedTitle style={textColorAnimation}>
-              {toTruncatedText(task, 30)}
+              {toTruncatedText(title, 30)}
             </AnimatedTitle>
             {note && (
               <AnimatedNote style={textOpacityAnimation}>

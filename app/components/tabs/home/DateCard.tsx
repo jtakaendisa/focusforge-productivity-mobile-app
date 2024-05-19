@@ -8,6 +8,7 @@ import Animated, {
 import { styled, View, Text, getTokens } from 'tamagui';
 
 import { DATE_CARD_HEIGHT } from '@/app/constants';
+import { toFormattedDateString } from '@/app/utils';
 
 interface Props {
   item: {
@@ -42,7 +43,7 @@ const DateCard = ({ item, selectedDate, onPress }: Props) => {
 
   useEffect(() => {
     isSelected.value =
-      selectedDate.toDateString() === item.date.toDateString()
+      toFormattedDateString(selectedDate) === toFormattedDateString(item.date)
         ? withTiming(1)
         : withTiming(0);
   }, [item.date, selectedDate]);

@@ -3,8 +3,8 @@ import { FlashList } from '@shopify/flash-list';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, styled } from 'tamagui';
 
-import { Todo } from '../entities';
-import { useTodoStore } from '../store';
+import { Task } from '../entities';
+import { useTaskStore } from '../store';
 import { toFormattedDateString } from '../utils';
 import DateCarousel from '../components/tabs/home/DateCarousel';
 import TaskListPlaceholder from '../components/tabs/home/TaskListPlaceholder';
@@ -13,25 +13,26 @@ import CreateTaskButton from '../components/tabs/CreateTaskButton';
 import TaskFrequencyModal from '../components/tabs/modals/TaskFrequencyModal';
 
 const HomeScreen = () => {
-  const todos = useTodoStore((s) => s.todos);
-  const selectedDate = useTodoStore((s) => s.selectedDate);
+  const tasks = useTaskStore((s) => s.tasks);
+  const selectedDate = useTaskStore((s) => s.selectedDate);
 
-  const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
 
-  const taskListRef = useRef<FlashList<Todo> | null>(null);
+  const taskListRef = useRef<FlashList<Task | (string | Task)> | null>(null);
   const taskFrequencyRef = useRef<BottomSheetModal | null>(null);
 
-  const isTasksEmpty = !filteredTodos.length;
+  const isTasksEmpty = !filteredTasks.length;
 
   const handlePresentModalPress = () => taskFrequencyRef.current?.present();
 
   useEffect(() => {
-    const filteredTodos = todos.filter(
-      (todo) => todo.dueDate === toFormattedDateString(selectedDate)
+    const filteredTasks = tasks.filter(
+      (task) =>
+        toFormattedDateString(task.dueDate) === toFormattedDateString(selectedDate)
     );
-    setFilteredTodos(filteredTodos);
+    setFilteredTasks(filteredTasks);
     taskListRef.current?.prepareForLayoutAnimationRender();
-  }, [todos, selectedDate, taskListRef]);
+  }, [tasks, selectedDate, taskListRef]);
 
   return (
     <Container>
@@ -42,8 +43,8 @@ const HomeScreen = () => {
         ) : (
           <TaskList
             taskListRef={taskListRef}
-            filteredTasks={filteredTodos}
-            todos={todos}
+            filteredTasks={filteredTasks}
+            tasks={tasks}
           />
         )}
       </TaskListContainer>

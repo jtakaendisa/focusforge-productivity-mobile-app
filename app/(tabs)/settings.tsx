@@ -198,11 +198,11 @@ const InfoContainer = styled(View, {
 });
 
 const Username = styled(Text, {
-  fontSize: 18,
+  fontSize: 22,
 });
 
 const Email = styled(Text, {
-  fontSize: 12,
+  fontSize: 14,
   color: '#8C8C8C',
 });
 
@@ -224,7 +224,7 @@ const Button = styled(View, {
 });
 
 const ButtonText = styled(Text, {
-  fontSize: 12,
+  fontSize: 13,
   color: '#8C8C8C',
 });
 
@@ -240,7 +240,7 @@ const ApplicationSettingsContainer = styled(View, {
 });
 
 const Heading = styled(Text, {
-  fontSize: 16,
+  fontSize: 18,
   marginBottom: 20,
 });
 
@@ -262,7 +262,7 @@ const SettingInfo = styled(View, {
 });
 
 const SettingTitle = styled(Text, {
-  fontSize: 14,
+  fontSize: 16,
 });
 
 export default SettingsScreen;

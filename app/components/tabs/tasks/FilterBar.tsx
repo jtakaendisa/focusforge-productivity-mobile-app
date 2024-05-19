@@ -1,8 +1,8 @@
-import { useTodoStore } from '@/app/store';
+import { useTaskStore } from '@/app/store';
 import { View, Text, styled } from 'tamagui';
 
 const FilterBar = () => {
-  const setFilter = useTodoStore((s) => s.setFilter);
+  const setFilter = useTaskStore((s) => s.setFilter);
 
   return (
     <Container>

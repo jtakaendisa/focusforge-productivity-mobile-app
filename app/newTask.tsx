@@ -12,7 +12,7 @@ import {
 import uuid from 'react-native-uuid';
 import { styled, Text, View } from 'tamagui';
 
-import { PriorityType, useTodoStore } from './store';
+import { PriorityType, useTaskStore } from './store';
 import { toFormattedDateString } from './utils';
 import { taskSchema } from './validationSchemas';
 import CategoryModal from './components/tabs/modals/CategoryModal';
@@ -25,8 +25,8 @@ export type NewTaskData = z.infer<typeof taskSchema>;
 const TODAYS_DATE = toFormattedDateString(new Date());
 
 const NewTaskScreen = () => {
-  const todos = useTodoStore((s) => s.todos);
-  const setTodos = useTodoStore((s) => s.setTodos);
+  const tasks = useTaskStore((s) => s.tasks);
+  const setTasks = useTaskStore((s) => s.setTasks);
 
   const [modalState, setModalState] = useState({
     categoryIsOpen: false,
@@ -45,7 +45,7 @@ const NewTaskScreen = () => {
     formState: { isSubmitSuccessful },
   } = useForm<NewTaskData>({
     defaultValues: {
-      task: '',
+      title: '',
       category: 'Task',
       dueDate: TODAYS_DATE,
       priority: PriorityType.normal,
@@ -76,13 +76,13 @@ const NewTaskScreen = () => {
   };
 
   const onSubmit: SubmitHandler<NewTaskData> = (data) => {
-    const newTodo = {
+    const newTask = {
       id: uuid.v4() as string,
       isCompleted: false,
       ...data,
     };
-    const updatedTodos = [...todos, newTodo];
-    setTodos(updatedTodos);
+    const updatedTasks = [...tasks, newTask];
+    setTasks(updatedTasks);
   };
 
   useEffect(() => {
@@ -104,7 +104,7 @@ const NewTaskScreen = () => {
       </ScreenBadge>
       <Controller
         control={control}
-        name="task"
+        name="title"
         render={({ field: { onChange, onBlur, value } }) => (
           <TaskInputField
             placeholder="Task Title..."

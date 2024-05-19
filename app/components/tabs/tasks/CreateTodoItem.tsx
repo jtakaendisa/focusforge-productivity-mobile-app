@@ -2,29 +2,29 @@ import { useState } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import uuid from 'react-native-uuid';
 
-import { Todo } from '@/app/entities';
+import { Task } from '@/app/entities';
 import { Input, TaskContainer } from './styled';
 
 interface Props {
-  todos: Todo[];
-  setTodos: (todos: Todo[]) => void;
+  tasks: Task[];
+  setTasks: (tasks: Task[]) => void;
 }
 
-const CreateTodoItem = ({ todos, setTodos }: Props) => {
-  const [newTodo, setNewTodo] = useState('');
+const CreateTaskItem = ({ tasks, setTasks }: Props) => {
+  const [newTask, setNewTask] = useState('');
 
   const handleTodoSubmit = () => {
-    if (!newTodo.length) return;
+    if (!newTask.length) return;
 
-    const newFormattedTodo = {
+    const newFormattedTask = {
       id: uuid.v4() as string,
-      task: newTodo,
+      title: newTask,
       isCompleted: false,
     };
-    const updatedTodos = [...todos, newFormattedTodo];
+    const updatedTasks = [...tasks, newFormattedTask];
 
-    setTodos(updatedTodos);
-    setNewTodo('');
+    setTasks(updatedTasks);
+    setNewTask('');
   };
 
   return (
@@ -36,12 +36,12 @@ const CreateTodoItem = ({ todos, setTodos }: Props) => {
       />
       <Input
         placeholder="Create Todo..."
-        value={newTodo}
-        onChangeText={setNewTodo}
+        value={newTask}
+        onChangeText={setNewTask}
         onEndEditing={handleTodoSubmit}
       />
     </TaskContainer>
   );
 };
 
-export default CreateTodoItem;
+export default CreateTaskItem;

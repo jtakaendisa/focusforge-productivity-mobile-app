@@ -16,7 +16,7 @@ const taskDescriptionSchema = z
 
 const subTaskSchema = z.object({
   id: z.string().min(1, { message: 'ID must be at least 1 characters long' }),
-  task: taskDescriptionSchema,
+  title: taskDescriptionSchema,
   isCompleted: z.boolean({ message: 'isCompleted must be a boolean (true / false)' }),
 });
 
@@ -35,7 +35,7 @@ export const signinSchema = z.object({
 });
 
 export const taskSchema = z.object({
-  task: taskDescriptionSchema,
+  title: taskDescriptionSchema,
   category: z.enum(categoryArray),
   dueDate: z.string().date('Invalid date string'),
   priority: z.nativeEnum(PriorityType),

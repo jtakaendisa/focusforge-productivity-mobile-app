@@ -5,9 +5,9 @@ import { FlashList } from '@shopify/flash-list';
 import { Text, View, styled } from 'tamagui';
 
 import { NewTaskData } from '@/app/newTask';
-import CreateTodoItem from '../tasks/CreateTodoItem';
+import CreateTaskItem from '../tasks/CreateTodoItem';
 import TaskItem from '../tasks/TaskItem';
-import { Todo } from '@/app/entities';
+import { Task } from '@/app/entities';
 import ModalContainer from './ModalContainer';
 
 interface Props {
@@ -16,30 +16,28 @@ interface Props {
 }
 
 const ChecklistModal = ({ control, closeModal }: Props) => {
-  const todosRef = useRef<Todo[]>([]);
-  const updateTodosRef = useRef<((...event: any[]) => void) | null>(null);
+  const tasksRef = useRef<Task[]>([]);
+  const updateTasksRef = useRef<((...event: any[]) => void) | null>(null);
 
   const handleTaskPress = (id: string) => {
     console.log({ id });
 
-    const updatedTodos = todosRef.current.map((todo) => {
-      if (todo.id === id) {
+    const updatedTasks = tasksRef.current.map((task) => {
+      if (task.id === id) {
         return {
-          ...todo,
-          isCompleted: !todo.isCompleted,
+          ...task,
+          isCompleted: !task.isCompleted,
         };
       }
-      return todo;
+      return task;
     });
 
-    console.log({ updatedTodos });
-
-    updateTodosRef.current?.(updatedTodos);
+    updateTasksRef.current?.(updatedTasks);
   };
 
   const handleTaskDelete = (id: string) => {
-    const filteredTodos = todosRef.current.filter((todo) => todo.id !== id);
-    updateTodosRef.current?.(filteredTodos);
+    const filteredTasks = tasksRef.current.filter((task) => task.id !== id);
+    updateTasksRef.current?.(filteredTasks);
   };
 
   return (
@@ -51,8 +49,8 @@ const ChecklistModal = ({ control, closeModal }: Props) => {
         control={control}
         name="checklist"
         render={({ field: { onChange, value } }) => {
-          todosRef.current = value;
-          updateTodosRef.current = onChange;
+          tasksRef.current = value;
+          updateTasksRef.current = onChange;
           return (
             <SubtasksContainer>
               <GestureHandlerRootView style={{ flex: 1 }}>
@@ -60,7 +58,7 @@ const ChecklistModal = ({ control, closeModal }: Props) => {
                   data={value}
                   renderItem={({ item }) => (
                     <TaskItem
-                      todo={item}
+                      task={item}
                       onPress={handleTaskPress}
                       onDelete={handleTaskDelete}
                     />
@@ -69,9 +67,9 @@ const ChecklistModal = ({ control, closeModal }: Props) => {
                   ItemSeparatorComponent={ItemSeparator}
                   estimatedItemSize={10}
                   ListHeaderComponent={() => (
-                    <CreateTodoItem
-                      todos={value}
-                      setTodos={(todos) => onChange(todos)}
+                    <CreateTaskItem
+                      tasks={value}
+                      setTasks={(tasks) => onChange(tasks)}
                     />
                   )}
                   showsVerticalScrollIndicator={false}

@@ -1,7 +1,7 @@
 import { TextInput } from 'react-native';
 import { styled } from 'tamagui';
 
-// CreateTodoItem
+// CreateTaskItem
 const Input = styled(TextInput, {
   flex: 1,
   // @ts-ignore

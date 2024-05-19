@@ -2,10 +2,10 @@ import { useRef, useState } from 'react';
 import { TextInput } from 'react-native';
 import { Text, View, styled } from 'tamagui';
 
-import { useTodoStore } from '@/app/store';
+import { useTaskStore } from '@/app/store';
 
 const SearchBar = () => {
-  const setSearchQuery = useTodoStore((s) => s.setSearchQuery);
+  const setSearchQuery = useTaskStore((s) => s.setSearchQuery);
 
   const [textInput, setTextInput] = useState('');
 

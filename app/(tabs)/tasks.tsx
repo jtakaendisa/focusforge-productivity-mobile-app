@@ -1,153 +1,88 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { FlashList } from '@shopify/flash-list';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { View, Text, styled } from 'tamagui';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { View, styled } from 'tamagui';
 
-import { Todo } from '../entities';
-import { useTodoStore } from '../store';
-import TodoItem from '../components/tabs/tasks/TaskItem';
-import SearchBar from '../components/tabs/tasks/SearchBar';
-import FilterBar from '../components/tabs/tasks/FilterBar';
-import FrequencySelector from '../components/tabs/modals/TaskFrequencyModal';
+import { Task } from '../entities';
+import { useTaskStore } from '../store';
+import CreateTaskButton from '../components/tabs/CreateTaskButton';
+import TaskFrequencyModal from '../components/tabs/modals/TaskFrequencyModal';
+import TaskList from '../components/tabs/home/TaskList';
+import { toDateGroupedTasks, toFormattedSections } from '../utils';
 
 const TasksScreen = () => {
-  const todos = useTodoStore((s) => s.todos);
-  const searchQuery = useTodoStore((s) => s.searchQuery);
-  const filter = useTodoStore((s) => s.filter);
-  const setTodos = useTodoStore((s) => s.setTodos);
+  const tasks = useTaskStore((s) => s.tasks);
+  const searchQuery = useTaskStore((s) => s.searchQuery);
+  const filter = useTaskStore((s) => s.filter);
 
-  const [filteredTodos, setFilteredTodos] = useState(todos);
-  const [isOpen, setIsOpen] = useState(false);
+  const [filteredTasks, setFilteredTasks] = useState<(string | Task)[]>([]);
 
-  const listRef = useRef<FlashList<Todo> | null>(null);
+  const tasklistRef = useRef<FlashList<Task | (string | Task)> | null>(null);
+  const taskFrequencyRef = useRef<BottomSheetModal | null>(null);
 
-  const handleTaskPress = (id: string) => {
-    const updatedTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        return {
-          ...todo,
-          isCompleted: !todo.isCompleted,
-        };
-      }
-      return todo;
-    });
-    setTodos(updatedTodos);
-  };
-
-  const handleTaskDelete = (id: string) => {
-    const filteredTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(filteredTodos);
-    listRef.current?.prepareForLayoutAnimationRender();
-  };
+  const handlePresentModalPress = () => taskFrequencyRef.current?.present();
 
   useEffect(() => {
     if (searchQuery.length) {
-      const filteredTodos = todos.filter((todo) =>
-        todo.task.toLowerCase().includes(searchQuery)
+      const filteredTasks = tasks.filter((task) =>
+        task.title.toLowerCase().includes(searchQuery)
       );
-      setFilteredTodos(filteredTodos);
+      setFilteredTasks(filteredTasks);
     } else {
-      setFilteredTodos(todos);
+      setFilteredTasks(tasks);
     }
-    listRef.current?.prepareForLayoutAnimationRender();
-  }, [searchQuery, todos, listRef]);
+    tasklistRef.current?.prepareForLayoutAnimationRender();
+  }, [searchQuery, tasks, tasklistRef]);
 
   useEffect(() => {
-    let filteredTodos: Todo[] = [];
+    let filteredTasks: Task[] = [];
 
     switch (filter) {
       case 'all':
-        filteredTodos = todos;
+        filteredTasks = tasks;
         break;
       case 'open':
-        filteredTodos = todos.filter((todo) => todo.isCompleted === false);
+        filteredTasks = tasks.filter((task) => task.isCompleted === false);
         break;
       case 'completed':
-        filteredTodos = todos.filter((todo) => todo.isCompleted === true);
+        filteredTasks = tasks.filter((task) => task.isCompleted === true);
         break;
       default:
-        filteredTodos = todos;
+        filteredTasks = tasks;
         break;
     }
 
-    setFilteredTodos(filteredTodos);
-    listRef.current?.prepareForLayoutAnimationRender();
-  }, [filter, todos, listRef]);
+    setFilteredTasks(filteredTasks);
+    tasklistRef.current?.prepareForLayoutAnimationRender();
+  }, [filter, tasks, tasklistRef]);
+
+  useEffect(() => {
+    const dateGroupedTasks = toDateGroupedTasks(tasks);
+    const sectionedTasks = toFormattedSections(dateGroupedTasks);
+    setFilteredTasks(sectionedTasks);
+    tasklistRef.current?.prepareForLayoutAnimationRender();
+  }, [tasks]);
 
   return (
     <Container>
-      <SearchBar />
-      <FilterBar />
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <FlashList
-          ref={listRef}
-          data={filteredTodos}
-          renderItem={({ item }) => (
-            <TodoItem
-              todo={item}
-              onPress={handleTaskPress}
-              onDelete={handleTaskDelete}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          ItemSeparatorComponent={ItemSeparator}
-          estimatedItemSize={20}
-          contentContainerStyle={{ padding: 10 }}
-        />
-      </GestureHandlerRootView>
-      <Pressable onPress={() => setIsOpen((prev) => !prev)}>
-        <AddButton>
-          <Text fontSize={32}>+</Text>
-        </AddButton>
-      </Pressable>
-      {isOpen && (
-        <>
-          <AnimatedBackdrop
-            entering={FadeIn}
-            exiting={FadeOut}
-            onPress={() => setIsOpen((prev) => !prev)}
-          />
-          <FrequencySelector onClose={() => setIsOpen((prev) => !prev)} />
-        </>
-      )}
+      {/* <SearchBar />
+      <FilterBar /> */}
+      <TaskList
+        taskListRef={tasklistRef}
+        filteredTasks={filteredTasks}
+        tasks={tasks}
+        isSectioned
+      />
+      <CreateTaskButton onPress={handlePresentModalPress} />
+      <TaskFrequencyModal taskFrequencyRef={taskFrequencyRef} />
     </Container>
   );
 };
 
 const Container = styled(View, {
   flex: 1,
-  backgroundColor: 'white',
+  position: 'relative',
+  backgroundColor: '#111111',
 });
-
-const ItemSeparator = styled(View, {
-  height: 6,
-});
-
-const AddButton = styled(View, {
-  position: 'absolute',
-  right: 30,
-  bottom: 30,
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: 48,
-  height: 48,
-  borderRadius: 24,
-  zIndex: 1,
-  backgroundColor: 'gray',
-});
-
-const Backdrop = styled(View, {
-  position: 'absolute',
-  top: 0,
-  right: 0,
-  bottom: 0,
-  left: 0,
-  zIndex: 1,
-  backgroundColor: 'rgba(0, 0, 0, 0.3)',
-});
-
-const AnimatedBackdrop = Animated.createAnimatedComponent(Backdrop);
 
 export default TasksScreen;
