@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -12,10 +11,6 @@ import { TamaguiProvider } from 'tamagui';
 import { useAuthStore } from './store';
 import { authStateChangeListener, formatAuthUserData } from './services/auth';
 import config from '../tamagui.config';
-
-interface RootLayoutNavProps {
-  onboarded: boolean;
-}
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -33,7 +28,6 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const setAuthUser = useAuthStore((s) => s.setAuthUser);
 
-  const [onboarded, setOnboarded] = useState(false);
   const [loadedAuth, setLoadedAuth] = useState(false);
 
   const [loadedFonts, error] = useFonts({
@@ -45,22 +39,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const value = await AsyncStorage.getItem('onboarded');
-
-        if (value !== null) {
-          setOnboarded(JSON.parse(value));
-        }
-      } catch (e) {
-        console.log('error', e);
-      }
-    };
-
-    getData();
-  }, []);
 
   useEffect(() => {
     if (loadedFonts && loadedAuth) {
@@ -88,18 +66,15 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav onboarded={onboarded} />;
+  return <RootLayoutNav />;
 }
 
-function RootLayoutNav({ onboarded }: RootLayoutNavProps) {
+function RootLayoutNav() {
   return (
     <TamaguiProvider config={config}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheetModalProvider>
-          <Stack
-            initialRouteName={!onboarded ? 'onboarding' : '(auth)'}
-            screenOptions={{ headerShown: false }}
-          >
+          <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="onboarding" />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { data, OnboardingData } from '@/data';
+import { SCREEN_WIDTH } from './constants';
 import OnboardingCard from './components/onboarding/OnboardingCard';
 import Pagination from './components/onboarding/Pagination';
 import CustomButton from './components/onboarding/CustomButton';
@@ -42,7 +43,7 @@ const OnboardingScreen = () => {
           <OnboardingCard item={item} index={index} x={x} />
         )}
         keyExtractor={(item) => item.id.toString()}
-        estimatedItemSize={3}
+        estimatedItemSize={SCREEN_WIDTH}
         onScroll={handleScroll}
         scrollEventThrottle={16}
         horizontal

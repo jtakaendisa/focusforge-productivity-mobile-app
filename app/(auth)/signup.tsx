@@ -32,6 +32,7 @@ import {
   ButtonsContainer,
   Container,
   ErrorText,
+  FormContainer,
   InputsContainer,
   LightsContainer,
 } from '../components/auth/styled';
@@ -87,13 +88,6 @@ const SignupScreen = () => {
       }, 2100);
     }
   }, [playAnimations]);
-
-  const FormContainer = styled(View, {
-    flex: 1,
-    justifyContent: 'space-around',
-    paddingTop: 0.22 * SCREEN_HEIGHT,
-    paddingBottom: 10,
-  });
 
   return (
     <Container>

@@ -14,6 +14,7 @@ import { Image, Text, View, styled } from 'tamagui';
 
 import { OnboardingData } from '@/data';
 import { SCREEN_WIDTH } from '@/app/constants';
+import { useAuthStore } from '@/app/store';
 
 interface Props {
   listRef: MutableRefObject<FlashList<OnboardingData> | null>;

@@ -1,5 +1,7 @@
-import { Button, Image, Text, View, styled } from 'tamagui';
 import Animated from 'react-native-reanimated';
+import { Button, Image, Text, View, styled } from 'tamagui';
+
+import { SCREEN_HEIGHT } from '@/app/constants';
 
 const Container = styled(View, {
   flex: 1,
@@ -32,6 +34,13 @@ const Title = styled(Text, {
   fontWeight: 'bold',
   fontSize: 42,
   textAlign: 'center',
+});
+
+const FormContainer = styled(View, {
+  flex: 1,
+  justifyContent: 'space-around',
+  paddingTop: 0.22 * SCREEN_HEIGHT,
+  paddingBottom: 10,
 });
 
 const InputsContainer = styled(View, {
@@ -91,6 +100,7 @@ export {
   AnimatedLargeLight,
   AnimatedSmallLight,
   AnimatedTitle,
+  FormContainer,
   InputsContainer,
   AnimatedInputContainer,
   ButtonsContainer,

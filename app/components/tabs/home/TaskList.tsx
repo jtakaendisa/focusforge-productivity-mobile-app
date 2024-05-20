@@ -72,7 +72,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isSectioned }: Props) => 
           getItemType={(item) => {
             return typeof item === 'string' ? 'sectionHeader' : 'row';
           }}
-          estimatedItemSize={60}
+          estimatedItemSize={72}
         />
       ) : (
         <FlashList
@@ -89,7 +89,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isSectioned }: Props) => 
             />
           )}
           keyExtractor={(item) => (item as Task).id}
-          estimatedItemSize={20}
+          estimatedItemSize={72}
         />
       )}
 

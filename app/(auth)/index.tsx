@@ -15,8 +15,8 @@ import {
 } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Text, View, styled, useWindowDimensions } from 'tamagui';
 import { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { Text } from 'tamagui';
 
 import { signinSchema } from '../validationSchemas';
 import { signInAuthUser } from '../services/auth';
@@ -32,6 +32,7 @@ import {
   ButtonsContainer,
   Container,
   ErrorText,
+  FormContainer,
   InputsContainer,
   LightsContainer,
 } from '../components/auth/styled';
@@ -55,8 +56,6 @@ const SigninScreen = () => {
     },
     resolver: zodResolver(signinSchema),
   });
-
-  const { height: SCREEN_HEIGHT } = useWindowDimensions();
 
   const onSubmit: SubmitHandler<SigninFormData> = async (data) => {
     const { email, password } = data;
@@ -83,13 +82,6 @@ const SigninScreen = () => {
       }, 2100);
     }
   }, [playAnimations]);
-
-  const FormContainer = styled(View, {
-    flex: 1,
-    justifyContent: 'space-around',
-    paddingTop: 0.22 * SCREEN_HEIGHT,
-    paddingBottom: 10,
-  });
 
   return (
     <Container>

@@ -5,10 +5,10 @@ import { View, styled } from 'tamagui';
 
 import { Task } from '../entities';
 import { useTaskStore } from '../store';
+import { toDateGroupedTasks, toFormattedSections } from '../utils';
 import CreateTaskButton from '../components/tabs/CreateTaskButton';
 import TaskFrequencyModal from '../components/tabs/modals/TaskFrequencyModal';
 import TaskList from '../components/tabs/home/TaskList';
-import { toDateGroupedTasks, toFormattedSections } from '../utils';
 
 const TasksScreen = () => {
   const tasks = useTaskStore((s) => s.tasks);
@@ -31,7 +31,7 @@ const TasksScreen = () => {
     } else {
       setFilteredTasks(tasks);
     }
-    tasklistRef.current?.prepareForLayoutAnimationRender();
+    // tasklistRef.current?.prepareForLayoutAnimationRender();
   }, [searchQuery, tasks, tasklistRef]);
 
   useEffect(() => {
@@ -60,7 +60,6 @@ const TasksScreen = () => {
     const dateGroupedTasks = toDateGroupedTasks(tasks);
     const sectionedTasks = toFormattedSections(dateGroupedTasks);
     setFilteredTasks(sectionedTasks);
-    tasklistRef.current?.prepareForLayoutAnimationRender();
   }, [tasks]);
 
   return (
