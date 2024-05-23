@@ -626,7 +626,7 @@ const useAuthStore = create<AuthStore>((set) => ({
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: dummyTasks,
   searchQuery: '',
-  filter: 'all',
+  filter: 'single',
   selectedDate: TODAYS_DATE,
   setTasks: (tasks) => set((state) => ({ ...state, tasks })),
   setSearchQuery: (searchQuery) => set((state) => ({ ...state, searchQuery })),

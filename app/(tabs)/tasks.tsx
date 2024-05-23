@@ -8,6 +8,7 @@ import { useTaskStore } from '../store';
 import { toDateGroupedTasks, toFormattedSections } from '../utils';
 import CreateTaskButton from '../components/tabs/CreateTaskButton';
 import TaskFrequencyModal from '../components/tabs/modals/TaskFrequencyModal';
+import FilterBar from '../components/tabs/tasks/FilterBar';
 import TaskList from '../components/tabs/home/TaskList';
 
 const TasksScreen = () => {
@@ -38,21 +39,17 @@ const TasksScreen = () => {
     let filteredTasks: Task[] = [];
 
     switch (filter) {
-      case 'all':
-        filteredTasks = tasks;
+      case 'single':
+        filteredTasks = tasks.filter((task) => task.isRecurring === false);
         break;
-      case 'open':
-        filteredTasks = tasks.filter((task) => task.isCompleted === false);
-        break;
-      case 'completed':
-        filteredTasks = tasks.filter((task) => task.isCompleted === true);
-        break;
-      default:
-        filteredTasks = tasks;
+      case 'recurring':
+        filteredTasks = tasks.filter((task) => task.isRecurring === true);
         break;
     }
 
-    setFilteredTasks(filteredTasks);
+    const dateGroupedTasks = toDateGroupedTasks(filteredTasks);
+    const sectionedTasks = toFormattedSections(dateGroupedTasks);
+    setFilteredTasks(sectionedTasks);
     tasklistRef.current?.prepareForLayoutAnimationRender();
   }, [filter, tasks, tasklistRef]);
 
@@ -64,8 +61,8 @@ const TasksScreen = () => {
 
   return (
     <Container>
-      {/* <SearchBar />
-      <FilterBar /> */}
+      {/* <SearchBar /> */}
+      <FilterBar />
       <TaskList
         taskListRef={tasklistRef}
         filteredTasks={filteredTasks}

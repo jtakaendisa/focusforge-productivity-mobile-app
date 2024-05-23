@@ -37,7 +37,7 @@ export const signinSchema = z.object({
 export const taskSchema = z.object({
   title: taskDescriptionSchema,
   category: z.enum(categoryArray),
-  dueDate: z.string().date('Invalid date string'),
+  dueDate: z.date({ message: 'Invalid date string' }),
   priority: z.nativeEnum(PriorityType),
   note: z.string().min(2, { message: 'Task note must be at least 2 characters long' }),
   isCarriedOver: z.boolean({

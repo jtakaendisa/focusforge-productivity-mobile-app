@@ -4,7 +4,6 @@ import { Control, Controller } from 'react-hook-form';
 import { Text, View, styled } from 'tamagui';
 
 import { NewTaskData } from '@/app/newTask';
-import ModalContainer from './ModalContainer';
 
 interface Props {
   control: Control<NewTaskData>;
@@ -12,13 +11,13 @@ interface Props {
   closeModal: () => void;
 }
 
-const NoteModal = ({ control, previousNote, closeModal }: Props) => {
+const NoteModalModule = ({ control, previousNote, closeModal }: Props) => {
   const previousNoteRef = useRef<string>(previousNote);
   const clearInputRef = useRef<((...event: any[]) => void) | null>(null);
 
   return (
-    <ModalContainer closeModal={closeModal}>
-      <NoteContainer>
+    <Container>
+      <MainContainer>
         <Controller
           control={control}
           name="note"
@@ -37,7 +36,7 @@ const NoteModal = ({ control, previousNote, closeModal }: Props) => {
             );
           }}
         />
-      </NoteContainer>
+      </MainContainer>
       <ButtonsContainer>
         <Button
           onPress={() => {
@@ -45,18 +44,24 @@ const NoteModal = ({ control, previousNote, closeModal }: Props) => {
             closeModal();
           }}
         >
-          <Text>CANCEL</Text>
+          <ButtonText>CANCEL</ButtonText>
         </Button>
-        <Button onPress={() => closeModal()}>
-          <Text color="red">OK</Text>
+        <Button onPress={closeModal}>
+          <ButtonText color="#C73A57">OK</ButtonText>
         </Button>
       </ButtonsContainer>
-    </ModalContainer>
+    </Container>
   );
 };
 
-const NoteContainer = styled(View, {
-  marginTop: 16,
+const Container = styled(View, {
+  width: '80%',
+  borderRadius: 16,
+  backgroundColor: '#1C1C1C',
+});
+
+const MainContainer = styled(View, {
+  margin: 16,
 });
 
 const NoteInputField = styled(TextInput, {
@@ -73,13 +78,22 @@ const NoteInputField = styled(TextInput, {
 
 const ButtonsContainer = styled(View, {
   flexDirection: 'row',
-  padding: 8,
+  alignItems: 'center',
+  borderTopWidth: 1,
+  borderColor: '#262626',
 });
 
 const Button = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
   width: '50%',
+  paddingVertical: 16,
 });
 
-export default NoteModal;
+const ButtonText = styled(Text, {
+  fontSize: 15.5,
+  fontWeight: 'bold',
+  textTransform: 'uppercase',
+});
+
+export default NoteModalModule;

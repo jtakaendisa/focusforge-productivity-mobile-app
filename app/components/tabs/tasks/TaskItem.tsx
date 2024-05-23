@@ -30,23 +30,22 @@ const TaskItem = ({ task, onPress, onSwipe, openModal }: Props) => {
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
-  const sharedIsCompleted = useSharedValue(isCompleted ? 1 : 0);
+  const isChecked = useSharedValue(isCompleted ? 1 : 0);
 
   const white = getTokens().color.$white.val;
   const gray = getTokens().color.$gray1.val;
 
   const textColorAnimation = useAnimatedStyle(() => ({
-    color: interpolateColor(sharedIsCompleted.value, [0, 1], [white, gray]),
-    textDecorationLine: sharedIsCompleted.value ? 'line-through' : 'none',
+    color: interpolateColor(isChecked.value, [0, 1], [white, gray]),
+    textDecorationLine: isChecked.value ? 'line-through' : 'none',
   }));
 
   const textOpacityAnimation = useAnimatedStyle(() => ({
-    opacity: interpolate(sharedIsCompleted.value, [0, 1], [1, 0.6]),
+    opacity: interpolate(isChecked.value, [0, 1], [1, 0.6]),
   }));
 
   const handleTaskCompletion = () => {
-    sharedIsCompleted.value =
-      sharedIsCompleted.value === 1 ? withTiming(0) : withTiming(1);
+    isChecked.value = isChecked.value === 1 ? withTiming(0) : withTiming(1);
     onPress(id);
   };
 
@@ -81,7 +80,7 @@ const TaskItem = ({ task, onPress, onSwipe, openModal }: Props) => {
       >
         <TaskContainer>
           <CheckboxContainer>
-            <Checkbox sharedIsCompleted={sharedIsCompleted} />
+            <Checkbox isChecked={isChecked} />
           </CheckboxContainer>
           <TextContainer>
             <AnimatedTitle style={textColorAnimation}>

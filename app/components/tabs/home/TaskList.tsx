@@ -6,7 +6,6 @@ import { useTaskStore } from '@/app/store';
 import TaskItem from '../tasks/TaskItem';
 import ModalContainer from '../modals/ModalContainer';
 import DeleteModalModule from '../modals/DeleteModalModule';
-import { Text } from 'tamagui';
 import TaskSectionHeader from '../tasks/TaskSectionHeader';
 
 interface Props {

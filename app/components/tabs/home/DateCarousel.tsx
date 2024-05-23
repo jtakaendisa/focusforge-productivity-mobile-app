@@ -41,7 +41,7 @@ const DateCarousel = () => {
           />
         )}
         keyExtractor={(item) => item.date.toString()}
-        estimatedItemSize={40}
+        estimatedItemSize={50}
         estimatedListSize={{ height: DATE_CARD_HEIGHT, width: SCREEN_WIDTH }}
         horizontal
         showsHorizontalScrollIndicator={false}

@@ -12,8 +12,12 @@ import OnboardingCard from './components/onboarding/OnboardingCard';
 import Pagination from './components/onboarding/Pagination';
 import CustomButton from './components/onboarding/CustomButton';
 import { FlashList, FlashListProps } from '@shopify/flash-list';
+import { useAuthStore } from './store';
+import { Redirect } from 'expo-router';
 
 const OnboardingScreen = () => {
+  const authUser = useAuthStore((s) => s.authUser);
+
   const listRef = useRef<FlashList<OnboardingData> | null>(null);
   const listIndex = useSharedValue(0);
   const x = useSharedValue(0);
@@ -33,6 +37,8 @@ const OnboardingScreen = () => {
       listIndex.value = viewableItems[0].index;
     }
   };
+
+  if (authUser) return <Redirect href="/(tabs)" />;
 
   return (
     <Container>

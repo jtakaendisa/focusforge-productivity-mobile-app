@@ -8,24 +8,20 @@ import Animated, {
 import { View, getTokens, styled } from 'tamagui';
 
 interface Props {
-  sharedIsCompleted: SharedValue<number>;
+  isChecked: SharedValue<number>;
 }
 
-const Checkbox = ({ sharedIsCompleted }: Props) => {
+const Checkbox = ({ isChecked }: Props) => {
   const gray = getTokens().color.$gray1.val;
   const green = getTokens().color.$green1.val;
 
   const checkboxAnimation = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(sharedIsCompleted.value, [0, 1], [gray, green]),
-    backgroundColor: interpolateColor(
-      sharedIsCompleted.value,
-      [0, 1],
-      ['transparent', green]
-    ),
+    borderColor: interpolateColor(isChecked.value, [0, 1], [gray, green]),
+    backgroundColor: interpolateColor(isChecked.value, [0, 1], ['transparent', green]),
   }));
 
   const checkboxIconAnimation = useAnimatedStyle(() => ({
-    opacity: interpolate(sharedIsCompleted.value, [0, 1], [0, 1]),
+    opacity: interpolate(isChecked.value, [0, 1], [0, 1]),
   }));
 
   return (

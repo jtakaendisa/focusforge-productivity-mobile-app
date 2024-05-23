@@ -17,7 +17,7 @@ const EditPhotoModalModule = ({
   return (
     <Container>
       <HeadingContainer>
-        <Heading>Edit Profile Photo</Heading>
+        <HeadingText>Edit Profile Photo</HeadingText>
       </HeadingContainer>
       <MainContent>
         <ButtonsContainer>
@@ -67,7 +67,7 @@ const HeadingContainer = styled(View, {
   borderColor: '#262626',
 });
 
-const Heading = styled(Text, {
+const HeadingText = styled(Text, {
   fontSize: 16,
 });
 

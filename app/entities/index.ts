@@ -9,13 +9,13 @@ export type AuthUser = User & {
 
 export type AnimatedInterpolation = Animated.AnimatedInterpolation<string | number>;
 
-export type Filter = 'all' | 'open' | 'completed';
+export type Filter = 'single' | 'recurring';
 
 export type Category = (typeof categoryArray)[number];
 
 export type Priority = 'Low' | 'Normal' | 'High';
 
-interface ChecklistItem {
+export interface ChecklistItem {
   id: string;
   title: string;
   isCompleted: boolean;
