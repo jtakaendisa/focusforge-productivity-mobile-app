@@ -7,14 +7,22 @@ import { NewTaskData } from '@/app/newTask';
 import PriorityButton from './PriorityButton';
 
 interface Props {
-  control: Control<NewTaskData>;
   currentPriority: Priority;
+  isForm?: boolean;
+  control?: Control<NewTaskData>;
   closeModal: () => void;
+  setPriority?: (...event: any[]) => void;
 }
 
 const priorities = ['Low', 'Normal', 'High'] as const;
 
-const PriorityModalModule = ({ control, currentPriority, closeModal }: Props) => {
+const PriorityModalModule = ({
+  isForm,
+  control,
+  currentPriority,
+  setPriority,
+  closeModal,
+}: Props) => {
   const previousPriorityRef = useRef<Priority>(currentPriority);
   const setPriorityRef = useRef<((...event: any[]) => void) | null>(null);
 
@@ -25,25 +33,38 @@ const PriorityModalModule = ({ control, currentPriority, closeModal }: Props) =>
       </HeadingContainer>
       <MainContent>
         <PrioritiesRow>
-          <Controller
-            control={control}
-            name="priority"
-            render={({ field: { onChange } }) => {
-              setPriorityRef.current = onChange;
-              return (
-                <>
-                  {priorities.map((priority) => (
-                    <PriorityButton
-                      key={priority}
-                      priority={priority}
-                      currentPriority={currentPriority}
-                      onChange={onChange}
-                    />
-                  ))}
-                </>
-              );
-            }}
-          />
+          {isForm ? (
+            <Controller
+              control={control}
+              name="priority"
+              render={({ field: { onChange } }) => {
+                setPriorityRef.current = onChange;
+                return (
+                  <>
+                    {priorities.map((priority) => (
+                      <PriorityButton
+                        key={priority}
+                        priority={priority}
+                        currentPriority={currentPriority}
+                        onChange={onChange}
+                      />
+                    ))}
+                  </>
+                );
+              }}
+            />
+          ) : (
+            <>
+              {priorities.map((priority) => (
+                <PriorityButton
+                  key={priority}
+                  priority={priority}
+                  currentPriority={currentPriority}
+                  onChange={setPriority}
+                />
+              ))}
+            </>
+          )}
         </PrioritiesRow>
         <PriorityInfo>
           <Text color="#8C8C8C">
@@ -52,14 +73,25 @@ const PriorityModalModule = ({ control, currentPriority, closeModal }: Props) =>
         </PriorityInfo>
       </MainContent>
       <ButtonsContainer>
-        <Button
-          onPress={() => {
-            setPriorityRef.current?.(previousPriorityRef.current);
-            closeModal();
-          }}
-        >
-          <Text>CANCEL</Text>
-        </Button>
+        {isForm ? (
+          <Button
+            onPress={() => {
+              setPriorityRef.current?.(previousPriorityRef.current);
+              closeModal();
+            }}
+          >
+            <Text>CANCEL</Text>
+          </Button>
+        ) : (
+          <Button
+            onPress={() => {
+              setPriority?.(previousPriorityRef.current);
+              closeModal();
+            }}
+          >
+            <Text>CANCEL</Text>
+          </Button>
+        )}
         <Button onPress={closeModal}>
           <ButtonText color="#C73A57">OK</ButtonText>
         </Button>

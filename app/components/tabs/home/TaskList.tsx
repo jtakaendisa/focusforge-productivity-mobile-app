@@ -1,12 +1,13 @@
-import { MutableRefObject, useState } from 'react';
+import { MutableRefObject, useEffect, useState } from 'react';
 import { FlashList } from '@shopify/flash-list';
 
-import { Task } from '@/app/entities';
+import { Priority, Task } from '@/app/entities';
 import { useTaskStore } from '@/app/store';
 import TaskItem from '../tasks/TaskItem';
 import ModalContainer from '../modals/ModalContainer';
 import DeleteModalModule from '../modals/DeleteModalModule';
 import TaskSectionHeader from '../tasks/TaskSectionHeader';
+import PriorityModalModule from '../modals/PriorityModalModule';
 
 interface Props {
   taskListRef: MutableRefObject<FlashList<Task | (string | Task)> | null>;
@@ -18,32 +19,63 @@ interface Props {
 const TaskList = ({ taskListRef, tasks, filteredTasks, isSectioned }: Props) => {
   const setTasks = useTaskStore((s) => s.setTasks);
 
+  const [currentPriority, setCurrentPriority] = useState<Priority | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
   const [modalState, setModalState] = useState({
-    deleteIsOpen: false,
-    prioritizeIsOpen: false,
+    isDeleteOpen: false,
+    isPrioritizeOpen: false,
   });
 
-  const handleTaskPress = (id: string) => {
+  const { isDeleteOpen, isPrioritizeOpen } = modalState;
+
+  const handlePress = (id: string) => {
     const updatedTasks = tasks.map((task) => {
       if (task.id === id) {
         return {
           ...task,
           isCompleted: !task.isCompleted,
         };
+      } else {
+        return task;
       }
-      return task;
     });
     setTasks(updatedTasks);
   };
 
-  const handleTaskDeletion = (id: string) => {
+  const handlePrioritize = (priority: Priority) => {
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === selectedTaskId) {
+        return {
+          ...task,
+          priority,
+        };
+      } else {
+        return task;
+      }
+    });
+    setTasks(updatedTasks);
+  };
+
+  const handleDelete = (id: string) => {
     const filteredTasks = tasks.filter((task) => task.id !== id);
     setTasks(filteredTasks);
     taskListRef.current?.prepareForLayoutAnimationRender();
   };
 
-  const { deleteIsOpen, prioritizeIsOpen } = modalState;
+  const closeDeleteModal = () => setModalState({ ...modalState, isDeleteOpen: false });
+  const closePriorityModal = () =>
+    setModalState({ ...modalState, isPrioritizeOpen: false });
+
+  useEffect(() => {
+    if (isPrioritizeOpen) {
+      const priority = tasks.find((task) => task.id === selectedTaskId)?.priority;
+      if (priority) {
+        setCurrentPriority(priority);
+      }
+    } else {
+      setCurrentPriority(null);
+    }
+  }, [tasks, isPrioritizeOpen, selectedTaskId]);
 
   return (
     <>
@@ -58,7 +90,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isSectioned }: Props) => 
               return (
                 <TaskItem
                   task={item}
-                  onPress={handleTaskPress}
+                  onPress={handlePress}
                   onSwipe={(id) => setSelectedTaskId(id)}
                   openModal={(modalName) =>
                     setModalState({ ...modalState, [modalName]: true })
@@ -80,7 +112,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isSectioned }: Props) => 
           renderItem={({ item }) => (
             <TaskItem
               task={item as Task}
-              onPress={handleTaskPress}
+              onPress={handlePress}
               onSwipe={(id) => setSelectedTaskId(id)}
               openModal={(modalName) =>
                 setModalState({ ...modalState, [modalName]: true })
@@ -92,26 +124,22 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isSectioned }: Props) => 
         />
       )}
 
-      {prioritizeIsOpen && (
-        <ModalContainer
-          isOpen={prioritizeIsOpen}
-          closeModal={() => setModalState({ ...modalState, prioritizeIsOpen: false })}
-        >
-          <></>
-        </ModalContainer>
-      )}
-      {deleteIsOpen && (
-        <ModalContainer
-          isOpen={deleteIsOpen}
-          closeModal={() => setModalState({ ...modalState, deleteIsOpen: false })}
-        >
-          <DeleteModalModule
-            taskId={selectedTaskId}
-            deleteTask={handleTaskDeletion}
-            closeModal={() => setModalState({ ...modalState, deleteIsOpen: false })}
+      <ModalContainer isOpen={isPrioritizeOpen} closeModal={closePriorityModal}>
+        {currentPriority && (
+          <PriorityModalModule
+            currentPriority={currentPriority}
+            setPriority={handlePrioritize}
+            closeModal={closePriorityModal}
           />
-        </ModalContainer>
-      )}
+        )}
+      </ModalContainer>
+      <ModalContainer isOpen={isDeleteOpen} closeModal={closeDeleteModal}>
+        <DeleteModalModule
+          taskId={selectedTaskId}
+          deleteTask={handleDelete}
+          closeModal={closeDeleteModal}
+        />
+      </ModalContainer>
     </>
   );
 };

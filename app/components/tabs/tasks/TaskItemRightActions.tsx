@@ -7,7 +7,7 @@ interface Props {
   dragAnimatedValue: AnimatedInterpolation;
 }
 
-const SVG_SIZE = 22;
+const SVG_SIZE = 20;
 
 const TaskItemRightActions = ({ dragAnimatedValue }: Props) => {
   const dragAnimation = {

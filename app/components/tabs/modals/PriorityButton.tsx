@@ -12,7 +12,7 @@ import { Priority } from '@/app/entities';
 interface Props {
   priority: Priority;
   currentPriority: Priority;
-  onChange: (...event: any[]) => void;
+  onChange?: (...event: any[]) => void;
 }
 
 const PriorityButton = ({ priority, currentPriority, onChange }: Props) => {
@@ -36,7 +36,7 @@ const PriorityButton = ({ priority, currentPriority, onChange }: Props) => {
         { borderRightWidth: priority !== 'High' ? 1 : 0 },
         backgroundColorAnimation,
       ]}
-      onPress={() => onChange(priority)}
+      onPress={() => onChange?.(priority)}
     >
       <AnimatedText style={textColorAnimation}>{priority}</AnimatedText>
     </AnimatedContainer>

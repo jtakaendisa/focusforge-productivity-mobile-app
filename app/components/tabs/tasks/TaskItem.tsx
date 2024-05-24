@@ -22,7 +22,7 @@ interface Props {
   task: Task;
   onPress: (id: string) => void;
   onSwipe: (id: string) => void;
-  openModal: (modalName: 'prioritizeIsOpen' | 'deleteIsOpen') => void;
+  openModal: (modalName: 'isPrioritizeOpen' | 'isDeleteOpen') => void;
 }
 
 const TaskItem = ({ task, onPress, onSwipe, openModal }: Props) => {
@@ -50,13 +50,14 @@ const TaskItem = ({ task, onPress, onSwipe, openModal }: Props) => {
   };
 
   const handleSwipeCompletion = (direction: 'left' | 'right') => {
+    onSwipe(id);
+
     if (direction === 'left') {
-      openModal('prioritizeIsOpen');
+      openModal('isPrioritizeOpen');
     }
 
     if (direction === 'right') {
-      onSwipe(id);
-      openModal('deleteIsOpen');
+      openModal('isDeleteOpen');
     }
 
     swipeableRef.current?.close();

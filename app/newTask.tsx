@@ -17,7 +17,7 @@ import { styled, Text, View } from 'tamagui';
 
 import { PriorityType, useTaskStore } from './store';
 import { TODAYS_DATE } from './constants';
-import { toFormattedDateString } from './utils';
+import { toFormattedDateString, toTruncatedText } from './utils';
 import { taskSchema } from './validationSchemas';
 import ModalContainer from './components/tabs/modals/ModalContainer';
 import CategoryModalModule from './components/tabs/modals/CategoryModalModule';
@@ -57,28 +57,7 @@ const NewTaskScreen = () => {
       category: 'Task',
       dueDate: TODAYS_DATE,
       priority: PriorityType.normal,
-      checklist: [
-        { id: '1', title: 'Test 1', isCompleted: false },
-        { id: '2', title: 'Test 2', isCompleted: false },
-        { id: '3', title: 'Test 3', isCompleted: false },
-        { id: '4', title: 'Test 4', isCompleted: false },
-        { id: '5', title: 'Test 5', isCompleted: false },
-        { id: '6', title: 'Test 6', isCompleted: false },
-        { id: '7', title: 'Test 7', isCompleted: false },
-        { id: '8', title: 'Test 8', isCompleted: false },
-        { id: '9', title: 'Test 9', isCompleted: false },
-        { id: '10', title: 'Test 10', isCompleted: false },
-        { id: '11', title: 'Test 11', isCompleted: false },
-        { id: '12', title: 'Test 12', isCompleted: false },
-        { id: '13', title: 'Test 13', isCompleted: false },
-        { id: '14', title: 'Test 14', isCompleted: false },
-        { id: '15', title: 'Test 15', isCompleted: false },
-        { id: '16', title: 'Test 16', isCompleted: false },
-        { id: '17', title: 'Test 17', isCompleted: false },
-        { id: '18', title: 'Test 18', isCompleted: false },
-        { id: '19', title: 'Test 19', isCompleted: false },
-        { id: '20', title: 'Test 20', isCompleted: false },
-      ],
+      checklist: [],
       note: '',
       isCarriedOver: true,
     },
@@ -249,11 +228,7 @@ const NewTaskScreen = () => {
           </Svg>
           <OptionTitle>Note</OptionTitle>
         </OptionInfo>
-        <Text color="#C73A57">
-          {note.length > 0
-            ? note.substring(0, 8) + (note.length >= 8 ? '...' : '')
-            : ''}
-        </Text>
+        <Text color="#C73A57">{toTruncatedText(note, 16)}</Text>
       </OptionContainer>
       <OptionContainer onPress={() => setIsCarriedOverRef.current?.(!isCarriedOver)}>
         <OptionInfo>
@@ -298,6 +273,7 @@ const NewTaskScreen = () => {
       </ModalContainer>
       <ModalContainer isOpen={isPriorityOpen} closeModal={togglePriorityModal}>
         <PriorityModalModule
+          isForm
           control={control}
           currentPriority={priority}
           closeModal={togglePriorityModal}
