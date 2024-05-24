@@ -1,5 +1,7 @@
 import { View, Text, styled } from 'tamagui';
 
+import { toFormattedSectionTitle } from '@/app/utils';
+
 interface Props {
   title: string;
 }
@@ -8,7 +10,7 @@ const TaskSectionHeader = ({ title }: Props) => {
   return (
     <Container>
       <HeaderLabel>
-        <HeaderText>{title}</HeaderText>
+        <HeaderText>{toFormattedSectionTitle(title)}</HeaderText>
       </HeaderLabel>
     </Container>
   );

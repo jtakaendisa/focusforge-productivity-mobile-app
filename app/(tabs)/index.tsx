@@ -45,6 +45,7 @@ const HomeScreen = () => {
             taskListRef={taskListRef}
             filteredTasks={filteredTasks}
             tasks={tasks}
+            isSwipeable
           />
         )}
       </TaskListContainer>

@@ -14,9 +14,16 @@ interface Props {
   tasks: Task[];
   filteredTasks: Task[] | (string | Task)[];
   isSectioned?: boolean;
+  isSwipeable?: boolean;
 }
 
-const TaskList = ({ taskListRef, tasks, filteredTasks, isSectioned }: Props) => {
+const TaskList = ({
+  taskListRef,
+  tasks,
+  filteredTasks,
+  isSectioned,
+  isSwipeable,
+}: Props) => {
   const setTasks = useTaskStore((s) => s.setTasks);
 
   const [currentPriority, setCurrentPriority] = useState<Priority | null>(null);
@@ -89,6 +96,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isSectioned }: Props) => 
             } else {
               return (
                 <TaskItem
+                  isSwipeable={isSwipeable}
                   task={item}
                   onPress={handlePress}
                   onSwipe={(id) => setSelectedTaskId(id)}
@@ -111,6 +119,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isSectioned }: Props) => 
           data={filteredTasks as Task[]}
           renderItem={({ item }) => (
             <TaskItem
+              isSwipeable={isSwipeable}
               task={item as Task}
               onPress={handlePress}
               onSwipe={(id) => setSelectedTaskId(id)}

@@ -19,13 +19,14 @@ import CategoryIcon from '../CategoryIcon';
 import Checkbox from './Checkbox';
 
 interface Props {
+  isSwipeable?: boolean;
   task: Task;
   onPress: (id: string) => void;
   onSwipe: (id: string) => void;
   openModal: (modalName: 'isPrioritizeOpen' | 'isDeleteOpen') => void;
 }
 
-const TaskItem = ({ task, onPress, onSwipe, openModal }: Props) => {
+const TaskItem = ({ isSwipeable, task, onPress, onSwipe, openModal }: Props) => {
   const { id, title, isCompleted, note, category } = task;
 
   const swipeableRef = useRef<Swipeable | null>(null);
@@ -63,49 +64,79 @@ const TaskItem = ({ task, onPress, onSwipe, openModal }: Props) => {
     swipeableRef.current?.close();
   };
 
-  return (
-    <AnimatedContainer
-      entering={FadeIn}
-      exiting={FadeOut}
-      onPress={handleTaskCompletion}
-    >
-      <Swipeable
-        ref={swipeableRef}
-        renderLeftActions={(_, dragAnimatedValue) => (
-          <TaskItemLeftActions dragAnimatedValue={dragAnimatedValue} />
-        )}
-        renderRightActions={(_, dragAnimatedValue) => (
-          <TaskItemRightActions dragAnimatedValue={dragAnimatedValue} />
-        )}
-        onSwipeableOpen={(direction) => handleSwipeCompletion(direction)}
+  if (isSwipeable) {
+    return (
+      <AnimatedContainer
+        entering={FadeIn}
+        exiting={FadeOut}
+        onPress={handleTaskCompletion}
       >
-        <TaskContainer>
-          <CheckboxContainer>
-            <Checkbox isChecked={isChecked} />
-          </CheckboxContainer>
-          <TextContainer>
-            <AnimatedTitle style={textColorAnimation}>
-              {toTruncatedText(title, 30)}
-            </AnimatedTitle>
-            {note && (
-              <AnimatedNote style={textOpacityAnimation}>
-                {toTruncatedText(note, 37)}
-              </AnimatedNote>
-            )}
-          </TextContainer>
-          <InfoContainer>
-            <MetricsContainer>
-              <CategoryBadge>
-                <BadgeText>{category}</BadgeText>
-              </CategoryBadge>
-              <ProgressText>0% done</ProgressText>
-            </MetricsContainer>
-            <CategoryContainer>
-              <CategoryIcon category={category} />
-            </CategoryContainer>
-          </InfoContainer>
-        </TaskContainer>
-      </Swipeable>
+        <Swipeable
+          ref={swipeableRef}
+          renderLeftActions={(_, dragAnimatedValue) => (
+            <TaskItemLeftActions dragAnimatedValue={dragAnimatedValue} />
+          )}
+          renderRightActions={(_, dragAnimatedValue) => (
+            <TaskItemRightActions dragAnimatedValue={dragAnimatedValue} />
+          )}
+          onSwipeableOpen={(direction) => handleSwipeCompletion(direction)}
+        >
+          <TaskContainer>
+            <CheckboxContainer>
+              <Checkbox isChecked={isChecked} />
+            </CheckboxContainer>
+            <TextContainer>
+              <AnimatedTitle style={textColorAnimation}>
+                {toTruncatedText(title, 30)}
+              </AnimatedTitle>
+              {note && (
+                <AnimatedNote style={textOpacityAnimation}>
+                  {toTruncatedText(note, 37)}
+                </AnimatedNote>
+              )}
+            </TextContainer>
+            <InfoContainer>
+              <MetricsContainer>
+                <CategoryBadge>
+                  <BadgeText>{category}</BadgeText>
+                </CategoryBadge>
+                <ProgressText>0% done</ProgressText>
+              </MetricsContainer>
+              <CategoryContainer>
+                <CategoryIcon category={category} />
+              </CategoryContainer>
+            </InfoContainer>
+          </TaskContainer>
+        </Swipeable>
+      </AnimatedContainer>
+    );
+  }
+
+  return (
+    <AnimatedContainer entering={FadeIn} exiting={FadeOut}>
+      <TaskContainer>
+        <TextContainer>
+          <AnimatedTitle style={textColorAnimation}>
+            {toTruncatedText(title, 30)}
+          </AnimatedTitle>
+          {note && (
+            <AnimatedNote style={textOpacityAnimation}>
+              {toTruncatedText(note, 37)}
+            </AnimatedNote>
+          )}
+        </TextContainer>
+        <InfoContainer>
+          <MetricsContainer>
+            <CategoryBadge>
+              <BadgeText>{category}</BadgeText>
+            </CategoryBadge>
+            <ProgressText>0% done</ProgressText>
+          </MetricsContainer>
+          <CategoryContainer>
+            <CategoryIcon category={category} />
+          </CategoryContainer>
+        </InfoContainer>
+      </TaskContainer>
     </AnimatedContainer>
   );
 };
