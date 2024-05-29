@@ -39,7 +39,7 @@ export const taskSchema = z.object({
   category: z.enum(categoryArray),
   dueDate: z.date({ message: 'Invalid date string' }),
   priority: z.nativeEnum(PriorityType),
-  note: z.string().min(2, { message: 'Task note must be at least 2 characters long' }),
+  note: z.string(),
   isCarriedOver: z.boolean({
     message: 'isCarriedOver must be a boolean (true / false)',
   }),

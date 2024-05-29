@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { FlashList } from '@shopify/flash-list';
+import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { addDays, addWeeks, format, startOfWeek } from 'date-fns';
 import { styled, View } from 'tamagui';
 
@@ -30,7 +30,7 @@ const DateCarousel = () => {
 
   return (
     <Container>
-      <FlashList
+      <AnimatedFlashList
         ref={listRef}
         data={weeks}
         renderItem={({ item }) => (

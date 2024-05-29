@@ -1,11 +1,11 @@
 import Svg, { Path } from 'react-native-svg';
 
 interface Props {
-  name: 'habit' | 'task' | 'proceed';
+  name: 'habit' | 'recurring task' | 'single task' | 'proceed';
   fill: string;
 }
 
-const SVG_SIZE = 24;
+const SVG_SIZE = 22;
 
 const TaskFrequencyIcon = ({ name, fill }: Props) => {
   switch (name) {
@@ -18,7 +18,16 @@ const TaskFrequencyIcon = ({ name, fill }: Props) => {
           />
         </Svg>
       );
-    case 'task':
+    case 'recurring task':
+      return (
+        <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 22 22" fill="none">
+          <Path
+            d="M0 9.625V4.125V2.75H1.375H13.75V0H15.125L19.25 4.125L15.125 8.25H13.75V5.5H2.75V9.625V11H0V9.625ZM22 12.375V17.875V19.25H20.625H8.25V22H6.875L2.75 17.875L6.875 13.75H8.25V16.5H19.25V12.375V11H22V12.375Z"
+            fill="#C73A57"
+          />
+        </Svg>
+      );
+    case 'single task':
       return (
         <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 12 16" fill="none">
           <Path

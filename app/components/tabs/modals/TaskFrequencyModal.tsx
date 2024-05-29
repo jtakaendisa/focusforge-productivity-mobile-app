@@ -15,6 +15,8 @@ interface Props {
   taskFrequencyRef: MutableRefObject<BottomSheetModalMethods | null>;
 }
 
+type Pathname = '/newTask' | '/newHabit';
+
 const renderBackdrop = (props: BottomSheetBackdropProps) => (
   <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />
 );
@@ -25,20 +27,34 @@ const options = [
     description:
       'Activity that repeats over time. It has detailed tracking and statistics.',
     icon: 'habit',
-    pathname: '/(tabs)',
+    pathname: '/newHabit',
+    isRecurring: true,
+  },
+  {
+    heading: 'Recurring Task',
+    description: 'Activity that repeats over time without tracking or statistics.',
+    icon: 'recurring task',
+    pathname: '/newTask',
+    isRecurring: true,
   },
   {
     heading: 'Task',
     description: 'Single instance activity without tracking over time.',
-    icon: 'task',
+    icon: 'single task',
     pathname: '/newTask',
+    isRecurring: false,
   },
 ] as const;
 
 const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
-  const handleCreateTask = (pathname: any) => {
+  const handleCreateTask = (pathname: Pathname, isRecurring: boolean) => {
     taskFrequencyRef.current?.dismiss();
-    router.push(pathname);
+
+    if (pathname === '/newTask') {
+      router.push({ pathname, params: { isRecurring: isRecurring.toString() } });
+    } else {
+      router.push(pathname);
+    }
   };
 
   return (
@@ -48,27 +64,33 @@ const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
       handleIndicatorStyle={{ backgroundColor: 'gray' }}
       backdropComponent={renderBackdrop}
       index={0}
-      snapPoints={[200]}
+      snapPoints={[285]}
       enablePanDownToClose
     >
       <BottomSheetView>
-        {options.map(({ heading, description, icon, pathname }, index) => (
-          <>
-            <CardContainer key={heading} onPress={() => handleCreateTask(pathname)}>
-              <IconContainer style={{ backgroundColor: 'rgba(150, 44, 66, 0.25)' }}>
-                <TaskFrequencyIcon name={icon} fill="#C73A57" />
-              </IconContainer>
-              <CardTextContainer>
-                <CardHeading>{heading}</CardHeading>
-                <CardDescription>{description}</CardDescription>
-              </CardTextContainer>
-              <IconContainer>
-                <TaskFrequencyIcon name="proceed" fill="#8C8C8C" />
-              </IconContainer>
-            </CardContainer>
-            {index === 0 && <Separator />}
-          </>
-        ))}
+        {options.map((option, index) => {
+          const { heading, description, icon, pathname, isRecurring } = option;
+          return (
+            <>
+              <CardContainer
+                key={heading}
+                onPress={() => handleCreateTask(pathname, isRecurring)}
+              >
+                <IconContainer style={{ backgroundColor: 'rgba(150, 44, 66, 0.25)' }}>
+                  <TaskFrequencyIcon name={icon} fill="#C73A57" />
+                </IconContainer>
+                <CardTextContainer>
+                  <CardHeading>{heading}</CardHeading>
+                  <CardDescription>{description}</CardDescription>
+                </CardTextContainer>
+                <IconContainer>
+                  <TaskFrequencyIcon name="proceed" fill="#8C8C8C" />
+                </IconContainer>
+              </CardContainer>
+              {index < options.length - 1 && <Separator />}
+            </>
+          );
+        })}
       </BottomSheetView>
     </BottomSheetModal>
   );

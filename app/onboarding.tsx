@@ -1,19 +1,16 @@
 import { useRef } from 'react';
 import { ViewToken } from 'react-native';
+import { Redirect } from 'expo-router';
+import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
+import { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { styled, View } from 'tamagui';
-import Animated, {
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from 'react-native-reanimated';
 
+import { useAuthStore } from './store';
 import { data, OnboardingData } from '@/data';
 import { SCREEN_WIDTH } from './constants';
 import OnboardingCard from './components/onboarding/OnboardingCard';
 import Pagination from './components/onboarding/Pagination';
 import CustomButton from './components/onboarding/CustomButton';
-import { FlashList, FlashListProps } from '@shopify/flash-list';
-import { useAuthStore } from './store';
-import { Redirect } from 'expo-router';
 
 const OnboardingScreen = () => {
   const authUser = useAuthStore((s) => s.authUser);
@@ -90,8 +87,5 @@ const PaginationContainer = styled(View, {
   marginHorizontal: 30,
   paddingVertical: 30,
 });
-
-const AnimatedFlashList =
-  Animated.createAnimatedComponent<FlashListProps<OnboardingData>>(FlashList);
 
 export default OnboardingScreen;

@@ -1,7 +1,11 @@
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 import { Task } from '../entities';
 import { TODAYS_DATE } from '../constants';
+
+interface DateGroupedTasks {
+  [key: string]: Task[];
+}
 
 export const toTruncatedText = (text: string, maxLength: number) => {
   if (text.length <= maxLength) {
@@ -15,7 +19,6 @@ export const toFormattedDateString = (date: Date) => {
 };
 
 export const toFormattedSectionTitle = (date: string) => {
-  TODAYS_DATE;
   const yesterday = new Date(TODAYS_DATE);
   yesterday.setDate(TODAYS_DATE.getDate() - 1);
   const tomorrow = new Date(TODAYS_DATE);
@@ -33,14 +36,29 @@ export const toFormattedSectionTitle = (date: string) => {
 };
 
 export const toDateGroupedTasks = (tasks: Task[]) => {
-  return tasks.reduce((groups: { [key: string]: Task[] }, task) => {
+  const groups: DateGroupedTasks = tasks.reduce((acc: DateGroupedTasks, task) => {
     const dueDate = toFormattedDateString(task.dueDate);
-    if (!groups[dueDate]) {
-      groups[dueDate] = [];
+    if (!acc[dueDate]) {
+      acc[dueDate] = [];
     }
-    groups[dueDate].push(task);
-    return groups;
+    acc[dueDate].push(task);
+    return acc;
   }, {});
+
+  // Sort the keys (due dates) in ascending order
+  const sortedKeys = Object.keys(groups).sort((a, b) => {
+    const dateA = parse(a, 'dd MMM yyyy', new Date()); // Convert formatted date string to Date object
+    const dateB = parse(b, 'dd MMM yyyy', new Date());
+    return dateA.getTime() - dateB.getTime();
+  });
+
+  // Create a new object with sorted keys
+  const sortedGroups: DateGroupedTasks = {};
+  sortedKeys.forEach((key) => {
+    sortedGroups[key] = groups[key];
+  });
+
+  return sortedGroups;
 };
 
 export const toFormattedSections = (tasksByDueDate: { [key: string]: Task[] }) => {

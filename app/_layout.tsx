@@ -79,6 +79,7 @@ function RootLayoutNav() {
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="newTask" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="newHabit" options={{ presentation: 'modal' }} />
           </Stack>
           <StatusBar />
         </BottomSheetModalProvider>

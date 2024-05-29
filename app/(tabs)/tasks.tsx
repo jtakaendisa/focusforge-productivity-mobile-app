@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlashList } from '@shopify/flash-list';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, styled } from 'tamagui';
@@ -21,6 +21,20 @@ const TasksScreen = () => {
   const tasklistRef = useRef<FlashList<Task | (string | Task)> | null>(null);
   const taskFrequencyRef = useRef<BottomSheetModal | null>(null);
 
+  const singleSectionedTasks = useMemo(() => {
+    const singleTasks = tasks.filter((task) => task.isRecurring === false);
+    const dateGroupedTasks = toDateGroupedTasks(singleTasks);
+    const sectionedTasks = toFormattedSections(dateGroupedTasks);
+    return sectionedTasks;
+  }, [tasks]);
+
+  const recurringSectionedTasks = useMemo(() => {
+    const recurringTasks = tasks.filter((task) => task.isRecurring === true);
+    const dateGroupedTasks = toDateGroupedTasks(recurringTasks);
+    const sectionedTasks = toFormattedSections(dateGroupedTasks);
+    return sectionedTasks;
+  }, [tasks]);
+
   const handlePresentModalPress = () => taskFrequencyRef.current?.present();
 
   useEffect(() => {
@@ -32,32 +46,25 @@ const TasksScreen = () => {
     } else {
       setFilteredTasks(tasks);
     }
-    // tasklistRef.current?.prepareForLayoutAnimationRender();
+    tasklistRef.current?.prepareForLayoutAnimationRender();
   }, [searchQuery, tasks, tasklistRef]);
 
   useEffect(() => {
-    let filteredTasks: Task[] = [];
+    let filteredTasks: (string | Task)[] = [];
 
     switch (filter) {
       case 'single':
-        filteredTasks = tasks.filter((task) => task.isRecurring === false);
+        filteredTasks = singleSectionedTasks;
         break;
       case 'recurring':
-        filteredTasks = tasks.filter((task) => task.isRecurring === true);
+        filteredTasks = recurringSectionedTasks;
         break;
     }
 
-    const dateGroupedTasks = toDateGroupedTasks(filteredTasks);
-    const sectionedTasks = toFormattedSections(dateGroupedTasks);
-    setFilteredTasks(sectionedTasks);
+    setFilteredTasks(filteredTasks);
+
     tasklistRef.current?.prepareForLayoutAnimationRender();
   }, [filter, tasks, tasklistRef]);
-
-  useEffect(() => {
-    const dateGroupedTasks = toDateGroupedTasks(tasks);
-    const sectionedTasks = toFormattedSections(dateGroupedTasks);
-    setFilteredTasks(sectionedTasks);
-  }, [tasks]);
 
   return (
     <Container>

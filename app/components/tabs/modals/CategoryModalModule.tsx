@@ -20,7 +20,7 @@ const CategoryModalModule = ({ control, closeModal }: Props) => {
         <HeadingText>Select a category</HeadingText>
       </HeadingContainer>
       <ScrollView maxHeight={SCREEN_HEIGHT / 3}>
-        <MainContent onLayout={(e) => console.log(e.nativeEvent.layout.width)}>
+        <MainContent>
           <Controller
             control={control}
             name="category"

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -27,11 +27,17 @@ import NoteModalModule from './components/tabs/modals/NoteModalModule';
 import Checkbox from './components/tabs/tasks/Checkbox';
 import CategoryIcon from './components/tabs/CategoryIcon';
 
+type SearchParams = {
+  isRecurring: string;
+};
+
 export type NewTaskData = z.infer<typeof taskSchema>;
 
 const SVG_SIZE = 22;
 
 const NewTaskScreen = () => {
+  const { isRecurring } = useLocalSearchParams<SearchParams>();
+
   const tasks = useTaskStore((s) => s.tasks);
   const setTasks = useTaskStore((s) => s.setTasks);
 
@@ -95,7 +101,7 @@ const NewTaskScreen = () => {
     const newTask = {
       id: uuid.v4() as string,
       isCompleted: false,
-      isRecurring: false,
+      isRecurring: JSON.parse(isRecurring),
       ...data,
     };
 
@@ -123,7 +129,7 @@ const NewTaskScreen = () => {
     if (!isSubmitSuccessful) return;
 
     reset();
-    router.replace('/(tabs)/tasks');
+    router.back();
   }, [isSubmitSuccessful]);
 
   return (
@@ -253,7 +259,7 @@ const NewTaskScreen = () => {
         />
       </OptionContainer>
       <ButtonsContainer>
-        <Button onPress={() => router.replace('/(tabs)/tasks')}>
+        <Button onPress={() => router.back()}>
           <ButtonText>CANCEL</ButtonText>
         </Button>
         <Button onPress={handleSubmit(onSubmit)}>

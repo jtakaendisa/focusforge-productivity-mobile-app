@@ -1,5 +1,5 @@
 import { MutableRefObject, useEffect, useState } from 'react';
-import { FlashList } from '@shopify/flash-list';
+import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 
 import { Priority, Task } from '@/app/entities';
 import { useTaskStore } from '@/app/store';
@@ -87,7 +87,7 @@ const TaskList = ({
   return (
     <>
       {isSectioned ? (
-        <FlashList
+        <AnimatedFlashList
           ref={taskListRef}
           data={filteredTasks as (string | Task)[]}
           renderItem={({ item }) => {
@@ -107,14 +107,16 @@ const TaskList = ({
               );
             }
           }}
-          keyExtractor={(item) => (typeof item === 'string' ? item : item.id)}
+          keyExtractor={(item: string | Task) => {
+            return typeof item === 'string' ? item : item.id;
+          }}
           getItemType={(item) => {
             return typeof item === 'string' ? 'sectionHeader' : 'row';
           }}
           estimatedItemSize={72}
         />
       ) : (
-        <FlashList
+        <AnimatedFlashList
           ref={taskListRef}
           data={filteredTasks as Task[]}
           renderItem={({ item }) => (

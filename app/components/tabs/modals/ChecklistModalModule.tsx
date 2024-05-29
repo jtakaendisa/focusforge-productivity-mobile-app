@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Control, Controller } from 'react-hook-form';
-import { FlashList } from '@shopify/flash-list';
+import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { Text, View, styled } from 'tamagui';
 
 import { ChecklistItem as ChecklistItemType } from '@/app/entities';
@@ -44,7 +44,7 @@ const ChecklistModalModule = ({ control, checklist, closeModal }: Props) => {
           setChecklistRef.current = onChange;
           return (
             <MainContent>
-              <FlashList
+              <AnimatedFlashList
                 ref={listRef}
                 data={value}
                 renderItem={({ item }) => (
