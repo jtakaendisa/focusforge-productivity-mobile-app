@@ -13,8 +13,6 @@ const DurationListModule = () => {
 const Container = styled(View, {
   width: SCREEN_WIDTH,
   height: SCREEN_HEIGHT - 60,
-  borderWidth: 1,
-  borderColor: 'orange',
 });
 
 export default DurationListModule;

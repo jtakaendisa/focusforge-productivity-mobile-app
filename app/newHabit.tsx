@@ -1,11 +1,13 @@
 import { useRef, useState } from 'react';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { AnimatedFlashList, FlashList, ViewToken } from '@shopify/flash-list';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, styled } from 'tamagui';
 
 import { SCREEN_WIDTH } from './constants';
 import HabitListItem from './components/habits/HabitListItem';
+import Dot from './components/habits/Dot';
 
 const listItems = [0, 1, 2, 3];
 
@@ -61,13 +63,18 @@ const NewHabitScreen = () => {
         <Button onPress={handleNavigateBackward}>
           <ButtonText>{listIndex === 0 ? 'CANCEL' : 'BACK'}</ButtonText>
         </Button>
-        <Button>
-          <ButtonText>* * *</ButtonText>
+        <Button style={{ maxWidth: 50 }}>
+          <ButtonRow>
+            {listItems.map((listItem) => (
+              <Dot key={listItem} listItem={listItem} listIndex={listIndex} />
+            ))}
+          </ButtonRow>
         </Button>
         <Button onPress={handleNavigateForward}>
           <ButtonText color="#C73A57">NEXT</ButtonText>
         </Button>
       </ButtonsContainer>
+      <StatusBar style="light" />
     </Container>
   );
 };
@@ -90,7 +97,7 @@ const ButtonsContainer = styled(View, {
 });
 
 const Button = styled(View, {
-  width: '33.333%',
+  flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
 });
@@ -98,6 +105,13 @@ const Button = styled(View, {
 const ButtonText = styled(Text, {
   fontSize: 15,
   fontWeight: 'bold',
+});
+
+const ButtonRow = styled(View, {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: 2,
 });
 
 export default NewHabitScreen;
