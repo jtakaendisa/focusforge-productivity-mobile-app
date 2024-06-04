@@ -24,11 +24,12 @@ import CategoryModalModule from './components/tabs/modals/CategoryModalModule';
 import ChecklistModalModule from './components/tabs/modals/ChecklistModalModule';
 import PriorityModalModule from './components/tabs/modals/PriorityModalModule';
 import NoteModalModule from './components/tabs/modals/NoteModalModule';
-import Checkbox from './components/tabs/tasks/Checkbox';
+import CircularCheckbox from './components/tabs/CircularCheckbox';
 import CategoryIcon from './components/tabs/CategoryIcon';
 
 type SearchParams = {
   isRecurring: string;
+  origin: '/' | '/habits' | '/tasks';
 };
 
 export type NewTaskData = z.infer<typeof taskSchema>;
@@ -36,7 +37,7 @@ export type NewTaskData = z.infer<typeof taskSchema>;
 const SVG_SIZE = 22;
 
 const NewTaskScreen = () => {
-  const { isRecurring } = useLocalSearchParams<SearchParams>();
+  const { isRecurring, origin } = useLocalSearchParams<SearchParams>();
 
   const tasks = useTaskStore((s) => s.tasks);
   const setTasks = useTaskStore((s) => s.setTasks);
@@ -104,9 +105,7 @@ const NewTaskScreen = () => {
       isRecurring: JSON.parse(isRecurring),
       ...data,
     };
-
-    const updatedTasks = [...tasks, newTask];
-    setTasks(updatedTasks);
+    setTasks([...tasks, newTask]);
   };
 
   const toggleCategoryModal = () =>
@@ -129,7 +128,7 @@ const NewTaskScreen = () => {
     if (!isSubmitSuccessful) return;
 
     reset();
-    router.back();
+    router.replace(origin);
   }, [isSubmitSuccessful]);
 
   return (
@@ -254,12 +253,12 @@ const NewTaskScreen = () => {
           name="isCarriedOver"
           render={({ field: { onChange } }) => {
             setIsCarriedOverRef.current = onChange;
-            return <Checkbox isChecked={isChecked} />;
+            return <CircularCheckbox isChecked={isChecked} />;
           }}
         />
       </OptionContainer>
       <ButtonsContainer>
-        <Button onPress={() => router.back()}>
+        <Button onPress={() => router.replace(origin)}>
           <ButtonText>CANCEL</ButtonText>
         </Button>
         <Button onPress={handleSubmit(onSubmit)}>

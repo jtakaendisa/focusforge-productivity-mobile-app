@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import uuid from 'react-native-uuid';
 
-import { AuthUser, Filter, Task } from '../entities';
+import { AuthUser, Filter, Habit, Task } from '../entities';
 import { TODAYS_DATE } from '../constants';
 
 interface AuthStore {
@@ -18,6 +18,11 @@ interface TaskStore {
   setSearchQuery: (searchQuery: string) => void;
   setFilter: (filter: Filter) => void;
   setSelectedDate: (selectedDate: Date) => void;
+}
+
+interface HabitStore {
+  habits: Habit[];
+  setHabits: (habits: Habit[]) => void;
 }
 
 export enum PriorityType {
@@ -634,4 +639,9 @@ const useTaskStore = create<TaskStore>((set) => ({
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
 }));
 
-export { useAuthStore, useTaskStore };
+const useHabitStore = create<HabitStore>((set) => ({
+  habits: [],
+  setHabits: (habits) => set((state) => ({ ...state, habits })),
+}));
+
+export { useAuthStore, useTaskStore, useHabitStore };

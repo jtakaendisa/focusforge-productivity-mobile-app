@@ -1,20 +1,65 @@
-import { useRef, useState } from 'react';
-import { router } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AnimatedFlashList, FlashList, ViewToken } from '@shopify/flash-list';
+import uuid from 'react-native-uuid';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, styled } from 'tamagui';
 
-import { SCREEN_WIDTH } from './constants';
+import { PriorityType, useHabitStore } from './store';
+import { SCREEN_WIDTH, TODAYS_DATE } from './constants';
+import { habitSchema } from './validationSchemas';
 import HabitListItem from './components/habits/HabitListItem';
 import Dot from './components/habits/Dot';
+
+export type NewHabitData = z.infer<typeof habitSchema>;
+
+type SearchParams = {
+  origin: '/' | '/habits' | '/tasks';
+};
 
 const listItems = [0, 1, 2, 3];
 
 const NewHabitScreen = () => {
+  const { origin } = useLocalSearchParams<SearchParams>();
+
+  const habits = useHabitStore((s) => s.habits);
+  const setHabits = useHabitStore((s) => s.setHabits);
+
   const [listIndex, setListIndex] = useState(0);
 
   const listRef = useRef<FlashList<typeof listItems> | null>(null);
+
+  const isFirstIndex = listIndex === 0;
+  const isLastIndex = listIndex === listItems.length - 1;
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isSubmitSuccessful },
+  } = useForm<NewHabitData>({
+    defaultValues: {
+      category: 'Task',
+      title: '',
+      note: '',
+      startDate: TODAYS_DATE,
+      priority: PriorityType.normal,
+      frequency: {
+        type: 'daily',
+      },
+      reminders: [],
+    },
+    resolver: zodResolver(habitSchema),
+  });
+
+  const watchAllFields = watch();
+
+  const { priority, startDate, endDate, reminders } = watchAllFields;
 
   const handleViewableItemChange = ({
     viewableItems,
@@ -27,13 +72,13 @@ const NewHabitScreen = () => {
   };
 
   const handleNavigateBackward = () => {
-    if (listIndex > 0) {
+    if (!isFirstIndex) {
       listRef.current?.scrollToIndex({
         index: listIndex - 1,
         animated: true,
       });
     } else {
-      router.back();
+      router.replace(origin);
     }
   };
 
@@ -46,22 +91,49 @@ const NewHabitScreen = () => {
     }
   };
 
+  const onSubmit: SubmitHandler<NewHabitData> = (data) => {
+    const newHabit = {
+      id: uuid.v4() as string,
+      ...data,
+    };
+    setHabits([...habits, newHabit]);
+  };
+
+  useEffect(() => {
+    if (!isSubmitSuccessful) return;
+
+    reset();
+    router.replace('/habits');
+  }, [isSubmitSuccessful]);
+
   return (
     <Container>
       <AnimatedFlashList
         ref={listRef}
         data={listItems}
-        renderItem={({ item }) => <HabitListItem item={item} />}
+        renderItem={({ item }) => (
+          <HabitListItem
+            item={item}
+            control={control}
+            currentPriority={priority}
+            startDate={startDate}
+            endDate={endDate}
+            reminders={reminders}
+            navigateForward={handleNavigateForward}
+          />
+        )}
         keyExtractor={(item) => item}
         estimatedItemSize={SCREEN_WIDTH}
         onViewableItemsChanged={handleViewableItemChange}
         scrollEnabled={false}
+        showsHorizontalScrollIndicator={false}
+        extraData={[priority, startDate, endDate, reminders]}
         pagingEnabled
         horizontal
       />
       <ButtonsContainer>
         <Button onPress={handleNavigateBackward}>
-          <ButtonText>{listIndex === 0 ? 'CANCEL' : 'BACK'}</ButtonText>
+          <ButtonText>{isFirstIndex ? 'CANCEL' : 'BACK'}</ButtonText>
         </Button>
         <Button style={{ maxWidth: 50 }}>
           <ButtonRow>
@@ -70,8 +142,13 @@ const NewHabitScreen = () => {
             ))}
           </ButtonRow>
         </Button>
-        <Button onPress={handleNavigateForward}>
-          <ButtonText color="#C73A57">NEXT</ButtonText>
+        <Button
+          onPress={isLastIndex ? handleSubmit(onSubmit) : handleNavigateForward}
+          disabled={isFirstIndex}
+        >
+          {!isFirstIndex && (
+            <ButtonText color="#C73A57">{isLastIndex ? 'SAVE' : 'NEXT'}</ButtonText>
+          )}
         </Button>
       </ButtonsContainer>
       <StatusBar style="light" />

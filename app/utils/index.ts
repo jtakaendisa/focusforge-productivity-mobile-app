@@ -1,4 +1,4 @@
-import { format, parse } from 'date-fns';
+import { format, parse, parseISO } from 'date-fns';
 
 import { Task } from '../entities';
 import { TODAYS_DATE } from '../constants';
@@ -16,6 +16,10 @@ export const toTruncatedText = (text: string, maxLength: number) => {
 
 export const toFormattedDateString = (date: Date) => {
   return format(date, 'dd MMM yyyy');
+};
+
+export const toFormattedTimeString = (date: Date) => {
+  return format(date, 'HH:mm');
 };
 
 export const toFormattedSectionTitle = (date: string) => {

@@ -1,7 +1,10 @@
+// @ts-nocheck
+
 import { createInterFont } from '@tamagui/font-inter';
 import { createMedia } from '@tamagui/react-native-media-driver';
 import { shorthands } from '@tamagui/shorthands';
 import { themes, tokens as defaultTokens } from '@tamagui/themes';
+import { createAnimations } from '@tamagui/animations-moti';
 import { createTamagui, createTokens } from 'tamagui';
 
 const headingFont = createInterFont();
@@ -22,6 +25,26 @@ const tokens = createTokens({
   },
 });
 
+const animations = createAnimations({
+  fast: {
+    type: 'timing',
+    damping: 20,
+    mass: 1.2,
+    stiffness: 250,
+  },
+  medium: {
+    type: 'timing',
+    damping: 10,
+    mass: 0.9,
+    stiffness: 100,
+  },
+  slow: {
+    type: 'timing',
+    damping: 20,
+    stiffness: 60,
+  },
+});
+
 const config = createTamagui({
   light: {
     color: {
@@ -38,6 +61,7 @@ const config = createTamagui({
     heading: headingFont,
   },
   themes,
+  animations,
   tokens,
   media: createMedia({
     xs: { maxWidth: 660 },

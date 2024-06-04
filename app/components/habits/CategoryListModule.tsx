@@ -1,28 +1,49 @@
+import { Control, Controller } from 'react-hook-form';
 import { View, Text, styled } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { categoryArray } from '@/app/store';
+import { NewHabitData } from '@/app/newHabit';
 import CategoryIcon from '../tabs/CategoryIcon';
 
-const CategoryListModule = () => {
+interface Props {
+  control: Control<NewHabitData>;
+  navigateForward: () => void;
+}
+
+const CategoryListModule = ({ control, navigateForward }: Props) => {
   return (
     <Container>
       <HeadingContainer>
         <Heading>Select a category for your habit</Heading>
       </HeadingContainer>
       <CategoriesContainer>
-        {categoryArray.map((category) => (
-          <CategoryContainer key={category}>
-            <CategoryCard>
-              <CategoryCardInnerRow>
-                <Text>{category}</Text>
-                <CategoryIconContainer>
-                  <CategoryIcon category={category} />
-                </CategoryIconContainer>
-              </CategoryCardInnerRow>
-            </CategoryCard>
-          </CategoryContainer>
-        ))}
+        <Controller
+          control={control}
+          name="category"
+          render={({ field: { onChange } }) => (
+            <>
+              {categoryArray.map((category) => (
+                <CategoryContainer
+                  key={category}
+                  onPress={() => {
+                    onChange(category);
+                    navigateForward();
+                  }}
+                >
+                  <CategoryCard>
+                    <CategoryCardInnerRow>
+                      <Text>{category}</Text>
+                      <CategoryIconContainer>
+                        <CategoryIcon category={category} />
+                      </CategoryIconContainer>
+                    </CategoryCardInnerRow>
+                  </CategoryCard>
+                </CategoryContainer>
+              ))}
+            </>
+          )}
+        />
       </CategoriesContainer>
     </Container>
   );

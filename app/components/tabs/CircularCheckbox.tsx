@@ -11,7 +11,7 @@ interface Props {
   isChecked: SharedValue<number>;
 }
 
-const Checkbox = ({ isChecked }: Props) => {
+const CircularCheckbox = ({ isChecked }: Props) => {
   const gray = getTokens().color.$gray1.val;
   const green = getTokens().color.$green1.val;
 
@@ -56,4 +56,4 @@ const CheckboxIcon = styled(View, {
 const AnimatedCheckbox = Animated.createAnimatedComponent(CheckboxCircle);
 const AnimatedCheckboxIcon = Animated.createAnimatedComponent(CheckboxIcon);
 
-export default Checkbox;
+export default CircularCheckbox;

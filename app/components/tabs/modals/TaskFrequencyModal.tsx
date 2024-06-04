@@ -1,5 +1,5 @@
 import { MutableRefObject } from 'react';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import {
   BottomSheetModal,
   BottomSheetBackdrop,
@@ -47,13 +47,18 @@ const options = [
 ] as const;
 
 const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
+  const currentPath = usePathname();
+
   const handleCreateTask = (pathname: Pathname, isRecurring: boolean) => {
     taskFrequencyRef.current?.dismiss();
 
     if (pathname === '/newTask') {
-      router.push({ pathname, params: { isRecurring: isRecurring.toString() } });
+      router.push({
+        pathname,
+        params: { isRecurring: isRecurring.toString(), origin: currentPath },
+      });
     } else {
-      router.push(pathname);
+      router.push({ pathname, params: { origin: currentPath } });
     }
   };
 
@@ -70,6 +75,7 @@ const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
       <BottomSheetView>
         {options.map((option, index) => {
           const { heading, description, icon, pathname, isRecurring } = option;
+
           return (
             <>
               <CardContainer

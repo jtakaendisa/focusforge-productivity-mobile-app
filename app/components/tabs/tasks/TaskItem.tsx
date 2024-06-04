@@ -16,7 +16,7 @@ import { toTruncatedText } from '@/app/utils';
 import TaskItemLeftActions from './TaskItemLeftActions';
 import TaskItemRightActions from './TaskItemRightActions';
 import CategoryIcon from '../CategoryIcon';
-import Checkbox from './Checkbox';
+import CircularCheckbox from '../CircularCheckbox';
 
 interface Props {
   isSwipeable?: boolean;
@@ -83,7 +83,7 @@ const TaskItem = ({ isSwipeable, task, onPress, onSwipe, openModal }: Props) => 
         >
           <TaskContainer>
             <CheckboxContainer>
-              <Checkbox isChecked={isChecked} />
+              <CircularCheckbox isChecked={isChecked} />
             </CheckboxContainer>
             <TextContainer>
               <AnimatedTitle style={textColorAnimation}>

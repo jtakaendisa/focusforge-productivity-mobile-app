@@ -52,7 +52,7 @@ const ChecklistModalModule = ({ control, checklist, closeModal }: Props) => {
                 )}
                 keyExtractor={(item) => item.id}
                 ItemSeparatorComponent={ItemSeparator}
-                estimatedItemSize={10}
+                estimatedItemSize={46}
                 ListHeaderComponent={() => (
                   <CreateChecklistItem setChecklist={handleCreateItem} />
                 )}

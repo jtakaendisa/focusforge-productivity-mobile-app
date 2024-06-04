@@ -34,4 +34,28 @@ export interface Task {
   checklist: ChecklistItem[];
 }
 
+interface HabitFrequency {
+  type: 'daily' | 'specific' | 'repeats';
+  isRepeatedOn?: string[];
+  isRepeatedEvery?: number;
+}
+
+export interface Reminder {
+  id: string;
+  type: 'notification' | 'alarm';
+  time: Date;
+}
+
+export interface Habit {
+  id: string;
+  title: string;
+  note: string;
+  category: Category;
+  startDate: Date;
+  endDate?: Date;
+  priority: Priority;
+  frequency: HabitFrequency;
+  reminders: Reminder[];
+}
+
 export type TabRoute = '' | 'habits' | 'tasks' | 'timer' | 'settings';

@@ -6,11 +6,17 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { Control, Controller } from 'react-hook-form';
 import { styled, View, Text } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
+import { NewHabitData } from '@/app/newHabit';
 
-const DetailsListModule = () => {
+interface Props {
+  control: Control<NewHabitData>;
+}
+
+const DetailsListModule = ({ control }: Props) => {
   const [inputFocusState, setInputFocusState] = useState({
     isTitleFocused: false,
     isNoteFocused: false,
@@ -57,20 +63,38 @@ const DetailsListModule = () => {
       <HeadingContainer>
         <Heading>Define your habit</Heading>
       </HeadingContainer>
-      <AnimatedInputField
-        style={titleFieldColorAnimation}
-        placeholder="Habit Title..."
-        onFocus={() =>
-          setInputFocusState({ isNoteFocused: false, isTitleFocused: true })
-        }
+      <Controller
+        control={control}
+        name="title"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <AnimatedInputField
+            style={titleFieldColorAnimation}
+            placeholder="Habit Title..."
+            onFocus={() =>
+              setInputFocusState({ isNoteFocused: false, isTitleFocused: true })
+            }
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+          />
+        )}
       />
       <ExampleHabit>e.g. Buy groceries in the morning.</ExampleHabit>
-      <AnimatedInputField
-        style={noteFieldColorAnimation}
-        placeholder="Description (optional)"
-        onFocus={() =>
-          setInputFocusState({ isTitleFocused: false, isNoteFocused: true })
-        }
+      <Controller
+        control={control}
+        name="note"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <AnimatedInputField
+            style={noteFieldColorAnimation}
+            placeholder="Description (optional)"
+            onFocus={() =>
+              setInputFocusState({ isTitleFocused: false, isNoteFocused: true })
+            }
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+          />
+        )}
       />
     </Container>
   );
