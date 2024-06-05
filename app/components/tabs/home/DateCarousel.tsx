@@ -6,6 +6,7 @@ import { styled, View } from 'tamagui';
 import { useTaskStore } from '@/app/store';
 import { DATE_CARD_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import DateCard from './DateCard';
+import { toFormattedDateString } from '@/app/utils';
 
 const DateCarousel = () => {
   const selectedDate = useTaskStore((s) => s.selectedDate);
@@ -28,6 +29,17 @@ const DateCarousel = () => {
 
   const listRef = useRef<FlashList<(typeof weeks)[number]> | null>(null);
 
+  const handleScrollToIndex = () => {
+    const selectedIndex = weeks.findIndex(
+      (week) => toFormattedDateString(week.date) === toFormattedDateString(selectedDate)
+    );
+    listRef.current?.scrollToIndex({
+      index: selectedIndex,
+      animated: true,
+      viewPosition: 0.5,
+    });
+  };
+
   return (
     <Container>
       <AnimatedFlashList
@@ -48,6 +60,7 @@ const DateCarousel = () => {
         scrollsToTop={false}
         ItemSeparatorComponent={ItemSeparator}
         extraData={selectedDate}
+        onLayout={handleScrollToIndex}
       />
     </Container>
   );
