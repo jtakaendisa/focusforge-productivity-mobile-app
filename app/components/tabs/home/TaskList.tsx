@@ -107,9 +107,7 @@ const TaskList = ({
               );
             }
           }}
-          keyExtractor={(item: string | Task) => {
-            return typeof item === 'string' ? item : item.id;
-          }}
+          keyExtractor={(item: string | Task, index) => index.toString()}
           getItemType={(item) => {
             return typeof item === 'string' ? 'sectionHeader' : 'row';
           }}
@@ -130,7 +128,7 @@ const TaskList = ({
               }
             />
           )}
-          keyExtractor={(item) => (item as Task).id}
+          keyExtractor={(item, index) => index.toString()}
           estimatedItemSize={72}
         />
       )}

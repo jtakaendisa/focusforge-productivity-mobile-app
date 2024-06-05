@@ -28,26 +28,24 @@ const TasksScreen = () => {
     return sectionedTasks;
   }, [tasks]);
 
-  const recurringSectionedTasks = useMemo(() => {
-    const recurringTasks = tasks.filter((task) => task.isRecurring === true);
-    const dateGroupedTasks = toDateGroupedTasks(recurringTasks);
-    const sectionedTasks = toFormattedSections(dateGroupedTasks);
-    return sectionedTasks;
-  }, [tasks]);
+  const recurringTasks = useMemo(
+    () => tasks.filter((task) => task.isRecurring === true),
+    [tasks]
+  );
 
   const handlePresentModalPress = () => taskFrequencyRef.current?.present();
 
-  useEffect(() => {
-    if (searchQuery.length) {
-      const filteredTasks = tasks.filter((task) =>
-        task.title.toLowerCase().includes(searchQuery)
-      );
-      setFilteredTasks(filteredTasks);
-    } else {
-      setFilteredTasks(tasks);
-    }
-    tasklistRef.current?.prepareForLayoutAnimationRender();
-  }, [searchQuery, tasks, tasklistRef]);
+  // useEffect(() => {
+  //   if (searchQuery.length) {
+  //     const filteredTasks = tasks.filter((task) =>
+  //       task.title.toLowerCase().includes(searchQuery)
+  //     );
+  //     setFilteredTasks(filteredTasks);
+  //   } else {
+  //     setFilteredTasks(tasks);
+  //   }
+  //   tasklistRef.current?.prepareForLayoutAnimationRender();
+  // }, [searchQuery, tasks, tasklistRef]);
 
   useEffect(() => {
     let filteredTasks: (string | Task)[] = [];
@@ -57,14 +55,14 @@ const TasksScreen = () => {
         filteredTasks = singleSectionedTasks;
         break;
       case 'recurring':
-        filteredTasks = recurringSectionedTasks;
+        filteredTasks = recurringTasks;
         break;
     }
 
     setFilteredTasks(filteredTasks);
 
     tasklistRef.current?.prepareForLayoutAnimationRender();
-  }, [filter, tasks, tasklistRef]);
+  }, [filter, singleSectionedTasks, recurringTasks, tasklistRef]);
 
   return (
     <Container>
@@ -74,7 +72,7 @@ const TasksScreen = () => {
         taskListRef={tasklistRef}
         filteredTasks={filteredTasks}
         tasks={tasks}
-        isSectioned
+        isSectioned={filter === 'single'}
       />
       <CreateTaskButton onPress={handlePresentModalPress} />
       <TaskFrequencyModal taskFrequencyRef={taskFrequencyRef} />
