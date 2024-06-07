@@ -68,8 +68,7 @@ const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
       backgroundStyle={{ backgroundColor: '#1C1C1C' }}
       handleIndicatorStyle={{ backgroundColor: 'gray' }}
       backdropComponent={renderBackdrop}
-      index={0}
-      snapPoints={[285]}
+      enableDynamicSizing
       enablePanDownToClose
     >
       <BottomSheetView>
@@ -82,7 +81,7 @@ const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
                 key={heading}
                 onPress={() => handleCreateTask(pathname, isRecurring)}
               >
-                <IconContainer style={{ backgroundColor: 'rgba(150, 44, 66, 0.25)' }}>
+                <IconContainer isTransparent={false}>
                   <TaskFrequencyIcon name={icon} fill="#C73A57" />
                 </IconContainer>
                 <CardTextContainer>
@@ -115,6 +114,16 @@ const IconContainer = styled(View, {
   width: 44,
   height: 44,
   borderRadius: 22,
+  variants: {
+    isTransparent: {
+      true: {
+        backgroundColor: 'transparent',
+      },
+      false: {
+        backgroundColor: 'rgba(150, 44, 66, 0.25)',
+      },
+    },
+  } as const,
 });
 
 const CardTextContainer = styled(View, {

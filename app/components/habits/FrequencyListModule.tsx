@@ -81,7 +81,10 @@ const FrequencyListModule = ({ control }: Props) => {
 
   const handleRepeatSelect = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
     const repeatFrequency = e.nativeEvent.text;
-    setFrequencyRef.current?.({ type: 'repeats', isRepeatedEvery: repeatFrequency });
+    setFrequencyRef.current?.({
+      type: 'repeats',
+      isRepeatedEvery: parseInt(repeatFrequency),
+    });
   };
 
   useEffect(() => {

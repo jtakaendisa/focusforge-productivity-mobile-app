@@ -47,7 +47,7 @@ const DateCarousel = () => {
         data={weeks}
         renderItem={({ item }) => (
           <DateCard
-            item={item}
+            day={item}
             selectedDate={selectedDate}
             onPress={(date) => setSelectedDate(date)}
           />

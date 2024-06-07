@@ -12,7 +12,7 @@ import { View, Text, styled } from 'tamagui';
 import { PriorityType, useHabitStore } from './store';
 import { SCREEN_WIDTH, TODAYS_DATE } from './constants';
 import { habitSchema } from './validationSchemas';
-import HabitListItem from './components/habits/HabitListItem';
+import NewHabitListItem from './components/habits/NewHabitListItem';
 import Dot from './components/habits/Dot';
 
 export type NewHabitData = z.infer<typeof habitSchema>;
@@ -99,6 +99,8 @@ const NewHabitScreen = () => {
     setHabits([...habits, newHabit]);
   };
 
+  console.log({ watchAllFields });
+
   useEffect(() => {
     if (!isSubmitSuccessful) return;
 
@@ -112,7 +114,7 @@ const NewHabitScreen = () => {
         ref={listRef}
         data={listItems}
         renderItem={({ item }) => (
-          <HabitListItem
+          <NewHabitListItem
             item={item}
             control={control}
             currentPriority={priority}

@@ -7,9 +7,12 @@ interface DateGroupedTasks {
   [key: string]: Task[];
 }
 
-export const toTruncatedText = (text: string, maxLength: number) => {
+export const toTruncatedText = (text: string, maxLength: number, altMode?: boolean) => {
   if (text.length <= maxLength) {
     return text;
+  }
+  if (altMode) {
+    return text.slice(0, maxLength).trim();
   }
   return text.slice(0, maxLength).trim() + '...';
 };

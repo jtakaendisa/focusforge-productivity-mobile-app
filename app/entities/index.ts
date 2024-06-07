@@ -34,7 +34,7 @@ export interface Task {
   checklist: ChecklistItem[];
 }
 
-interface HabitFrequency {
+export interface HabitFrequency {
   type: 'daily' | 'specific' | 'repeats';
   isRepeatedOn?: string[];
   isRepeatedEvery?: number;

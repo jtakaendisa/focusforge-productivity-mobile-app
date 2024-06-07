@@ -11,7 +11,7 @@ import { DATE_CARD_HEIGHT } from '@/app/constants';
 import { toFormattedDateString } from '@/app/utils';
 
 interface Props {
-  item: {
+  day: {
     weekday: string;
     date: Date;
   };
@@ -19,7 +19,9 @@ interface Props {
   onPress: (date: Date) => void;
 }
 
-const DateCard = ({ item, selectedDate, onPress }: Props) => {
+const DateCard = ({ day, selectedDate, onPress }: Props) => {
+  const { date, weekday } = day;
+
   const isSelected = useSharedValue(0);
 
   const white = getTokens().color.$white.val;
@@ -43,22 +45,18 @@ const DateCard = ({ item, selectedDate, onPress }: Props) => {
 
   useEffect(() => {
     isSelected.value =
-      toFormattedDateString(selectedDate) === toFormattedDateString(item.date)
+      toFormattedDateString(selectedDate) === toFormattedDateString(date)
         ? withTiming(1)
         : withTiming(0);
-  }, [item.date, selectedDate]);
+  }, [date, selectedDate]);
 
   return (
-    <Container onPress={() => onPress(item.date)}>
+    <Container onPress={() => onPress(date)}>
       <AnimatedWeekdayContainer style={weekdayBackgroundAnimation}>
-        <AnimatedWeekdayText style={textColorAnimation}>
-          {item.weekday}
-        </AnimatedWeekdayText>
+        <AnimatedWeekdayText style={textColorAnimation}>{weekday}</AnimatedWeekdayText>
       </AnimatedWeekdayContainer>
       <AnimatedDateContainer style={dateBackgroundAnimation}>
-        <AnimatedDateText style={textColorAnimation}>
-          {item.date.getDate()}
-        </AnimatedDateText>
+        <AnimatedDateText style={textColorAnimation}>{date.getDate()}</AnimatedDateText>
       </AnimatedDateContainer>
     </Container>
   );
