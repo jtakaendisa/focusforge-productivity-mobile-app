@@ -1,57 +1,71 @@
+import { useEffect } from 'react';
 import { View, Text, styled } from 'tamagui';
 
-import { useTaskStore } from '@/app/store';
 import Animated, {
+  SharedValue,
   interpolate,
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useEffect } from 'react';
 
-const FilterBar = () => {
-  const filter = useTaskStore((s) => s.filter);
-  const setFilter = useTaskStore((s) => s.setFilter);
+import { Filter } from '@/app/entities';
 
-  const sharedFilter = useSharedValue(filter === 'single' ? 1 : 0);
+interface Props {
+  filter: Filter;
+  onSelect: (filter: Filter) => void;
+}
 
-  const textColorAnimation = useAnimatedStyle(() => ({
-    color: interpolateColor(sharedFilter.value, [0, 1], ['#8C8C8C', '#fff']),
-  }));
+const FilterBar = ({ filter, onSelect }: Props) => {
+  const isSingleTaskSelected = useSharedValue(0);
+  const isRecurringTaskSelected = useSharedValue(0);
 
-  const textColorInverseAnimation = useAnimatedStyle(() => ({
-    color: interpolateColor(sharedFilter.value, [0, 1], ['#fff', '#8C8C8C']),
-  }));
+  const textColorAnimation = (filter: SharedValue<number>) => {
+    return useAnimatedStyle(() => ({
+      color: interpolateColor(filter.value, [0, 1], ['#8C8C8C', '#fff']),
+    }));
+  };
 
-  const indicatorOpacityAnimation = useAnimatedStyle(() => ({
-    opacity: interpolate(sharedFilter.value, [0, 1], [0, 1]),
-  }));
-
-  const indicatorOpacityInverseAnimation = useAnimatedStyle(() => ({
-    opacity: interpolate(sharedFilter.value, [0, 1], [1, 0]),
-  }));
+  const indicatorOpacityAnimation = (filter: SharedValue<number>) => {
+    return useAnimatedStyle(() => ({
+      opacity: interpolate(filter.value, [0, 1], [0, 1]),
+    }));
+  };
 
   useEffect(() => {
-    sharedFilter.value = filter === 'single' ? withTiming(1) : withTiming(0);
+    switch (filter) {
+      case 'single':
+        isSingleTaskSelected.value = withTiming(1);
+        isRecurringTaskSelected.value = withTiming(0);
+        break;
+      case 'recurring':
+        isRecurringTaskSelected.value = withTiming(1);
+        isSingleTaskSelected.value = withTiming(0);
+        break;
+    }
   }, [filter]);
 
   return (
     <Container>
-      <Button onPress={() => setFilter('single')}>
+      <Button onPress={() => onSelect('single')}>
         <TextContainer>
-          <AnimatedButtonText style={textColorAnimation}>
+          <AnimatedButtonText style={textColorAnimation(isSingleTaskSelected)}>
             Single Tasks
           </AnimatedButtonText>
-          <AnimatedSelectionIndicator style={indicatorOpacityAnimation} />
+          <AnimatedSelectionIndicator
+            style={indicatorOpacityAnimation(isSingleTaskSelected)}
+          />
         </TextContainer>
       </Button>
-      <Button onPress={() => setFilter('recurring')}>
+      <Button onPress={() => onSelect('recurring')}>
         <TextContainer>
-          <AnimatedButtonText style={textColorInverseAnimation}>
+          <AnimatedButtonText style={textColorAnimation(isRecurringTaskSelected)}>
             Recurring Tasks
           </AnimatedButtonText>
-          <AnimatedSelectionIndicator style={indicatorOpacityInverseAnimation} />
+          <AnimatedSelectionIndicator
+            style={indicatorOpacityAnimation(isRecurringTaskSelected)}
+          />
         </TextContainer>
       </Button>
     </Container>

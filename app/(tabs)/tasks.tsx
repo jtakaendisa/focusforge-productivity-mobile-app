@@ -3,7 +3,7 @@ import { FlashList } from '@shopify/flash-list';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, styled } from 'tamagui';
 
-import { Task } from '../entities';
+import { Filter, Task } from '../entities';
 import { useTaskStore } from '../store';
 import { toDateGroupedTasks, toFormattedSections } from '../utils';
 import CreateTaskButton from '../components/tabs/CreateTaskButton';
@@ -14,8 +14,8 @@ import TaskList from '../components/tabs/home/TaskList';
 const TasksScreen = () => {
   const tasks = useTaskStore((s) => s.tasks);
   const searchQuery = useTaskStore((s) => s.searchQuery);
-  const filter = useTaskStore((s) => s.filter);
 
+  const [filter, setFilter] = useState<Filter>('single');
   const [filteredTasks, setFilteredTasks] = useState<(string | Task)[]>([]);
 
   const tasklistRef = useRef<FlashList<Task | (string | Task)> | null>(null);
@@ -24,14 +24,15 @@ const TasksScreen = () => {
   const singleSectionedTasks = useMemo(() => {
     const singleTasks = tasks.filter((task) => task.isRecurring === false);
     const dateGroupedTasks = toDateGroupedTasks(singleTasks);
-    const sectionedTasks = toFormattedSections(dateGroupedTasks);
-    return sectionedTasks;
+    return toFormattedSections(dateGroupedTasks);
   }, [tasks]);
 
   const recurringTasks = useMemo(
     () => tasks.filter((task) => task.isRecurring === true),
     [tasks]
   );
+
+  const handleSelectFilter = (filter: Filter) => setFilter(filter);
 
   const handlePresentModalPress = () => taskFrequencyRef.current?.present();
 
@@ -67,7 +68,7 @@ const TasksScreen = () => {
   return (
     <Container>
       {/* <SearchBar /> */}
-      <FilterBar />
+      <FilterBar filter={filter} onSelect={handleSelectFilter} />
       <TaskList
         taskListRef={tasklistRef}
         filteredTasks={filteredTasks}
@@ -82,7 +83,6 @@ const TasksScreen = () => {
 
 const Container = styled(View, {
   flex: 1,
-  position: 'relative',
   backgroundColor: '#111111',
 });
 

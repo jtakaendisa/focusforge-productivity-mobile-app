@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import uuid from 'react-native-uuid';
 
-import { AuthUser, Filter, Habit, Task } from '../entities';
+import { AuthUser, Habit, Task } from '../entities';
 import { TODAYS_DATE } from '../constants';
 
 interface AuthStore {
@@ -12,11 +12,9 @@ interface AuthStore {
 interface TaskStore {
   tasks: Task[];
   searchQuery: string;
-  filter: Filter;
   selectedDate: Date;
   setTasks: (tasks: Task[]) => void;
   setSearchQuery: (searchQuery: string) => void;
-  setFilter: (filter: Filter) => void;
   setSelectedDate: (selectedDate: Date) => void;
 }
 
@@ -633,11 +631,9 @@ const useAuthStore = create<AuthStore>((set) => ({
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: dummyTasks,
   searchQuery: '',
-  filter: 'single',
   selectedDate: TODAYS_DATE,
   setTasks: (tasks) => set((state) => ({ ...state, tasks })),
   setSearchQuery: (searchQuery) => set((state) => ({ ...state, searchQuery })),
-  setFilter: (filter) => set((state) => ({ ...state, filter })),
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
 }));
 

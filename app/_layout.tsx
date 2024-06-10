@@ -76,10 +76,11 @@ function RootLayoutNav() {
         <BottomSheetModalProvider>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="onboarding" />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
             <Stack.Screen name="newTask" options={{ presentation: 'modal' }} />
             <Stack.Screen name="newHabit" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="habitDetails" options={{ presentation: 'modal' }} />
           </Stack>
           <StatusBar />
         </BottomSheetModalProvider>

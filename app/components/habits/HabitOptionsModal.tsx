@@ -1,5 +1,4 @@
 import { MutableRefObject } from 'react';
-import { router, usePathname } from 'expo-router';
 import {
   BottomSheetModal,
   BottomSheetBackdrop,
@@ -9,17 +8,18 @@ import {
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { styled, View, Text } from 'tamagui';
 
+import { Habit } from '@/app/entities';
 import HabitOptionIcon from './HabitOptionIcon';
+import HabitBadge from './HabitBadge';
+import CategoryIcon from '../tabs/CategoryIcon';
+import { toTruncatedText } from '@/app/utils';
 
 interface Props {
   habitOptionsRef: MutableRefObject<BottomSheetModalMethods | null>;
+  selectedHabit: Habit | null;
+  onDelete: () => void;
+  onNavigate: (activeTab: string) => void;
 }
-
-type Pathname = '/newTask' | '/newHabit';
-
-const renderBackdrop = (props: BottomSheetBackdropProps) => (
-  <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />
-);
 
 const options = [
   {
@@ -40,19 +40,15 @@ const options = [
   },
 ] as const;
 
-const HabitOptionsModal = ({ habitOptionsRef }: Props) => {
-  const currentPath = usePathname();
+const HabitOptionsModal = ({
+  habitOptionsRef,
+  selectedHabit,
+  onDelete,
+  onNavigate,
+}: Props) => {
+  if (!selectedHabit) return null;
 
-  const handleDelete = () => {};
-
-  const navigateToHabitDetailsScreen = (activeTab: string) => {
-    habitOptionsRef.current?.dismiss();
-
-    router.push({
-      pathname: '/',
-      params: { origin: currentPath, activeTab },
-    });
-  };
+  const { title, frequency, note, category } = selectedHabit;
 
   return (
     <BottomSheetModal
@@ -64,6 +60,16 @@ const HabitOptionsModal = ({ habitOptionsRef }: Props) => {
       enablePanDownToClose
     >
       <BottomSheetView>
+        <TopRow>
+          <DetailsContainer>
+            <TitleText>{title}</TitleText>
+            {!!note.length && <Text>{toTruncatedText(note, 12)}</Text>}
+            <HabitBadge frequency={frequency} />
+          </DetailsContainer>
+          <CategoryContainer>
+            <CategoryIcon category={category} />
+          </CategoryContainer>
+        </TopRow>
         {options.map((option, index) => {
           const { heading, icon } = option;
 
@@ -74,16 +80,14 @@ const HabitOptionsModal = ({ habitOptionsRef }: Props) => {
           return (
             <CardContainer
               key={heading}
-              onPress={() =>
-                isLastIndex ? handleDelete : navigateToHabitDetailsScreen(icon)
-              }
+              onPress={() => (isLastIndex ? onDelete() : onNavigate(icon))}
               isBordered={isBordered}
             >
               <IconContainer>
                 <HabitOptionIcon name={icon} fill={fill} />
               </IconContainer>
               <CardTextContainer>
-                <CardHeading isLastIndex={isLastIndex}>{heading}</CardHeading>
+                <CardTitle isLastIndex={isLastIndex}>{heading}</CardTitle>
               </CardTextContainer>
             </CardContainer>
           );
@@ -92,6 +96,38 @@ const HabitOptionsModal = ({ habitOptionsRef }: Props) => {
     </BottomSheetModal>
   );
 };
+
+const renderBackdrop = (props: BottomSheetBackdropProps) => (
+  <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />
+);
+
+const TopRow = styled(View, {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 12,
+  paddingBottom: 12,
+  borderBottomWidth: 1,
+  borderColor: '#262626',
+});
+
+const DetailsContainer = styled(View, {
+  gap: 4,
+});
+
+const TitleText = styled(Text, {
+  fontSize: 18.5,
+  fontWeight: 'bold',
+});
+
+const CategoryContainer = styled(View, {
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 36,
+  height: 36,
+  backgroundColor: 'gray',
+  borderRadius: 8,
+});
 
 const CardContainer = styled(View, {
   flexDirection: 'row',
@@ -122,9 +158,8 @@ const CardTextContainer = styled(View, {
   paddingHorizontal: 16,
 });
 
-const CardHeading = styled(Text, {
+const CardTitle = styled(Text, {
   fontSize: 15.5,
-  fontWeight: '900',
   variants: {
     isLastIndex: {
       true: {

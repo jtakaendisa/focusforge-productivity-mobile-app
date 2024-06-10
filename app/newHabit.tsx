@@ -99,8 +99,6 @@ const NewHabitScreen = () => {
     setHabits([...habits, newHabit]);
   };
 
-  console.log({ watchAllFields });
-
   useEffect(() => {
     if (!isSubmitSuccessful) return;
 
