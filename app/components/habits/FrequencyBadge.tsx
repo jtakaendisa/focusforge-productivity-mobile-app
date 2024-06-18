@@ -1,15 +1,15 @@
 import { styled, View, Text } from 'tamagui';
 
-import { HabitFrequency } from '@/app/entities';
+import { Frequency } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
 
 interface Props {
-  frequency: HabitFrequency;
+  frequency: Frequency;
   isForm?: boolean;
 }
 
 const FrequencyBadge = ({ frequency, isForm }: Props) => {
-  const generateBadgeText = (frequency: HabitFrequency) => {
+  const generateBadgeText = (frequency: Frequency) => {
     const { type, isRepeatedEvery, isRepeatedOn } = frequency;
 
     switch (type) {

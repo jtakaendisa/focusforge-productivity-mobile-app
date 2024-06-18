@@ -17,8 +17,6 @@ import Dot from './components/habits/Dot';
 
 export type NewHabitData = z.infer<typeof habitSchema>;
 
-type HabitFrequency = z.infer<typeof habitSchema>;
-
 type SearchParams = {
   origin: '/' | '/habits' | '/tasks';
 };

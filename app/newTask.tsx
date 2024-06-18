@@ -26,6 +26,8 @@ import PriorityModalModule from './components/tabs/modals/PriorityModalModule';
 import TextModalModule from './components/tabs/modals/TextModalModule';
 import CircularCheckbox from './components/tabs/CircularCheckbox';
 import CategoryIcon from './components/tabs/CategoryIcon';
+import FrequencyBadge from './components/habits/FrequencyBadge';
+import FrequencyListModule from './components/habits/FrequencyListModule';
 
 type SearchParams = {
   isRecurring: string;
@@ -37,7 +39,10 @@ export type NewTaskData = z.infer<typeof taskSchema>;
 const SVG_SIZE = 22;
 
 const NewTaskScreen = () => {
-  const { isRecurring, origin } = useLocalSearchParams<SearchParams>();
+  const { isRecurring: isRecurringString, origin } =
+    useLocalSearchParams<SearchParams>();
+
+  const isRecurring: boolean = JSON.parse(isRecurringString);
 
   const tasks = useTaskStore((s) => s.tasks);
   const setTasks = useTaskStore((s) => s.setTasks);
@@ -46,6 +51,7 @@ const NewTaskScreen = () => {
     isCategoryOpen: false,
     isChecklistOpen: false,
     isPriorityOpen: false,
+    isFrequencyOpen: false,
     isNoteOpen: false,
   });
 
@@ -64,6 +70,11 @@ const NewTaskScreen = () => {
       category: 'Task',
       dueDate: TODAYS_DATE,
       priority: PriorityType.normal,
+      frequency: isRecurring
+        ? {
+            type: 'daily',
+          }
+        : undefined,
       checklist: [],
       note: '',
       isCarriedOver: true,
@@ -73,9 +84,15 @@ const NewTaskScreen = () => {
 
   const watchAllFields = watch();
 
-  const { isCategoryOpen, isChecklistOpen, isPriorityOpen, isNoteOpen } = modalState;
+  const {
+    isCategoryOpen,
+    isChecklistOpen,
+    isPriorityOpen,
+    isFrequencyOpen,
+    isNoteOpen,
+  } = modalState;
 
-  const { category, dueDate, checklist, priority, note, isCarriedOver } =
+  const { category, dueDate, checklist, priority, frequency, note, isCarriedOver } =
     watchAllFields;
 
   const isChecked = useSharedValue(isCarriedOver ? 1 : 0);
@@ -102,7 +119,7 @@ const NewTaskScreen = () => {
     const newTask = {
       id: uuid.v4() as string,
       isCompleted: false,
-      isRecurring: JSON.parse(isRecurring),
+      isRecurring,
       ...data,
     };
     setTasks([...tasks, newTask]);
@@ -116,6 +133,9 @@ const NewTaskScreen = () => {
 
   const togglePriorityModal = () =>
     setModalState({ ...modalState, isPriorityOpen: !isPriorityOpen });
+
+  const toggleFrequencyModal = () =>
+    setModalState({ ...modalState, isFrequencyOpen: !isFrequencyOpen });
 
   const toggleNoteModal = () =>
     setModalState({ ...modalState, isNoteOpen: !isNoteOpen });
@@ -223,6 +243,20 @@ const NewTaskScreen = () => {
           <LabelText>{priority}</LabelText>
         </CategoryLabel>
       </OptionContainer>
+      {isRecurring && (
+        <OptionContainer onPress={toggleFrequencyModal}>
+          <OptionInfo>
+            <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 22 22" fill="none">
+              <Path
+                d="M0 9.625V4.125V2.75H1.375H13.75V0H15.125L19.25 4.125L15.125 8.25H13.75V5.5H2.75V9.625V11H0V9.625ZM22 12.375V17.875V19.25H20.625H8.25V22H6.875L2.75 17.875L6.875 13.75H8.25V16.5H19.25V12.375V11H22V12.375Z"
+                fill="#C73A57"
+              />
+            </Svg>
+            <OptionTitle>Frequency</OptionTitle>
+          </OptionInfo>
+          <FrequencyBadge frequency={frequency!} isForm />
+        </OptionContainer>
+      )}
       <OptionContainer onPress={toggleNoteModal}>
         <OptionInfo>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 20 20" fill="none">
@@ -282,6 +316,13 @@ const NewTaskScreen = () => {
           control={control}
           currentPriority={priority}
           closeModal={togglePriorityModal}
+        />
+      </ModalContainer>
+      <ModalContainer isOpen={isFrequencyOpen} closeModal={toggleFrequencyModal}>
+        <FrequencyListModule
+          isModal
+          control={control as any}
+          closeModal={toggleFrequencyModal}
         />
       </ModalContainer>
       <ModalContainer isOpen={isNoteOpen} closeModal={toggleNoteModal}>

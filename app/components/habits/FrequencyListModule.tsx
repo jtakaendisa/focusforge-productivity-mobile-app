@@ -6,17 +6,14 @@ import {
 } from 'react-native';
 import Constants from 'expo-constants';
 import { Control, Controller } from 'react-hook-form';
-import { z } from 'zod';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import { styled, View, Text, Accordion } from 'tamagui';
 
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
-import { habitFrequencySchema } from '@/app/validationSchemas';
 import { NewHabitData } from '@/app/newHabit';
 import CircularCheckbox from '../tabs/CircularCheckbox';
 import WeekdayCard from './WeekdayCard';
-
-type HabitFrequency = z.infer<typeof habitFrequencySchema>;
+import { Frequency } from '@/app/entities';
 
 interface Props {
   control: Control<NewHabitData>;
@@ -37,7 +34,7 @@ const initialWeekdays = [
 const statusBarHeight = Constants.statusBarHeight;
 
 const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
-  const frequency: HabitFrequency = control._getWatch('frequency');
+  const frequency: Frequency = control._getWatch('frequency');
   const frequencyType = frequency.type || 'daily';
   const selectedDays: string[] = control._getWatch('frequency')?.isRepeatedOn;
 
@@ -50,7 +47,7 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
 
   const { isDailySelected, isSpecificSelected, isRepeatSelected } = selectionState;
 
-  const previousFrequencyRef = useRef<HabitFrequency>(frequency);
+  const previousFrequencyRef = useRef<Frequency>(frequency);
   const setFrequencyRef = useRef<((...event: any[]) => void) | null>(null);
 
   const isDailyChecked = useSharedValue(isDailySelected ? 1 : 0);
