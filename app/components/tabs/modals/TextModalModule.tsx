@@ -7,12 +7,13 @@ import { NewTaskData } from '@/app/newTask';
 
 interface Props {
   control: Control<NewTaskData>;
-  previousNote: string;
+  name: 'title' | 'note';
+  previousText: string;
   closeModal: () => void;
 }
 
-const NoteModalModule = ({ control, previousNote, closeModal }: Props) => {
-  const previousNoteRef = useRef<string>(previousNote);
+const TextModalModule = ({ control, name, previousText, closeModal }: Props) => {
+  const previousTextRef = useRef<string>(previousText);
   const clearInputRef = useRef<((...event: any[]) => void) | null>(null);
 
   return (
@@ -20,11 +21,11 @@ const NoteModalModule = ({ control, previousNote, closeModal }: Props) => {
       <MainContainer>
         <Controller
           control={control}
-          name="note"
+          name={name}
           render={({ field: { onChange, onBlur, value } }) => {
             clearInputRef.current = onChange;
             return (
-              <NoteInputField
+              <TextInputField
                 placeholder="Additional notes..."
                 onBlur={onBlur}
                 onChangeText={onChange}
@@ -40,7 +41,7 @@ const NoteModalModule = ({ control, previousNote, closeModal }: Props) => {
       <ButtonsContainer>
         <Button
           onPress={() => {
-            clearInputRef.current?.(previousNoteRef.current);
+            clearInputRef.current?.(previousTextRef.current);
             closeModal();
           }}
         >
@@ -64,7 +65,7 @@ const MainContainer = styled(View, {
   margin: 16,
 });
 
-const NoteInputField = styled(TextInput, {
+const TextInputField = styled(TextInput, {
   textAlignVertical: 'top',
   borderWidth: 1,
   borderColor: 'white',
@@ -96,4 +97,4 @@ const ButtonText = styled(Text, {
   textTransform: 'uppercase',
 });
 
-export default NoteModalModule;
+export default TextModalModule;

@@ -1,4 +1,4 @@
-import { format, parse, parseISO } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 import { Task } from '../entities';
 import { TODAYS_DATE } from '../constants';
@@ -9,7 +9,7 @@ interface DateGroupedTasks {
 
 export const toTruncatedText = (text: string, maxLength: number, altMode?: boolean) => {
   if (text.length <= maxLength) {
-    return text;
+    return text.trim();
   }
   if (altMode) {
     return text.slice(0, maxLength).trim();

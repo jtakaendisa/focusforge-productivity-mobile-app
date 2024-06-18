@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-import { PriorityType, categoryArray } from './store';
+import { categoryArray } from './store';
+
+const priorityEnum = z.enum(['Low', 'Normal', 'High']);
 
 const emailSchema = z.string().email({ message: 'Invalid email address' });
 
@@ -38,7 +40,7 @@ export const taskSchema = z.object({
   title: titleSchema,
   category: z.enum(categoryArray),
   dueDate: z.date({ message: 'Invalid date string' }),
-  priority: z.nativeEnum(PriorityType),
+  priority: priorityEnum,
   note: z.string(),
   isCarriedOver: z.boolean({
     message: 'isCarriedOver must be a boolean (true / false)',
@@ -52,17 +54,19 @@ const reminderSchema = z.object({
   time: z.date({ message: 'Invalid time' }),
 });
 
+export const habitFrequencySchema = z.object({
+  type: z.enum(['daily', 'specific', 'repeats']),
+  isRepeatedOn: z.array(z.string()).optional(),
+  isRepeatedEvery: z.number().optional(),
+});
+
 export const habitSchema = z.object({
   title: titleSchema,
   note: z.string(),
   category: z.enum(categoryArray),
   startDate: z.date({ message: 'Invalid date string' }),
   endDate: z.date({ message: 'Invalid date string' }).optional(),
-  priority: z.nativeEnum(PriorityType),
-  frequency: z.object({
-    type: z.enum(['daily', 'specific', 'repeats']),
-    isRepeatedOn: z.array(z.string()).optional(),
-    isRepeatedEvery: z.number().optional(),
-  }),
+  priority: priorityEnum,
+  frequency: habitFrequencySchema,
   reminders: z.array(reminderSchema),
 });

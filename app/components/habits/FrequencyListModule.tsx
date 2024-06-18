@@ -4,17 +4,24 @@ import {
   TextInput,
   TextInputChangeEventData,
 } from 'react-native';
+import Constants from 'expo-constants';
 import { Control, Controller } from 'react-hook-form';
+import { z } from 'zod';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import { styled, View, Text, Accordion } from 'tamagui';
 
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
+import { habitFrequencySchema } from '@/app/validationSchemas';
 import { NewHabitData } from '@/app/newHabit';
 import CircularCheckbox from '../tabs/CircularCheckbox';
 import WeekdayCard from './WeekdayCard';
 
+type HabitFrequency = z.infer<typeof habitFrequencySchema>;
+
 interface Props {
   control: Control<NewHabitData>;
+  isModal?: boolean;
+  closeModal?: () => void;
 }
 
 const initialWeekdays = [
@@ -27,16 +34,23 @@ const initialWeekdays = [
   { day: 'Sunday', isSelected: false },
 ];
 
-const FrequencyListModule = ({ control }: Props) => {
+const statusBarHeight = Constants.statusBarHeight;
+
+const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
+  const frequency: HabitFrequency = control._getWatch('frequency');
+  const frequencyType = frequency.type || 'daily';
+  const selectedDays: string[] = control._getWatch('frequency')?.isRepeatedOn;
+
   const [selectionState, setSelectionState] = useState({
-    isDailySelected: true,
-    isSpecificSelected: false,
-    isRepeatSelected: false,
+    isDailySelected: frequencyType === 'daily' ? true : false,
+    isSpecificSelected: frequencyType === 'specific' ? true : false,
+    isRepeatSelected: frequencyType === 'repeats' ? true : false,
   });
   const [weekdays, setWeekdays] = useState(initialWeekdays);
 
   const { isDailySelected, isSpecificSelected, isRepeatSelected } = selectionState;
 
+  const previousFrequencyRef = useRef<HabitFrequency>(frequency);
   const setFrequencyRef = useRef<((...event: any[]) => void) | null>(null);
 
   const isDailyChecked = useSharedValue(isDailySelected ? 1 : 0);
@@ -87,6 +101,27 @@ const FrequencyListModule = ({ control }: Props) => {
     });
   };
 
+  const handleResetFrequency = () => {
+    setFrequencyRef.current?.(previousFrequencyRef.current);
+    closeModal?.();
+  };
+
+  useEffect(() => {
+    if (!selectedDays) return;
+
+    const updatedWeekdays = weekdays.map((weekday) => {
+      if (selectedDays.includes(weekday.day)) {
+        return {
+          ...weekday,
+          isSelected: !weekday.isSelected,
+        };
+      } else {
+        return weekday;
+      }
+    });
+    setWeekdays(updatedWeekdays);
+  }, []);
+
   useEffect(() => {
     isDailyChecked.value = isDailySelected ? withTiming(1) : withTiming(0);
     isSpecificChecked.value = isSpecificSelected ? withTiming(1) : withTiming(0);
@@ -94,11 +129,11 @@ const FrequencyListModule = ({ control }: Props) => {
   }, [isDailySelected, isSpecificSelected, isRepeatSelected]);
 
   return (
-    <Container>
+    <Container isFullScreen={isModal}>
       <HeadingContainer>
         <Heading>How often do you want to do it?</Heading>
       </HeadingContainer>
-      <Accordion overflow="hidden" type="single">
+      <Accordion overflow="hidden" type="single" defaultValue={frequencyType}>
         <Controller
           control={control}
           name="frequency"
@@ -154,7 +189,7 @@ const FrequencyListModule = ({ control }: Props) => {
                   </Accordion.HeightAnimator>
                 </Accordion.Item>
 
-                <Accordion.Item value="repeat">
+                <Accordion.Item value="repeats">
                   <AccordionTrigger onPress={() => handleSelection('isRepeatSelected')}>
                     {({ open }: { open: boolean }) => (
                       <>
@@ -190,13 +225,35 @@ const FrequencyListModule = ({ control }: Props) => {
           }}
         />
       </Accordion>
+
+      {isModal && (
+        <ButtonsContainer>
+          <Button onPress={handleResetFrequency}>
+            <ButtonText>CANCEL</ButtonText>
+          </Button>
+          <Button onPress={closeModal}>
+            <ButtonText color="#C73A57">CONFIRM</ButtonText>
+          </Button>
+        </ButtonsContainer>
+      )}
     </Container>
   );
 };
 
 const Container = styled(View, {
   width: SCREEN_WIDTH,
-  height: SCREEN_HEIGHT - 60,
+  backgroundColor: '#111111',
+  variants: {
+    isFullScreen: {
+      true: {
+        paddingTop: statusBarHeight,
+        flex: 1,
+      },
+      false: {
+        height: SCREEN_HEIGHT - 60,
+      },
+    },
+  } as const,
 });
 
 const HeadingContainer = styled(View, {
@@ -267,6 +324,29 @@ const DaysInputField = styled(TextInput, {
   //@ts-ignore
   fontSize: 16,
   color: 'white',
+});
+
+const ButtonsContainer = styled(View, {
+  flexDirection: 'row',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: 60,
+  backgroundColor: '#1C1C1C',
+  borderTopWidth: 1,
+  borderColor: '#262626',
+});
+
+const Button = styled(View, {
+  width: '50%',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
+const ButtonText = styled(Text, {
+  fontSize: 15,
+  fontWeight: 'bold',
 });
 
 export default FrequencyListModule;

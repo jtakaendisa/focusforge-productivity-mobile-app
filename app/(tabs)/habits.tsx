@@ -19,7 +19,7 @@ const HabitsScreen = () => {
 
   return (
     <Container>
-      <HabitListContainer isHabitsEmpty={isHabitsEmpty}>
+      <HabitListContainer isCentered={isHabitsEmpty}>
         {isHabitsEmpty ? (
           <ActivityListPlaceholder />
         ) : (
@@ -42,7 +42,7 @@ const HabitListContainer = styled(View, {
   flex: 1,
   marginTop: 16,
   variants: {
-    isHabitsEmpty: {
+    isCentered: {
       true: {
         justifyContent: 'center',
         alignItems: 'center',

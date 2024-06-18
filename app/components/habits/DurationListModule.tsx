@@ -128,25 +128,27 @@ const DurationListModule = ({
           <OptionTitle>End date</OptionTitle>
         </OptionInfo>
         <Row>
-          {isEndDateEnabled && endDate && (
-            <Controller
-              control={control}
-              name="endDate"
-              render={({ field: { onChange } }) => {
-                setEndDateRef.current = onChange;
-                return (
-                  <AnimatedOptionLabel entering={FadeIn} exiting={FadeOut}>
-                    <LabelText>
-                      {toFormattedDateString(endDate) ===
-                      toFormattedDateString(TODAYS_DATE)
-                        ? 'Today'
-                        : toFormattedDateString(endDate)}
-                    </LabelText>
-                  </AnimatedOptionLabel>
-                );
-              }}
-            />
-          )}
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field: { onChange } }) => {
+              setEndDateRef.current = onChange;
+              return (
+                <>
+                  {isEndDateEnabled && endDate && (
+                    <AnimatedOptionLabel entering={FadeIn} exiting={FadeOut}>
+                      <LabelText>
+                        {toFormattedDateString(endDate) ===
+                        toFormattedDateString(TODAYS_DATE)
+                          ? 'Today'
+                          : toFormattedDateString(endDate)}
+                      </LabelText>
+                    </AnimatedOptionLabel>
+                  )}
+                </>
+              );
+            }}
+          />
           <Switch value={isEndDateEnabled ? 1 : 0} onToggle={() => {}} />
         </Row>
       </OptionContainer>
@@ -162,7 +164,12 @@ const DurationListModule = ({
         </OptionInfo>
         <OptionLabel>
           <LabelText>
-            {reminders.length} {reminders.length === 1 ? 'reminder' : 'reminders'}
+            {!reminders.length && '---'}
+            {reminders.length > 0
+              ? reminders.length === 1
+                ? `${reminders.length} reminder`
+                : `${reminders.length} reminders`
+              : ''}
           </LabelText>
         </OptionLabel>
       </OptionContainer>

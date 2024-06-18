@@ -33,12 +33,13 @@ const HabitList = ({ habits, filteredHabits }: Props) => {
     habitOptionsRef.current?.present();
   };
 
-  const navigateToHabitDetailsScreen = (activeTab: string) => {
-    habitOptionsRef.current?.dismiss();
+  const navigateToHabitDetailsScreen = (activeTab: string, habitId: string) => {
+    if (!habitId.length) return;
 
+    habitOptionsRef.current?.dismiss();
     router.push({
       pathname: '/habitDetails',
-      params: { activeTab },
+      params: { activeTab, habitId },
     });
   };
 

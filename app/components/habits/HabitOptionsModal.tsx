@@ -9,16 +9,16 @@ import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/typ
 import { styled, View, Text } from 'tamagui';
 
 import { Habit } from '@/app/entities';
-import HabitOptionIcon from './HabitOptionIcon';
-import HabitBadge from './HabitBadge';
-import CategoryIcon from '../tabs/CategoryIcon';
 import { toTruncatedText } from '@/app/utils';
+import HabitOptionIcon from './HabitOptionIcon';
+import CategoryIcon from '../tabs/CategoryIcon';
+import FrequencyBadge from './FrequencyBadge';
 
 interface Props {
   habitOptionsRef: MutableRefObject<BottomSheetModalMethods | null>;
   selectedHabit: Habit | null;
   onDelete: () => void;
-  onNavigate: (activeTab: string) => void;
+  onNavigate: (activeTab: string, habitId: string) => void;
 }
 
 const options = [
@@ -46,10 +46,6 @@ const HabitOptionsModal = ({
   onDelete,
   onNavigate,
 }: Props) => {
-  if (!selectedHabit) return null;
-
-  const { title, frequency, note, category } = selectedHabit;
-
   return (
     <BottomSheetModal
       ref={habitOptionsRef}
@@ -62,12 +58,18 @@ const HabitOptionsModal = ({
       <BottomSheetView>
         <TopRow>
           <DetailsContainer>
-            <TitleText>{title}</TitleText>
-            {!!note.length && <Text>{toTruncatedText(note, 12)}</Text>}
-            <HabitBadge frequency={frequency} />
+            <TitleText>{selectedHabit?.title}</TitleText>
+            {!!selectedHabit?.note.length && (
+              <Text>{toTruncatedText(selectedHabit.note, 12)}</Text>
+            )}
+            {selectedHabit?.frequency && (
+              <FrequencyBadge frequency={selectedHabit.frequency} />
+            )}
           </DetailsContainer>
           <CategoryContainer>
-            <CategoryIcon category={category} />
+            {selectedHabit?.category && (
+              <CategoryIcon category={selectedHabit.category} />
+            )}
           </CategoryContainer>
         </TopRow>
         {options.map((option, index) => {
@@ -75,21 +77,27 @@ const HabitOptionsModal = ({
 
           const isBordered = index === options.length - 2;
           const isLastIndex = index === options.length - 1;
+
           const fill = isLastIndex ? '#C73A57' : '#8C8C8C';
 
           return (
-            <CardContainer
-              key={heading}
-              onPress={() => (isLastIndex ? onDelete() : onNavigate(icon))}
-              isBordered={isBordered}
-            >
-              <IconContainer>
-                <HabitOptionIcon name={icon} fill={fill} />
-              </IconContainer>
-              <CardTextContainer>
-                <CardTitle isLastIndex={isLastIndex}>{heading}</CardTitle>
-              </CardTextContainer>
-            </CardContainer>
+            <View key={heading}>
+              {selectedHabit?.id && (
+                <CardContainer
+                  onPress={() =>
+                    isLastIndex ? onDelete() : onNavigate(icon, selectedHabit.id)
+                  }
+                  isBordered={isBordered}
+                >
+                  <IconContainer>
+                    <HabitOptionIcon name={icon} fill={fill} />
+                  </IconContainer>
+                  <CardTextContainer>
+                    <CardTitle isRed={isLastIndex}>{heading}</CardTitle>
+                  </CardTextContainer>
+                </CardContainer>
+              )}
+            </View>
           );
         })}
       </BottomSheetView>
@@ -161,7 +169,7 @@ const CardTextContainer = styled(View, {
 const CardTitle = styled(Text, {
   fontSize: 15.5,
   variants: {
-    isLastIndex: {
+    isRed: {
       true: {
         color: '#C73A57',
       },

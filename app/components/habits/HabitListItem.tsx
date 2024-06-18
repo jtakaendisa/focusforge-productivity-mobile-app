@@ -7,20 +7,19 @@ import { View, Text, styled } from 'tamagui';
 import { Habit } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
 import CategoryIcon from '../tabs/CategoryIcon';
-import HabitBadge from './HabitBadge';
+import FrequencyBadge from './FrequencyBadge';
 import HabitDateCard from './HabitDateCard';
 
 interface Props {
   habit: Habit;
   showOptions: (habit: Habit) => void;
-  onNavigate: (activeTab: string) => void;
+  onNavigate: (activeTab: string, habitId: string) => void;
 }
 
 const SVG_SIZE = 18;
 
 const HabitListItem = ({ habit, showOptions, onNavigate }: Props) => {
-  const { title, category, frequency, priority, startDate, endDate, note, reminders } =
-    habit;
+  const { id, title, category, frequency, startDate, endDate } = habit;
 
   const days = useMemo(() => {
     const defaultEndDate = new Date(startDate);
@@ -44,7 +43,7 @@ const HabitListItem = ({ habit, showOptions, onNavigate }: Props) => {
       <DetailsRow>
         <TitleContainer>
           <Title>{toTruncatedText(title, 38)}</Title>
-          <HabitBadge frequency={frequency} />
+          <FrequencyBadge frequency={frequency} />
         </TitleContainer>
         <CategoryContainer>
           <CategoryIcon category={category} />
@@ -77,7 +76,7 @@ const HabitListItem = ({ habit, showOptions, onNavigate }: Props) => {
           </Stat>
         </StatsContainer>
         <ActionsContainer>
-          <ActionButton onPress={() => onNavigate('calendar')}>
+          <ActionButton onPress={() => onNavigate('calendar', id)}>
             <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 19 20" fill="none">
               <Path
                 d="M17.1367 1.41797H15.7188V3.57422C15.7188 3.97656 15.4102 4.28125 15.0117 4.28125H12.1445C11.7422 4.28125 11.4375 3.97266 11.4375 3.57422V1.41797H7.12109V3.57422C7.12109 3.97656 6.8125 4.28125 6.41406 4.28125H3.54688C3.14453 4.28125 2.83984 3.97266 2.83984 3.57422V1.41797H1.41797C0.617188 1.41797 0 2.06641 0 2.83594V18.582C0 19.3828 0.648438 20 1.41797 20H17.1641C17.9648 20 18.582 19.3516 18.582 18.582V2.86719C18.5859 2.06641 17.9375 1.41797 17.1367 1.41797ZM17.1367 18.6133H1.41797V5.73047H17.1641V18.6133H17.1367ZM5.70312 2.86719H4.28516V0H5.70312V2.86719ZM14.3008 2.86719H12.8828V0H14.3008V2.86719ZM7.12109 8.59766H5.70312V7.17969H7.12109V8.59766ZM9.98828 8.59766H8.57031V7.17969H9.98828V8.59766ZM12.8516 8.59766H11.4336V7.17969H12.8516V8.59766ZM15.7188 8.59766H14.3008V7.17969H15.7188V8.59766ZM4.28516 11.4336H2.86719V10.0156H4.28516V11.4336ZM7.12109 11.4336H5.70312V10.0156H7.12109V11.4336ZM9.98828 11.4336H8.57031V10.0156H9.98828V11.4336ZM12.8516 11.4336H11.4336V10.0156H12.8516V11.4336ZM15.7188 11.4336H14.3008V10.0156H15.7188V11.4336ZM4.28516 14.3008H2.86719V12.8828H4.28516V14.3008ZM7.12109 14.3008H5.70312V12.8828H7.12109V14.3008ZM9.98828 14.3008H8.57031V12.8828H9.98828V14.3008ZM12.8516 14.3008H11.4336V12.8828H12.8516V14.3008ZM15.7188 14.3008H14.3008V12.8828H15.7188V14.3008ZM4.28516 17.1641H2.86719V15.7461H4.28516V17.1641ZM7.12109 17.1641H5.70312V15.7461H7.12109V17.1641ZM9.98828 17.1641H8.57031V15.7461H9.98828V17.1641ZM12.8516 17.1641H11.4336V15.7461H12.8516V17.1641Z"
@@ -85,7 +84,7 @@ const HabitListItem = ({ habit, showOptions, onNavigate }: Props) => {
               />
             </Svg>
           </ActionButton>
-          <ActionButton onPress={() => onNavigate('statistics')}>
+          <ActionButton onPress={() => onNavigate('statistics', id)}>
             <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 20 20" fill="none">
               <Path
                 d="M10.7143 1.42857C11.1071 1.42857 11.4286 1.75 11.4286 2.14286V17.8571C11.4286 18.25 11.1071 18.5714 10.7143 18.5714H9.28571C8.89286 18.5714 8.57143 18.25 8.57143 17.8571V2.14286C8.57143 1.75 8.89286 1.42857 9.28571 1.42857H10.7143ZM9.28571 0C8.10268 0 7.14286 0.959821 7.14286 2.14286V17.8571C7.14286 19.0402 8.10268 20 9.28571 20H10.7143C11.8973 20 12.8571 19.0402 12.8571 17.8571V2.14286C12.8571 0.959821 11.8973 0 10.7143 0H9.28571ZM3.57143 10C3.96429 10 4.28571 10.3214 4.28571 10.7143V17.8571C4.28571 18.25 3.96429 18.5714 3.57143 18.5714H2.14286C1.75 18.5714 1.42857 18.25 1.42857 17.8571V10.7143C1.42857 10.3214 1.75 10 2.14286 10H3.57143ZM2.14286 8.57143C0.959821 8.57143 0 9.53125 0 10.7143V17.8571C0 19.0402 0.959821 20 2.14286 20H3.57143C4.75446 20 5.71429 19.0402 5.71429 17.8571V10.7143C5.71429 9.53125 4.75446 8.57143 3.57143 8.57143H2.14286ZM16.4286 4.28571H17.8571C18.25 4.28571 18.5714 4.60714 18.5714 5V17.8571C18.5714 18.25 18.25 18.5714 17.8571 18.5714H16.4286C16.0357 18.5714 15.7143 18.25 15.7143 17.8571V5C15.7143 4.60714 16.0357 4.28571 16.4286 4.28571ZM14.2857 5V17.8571C14.2857 19.0402 15.2455 20 16.4286 20H17.8571C19.0402 20 20 19.0402 20 17.8571V5C20 3.81696 19.0402 2.85714 17.8571 2.85714H16.4286C15.2455 2.85714 14.2857 3.81696 14.2857 5Z"

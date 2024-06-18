@@ -23,7 +23,7 @@ import ModalContainer from './components/tabs/modals/ModalContainer';
 import CategoryModalModule from './components/tabs/modals/CategoryModalModule';
 import ChecklistModalModule from './components/tabs/modals/ChecklistModalModule';
 import PriorityModalModule from './components/tabs/modals/PriorityModalModule';
-import NoteModalModule from './components/tabs/modals/NoteModalModule';
+import TextModalModule from './components/tabs/modals/TextModalModule';
 import CircularCheckbox from './components/tabs/CircularCheckbox';
 import CategoryIcon from './components/tabs/CategoryIcon';
 
@@ -285,9 +285,10 @@ const NewTaskScreen = () => {
         />
       </ModalContainer>
       <ModalContainer isOpen={isNoteOpen} closeModal={toggleNoteModal}>
-        <NoteModalModule
+        <TextModalModule
           control={control}
-          previousNote={note}
+          name="note"
+          previousText={note}
           closeModal={toggleNoteModal}
         />
       </ModalContainer>
