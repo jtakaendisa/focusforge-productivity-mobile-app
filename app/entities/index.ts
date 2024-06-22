@@ -2,6 +2,8 @@ import { Animated } from 'react-native';
 import { User } from 'firebase/auth';
 
 import { categoryArray } from '../store';
+import { z } from 'zod';
+import { frequencySchema, reminderSchema } from '../validationSchemas';
 
 export type AuthUser = User & {
   username?: string;
@@ -21,6 +23,10 @@ export interface ChecklistItem {
   isCompleted: boolean;
 }
 
+export type Frequency = z.infer<typeof frequencySchema>;
+
+export type Reminder = z.infer<typeof reminderSchema>;
+
 export interface Task {
   id: string;
   title: string;
@@ -29,21 +35,11 @@ export interface Task {
   dueDate: Date;
   priority: Priority;
   note: string;
+  frequency?: Frequency;
+  reminders: Reminder[];
   isCarriedOver: boolean;
   isRecurring: boolean;
   checklist: ChecklistItem[];
-}
-
-export interface Frequency {
-  type: 'daily' | 'specific' | 'repeats';
-  isRepeatedOn?: string[];
-  isRepeatedEvery?: number;
-}
-
-export interface Reminder {
-  id: string;
-  type: 'notification' | 'alarm';
-  time: Date;
 }
 
 export interface Habit {

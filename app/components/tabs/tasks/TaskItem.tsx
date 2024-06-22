@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { Swipeable } from 'react-native-gesture-handler';
+import { router } from 'expo-router';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -19,14 +20,14 @@ import CategoryIcon from '../CategoryIcon';
 import CircularCheckbox from '../CircularCheckbox';
 
 interface Props {
-  isSwipeable?: boolean;
   task: Task;
+  isCheckable?: boolean;
   onPress: (id: string) => void;
   onSwipe: (id: string) => void;
   openModal: (modalName: 'isPrioritizeOpen' | 'isDeleteOpen') => void;
 }
 
-const TaskItem = ({ isSwipeable, task, onPress, onSwipe, openModal }: Props) => {
+const TaskItem = ({ task, isCheckable, onPress, onSwipe, openModal }: Props) => {
   const { id, title, isCompleted, note, category } = task;
 
   const swipeableRef = useRef<Swipeable | null>(null);
@@ -54,7 +55,11 @@ const TaskItem = ({ isSwipeable, task, onPress, onSwipe, openModal }: Props) => 
     onSwipe(id);
 
     if (direction === 'left') {
-      openModal('isPrioritizeOpen');
+      if (isCheckable) {
+        openModal('isPrioritizeOpen');
+      } else {
+        router.push({ pathname: '/editTask', params: { taskId: id } });
+      }
     }
 
     if (direction === 'right') {
@@ -64,79 +69,54 @@ const TaskItem = ({ isSwipeable, task, onPress, onSwipe, openModal }: Props) => 
     swipeableRef.current?.close();
   };
 
-  if (isSwipeable) {
-    return (
-      <AnimatedContainer
-        entering={FadeIn}
-        exiting={FadeOut}
-        onPress={handleTaskCompletion}
+  return (
+    <AnimatedContainer
+      entering={FadeIn}
+      exiting={FadeOut}
+      onPress={isCheckable ? handleTaskCompletion : null}
+    >
+      <Swipeable
+        ref={swipeableRef}
+        renderLeftActions={(_, dragAnimatedValue) => (
+          <TaskItemLeftActions
+            dragAnimatedValue={dragAnimatedValue}
+            isCheckable={isCheckable}
+          />
+        )}
+        renderRightActions={(_, dragAnimatedValue) => (
+          <TaskItemRightActions dragAnimatedValue={dragAnimatedValue} />
+        )}
+        onSwipeableOpen={(direction) => handleSwipeCompletion(direction)}
       >
-        <Swipeable
-          ref={swipeableRef}
-          renderLeftActions={(_, dragAnimatedValue) => (
-            <TaskItemLeftActions dragAnimatedValue={dragAnimatedValue} />
-          )}
-          renderRightActions={(_, dragAnimatedValue) => (
-            <TaskItemRightActions dragAnimatedValue={dragAnimatedValue} />
-          )}
-          onSwipeableOpen={(direction) => handleSwipeCompletion(direction)}
-        >
-          <TaskContainer>
+        <TaskContainer>
+          {isCheckable && (
             <CheckboxContainer>
               <CircularCheckbox isChecked={isChecked} />
             </CheckboxContainer>
-            <TextContainer>
-              <AnimatedTitle style={textColorAnimation}>
-                {toTruncatedText(title, 30)}
-              </AnimatedTitle>
-              {note && (
-                <AnimatedNote style={textOpacityAnimation}>
-                  {toTruncatedText(note, 37)}
-                </AnimatedNote>
-              )}
-            </TextContainer>
-            <InfoContainer>
-              <MetricsContainer>
-                <CategoryBadge>
-                  <BadgeText>{category}</BadgeText>
-                </CategoryBadge>
-                <ProgressText>0% done</ProgressText>
-              </MetricsContainer>
-              <CategoryContainer>
-                <CategoryIcon category={category} />
-              </CategoryContainer>
-            </InfoContainer>
-          </TaskContainer>
-        </Swipeable>
-      </AnimatedContainer>
-    );
-  }
-
-  return (
-    <AnimatedContainer entering={FadeIn} exiting={FadeOut}>
-      <TaskContainer>
-        <TextContainer>
-          <AnimatedTitle style={textColorAnimation}>
-            {toTruncatedText(title, 30)}
-          </AnimatedTitle>
-          {note && (
-            <AnimatedNote style={textOpacityAnimation}>
-              {toTruncatedText(note, 37)}
-            </AnimatedNote>
           )}
-        </TextContainer>
-        <InfoContainer>
-          <MetricsContainer>
-            <CategoryBadge>
-              <BadgeText>{category}</BadgeText>
-            </CategoryBadge>
-            <ProgressText>0% done</ProgressText>
-          </MetricsContainer>
-          <CategoryContainer>
-            <CategoryIcon category={category} />
-          </CategoryContainer>
-        </InfoContainer>
-      </TaskContainer>
+          <TextContainer>
+            <AnimatedTitle style={textColorAnimation}>
+              {toTruncatedText(title, 30)}
+            </AnimatedTitle>
+            {note && (
+              <AnimatedNote style={textOpacityAnimation}>
+                {toTruncatedText(note, 37)}
+              </AnimatedNote>
+            )}
+          </TextContainer>
+          <InfoContainer>
+            <MetricsContainer>
+              <CategoryBadge>
+                <BadgeText>{category}</BadgeText>
+              </CategoryBadge>
+              <ProgressText>0% done</ProgressText>
+            </MetricsContainer>
+            <CategoryContainer>
+              <CategoryIcon category={category} />
+            </CategoryContainer>
+          </InfoContainer>
+        </TaskContainer>
+      </Swipeable>
     </AnimatedContainer>
   );
 };

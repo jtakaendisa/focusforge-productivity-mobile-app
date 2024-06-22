@@ -164,12 +164,11 @@ const DurationListModule = ({
         </OptionInfo>
         <OptionLabel>
           <LabelText>
-            {!reminders.length && '---'}
-            {reminders.length > 0
+            {!!reminders.length
               ? reminders.length === 1
                 ? `${reminders.length} reminder`
                 : `${reminders.length} reminders`
-              : ''}
+              : '---'}
           </LabelText>
         </OptionLabel>
       </OptionContainer>

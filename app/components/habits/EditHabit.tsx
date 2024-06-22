@@ -117,7 +117,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
     const updatedHabits = habits.map((habit) =>
       habit.id === selectedHabit.id
         ? {
-            id: selectedHabit.id,
+            ...selectedHabit,
             ...data,
           }
         : habit

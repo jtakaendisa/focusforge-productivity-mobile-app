@@ -14,7 +14,7 @@ interface Props {
   tasks: Task[];
   filteredTasks: Task[] | (string | Task)[];
   isSectioned?: boolean;
-  isSwipeable?: boolean;
+  isCheckable?: boolean;
 }
 
 const TaskList = ({
@@ -22,7 +22,7 @@ const TaskList = ({
   tasks,
   filteredTasks,
   isSectioned,
-  isSwipeable,
+  isCheckable,
 }: Props) => {
   const setTasks = useTaskStore((s) => s.setTasks);
 
@@ -96,13 +96,13 @@ const TaskList = ({
             } else {
               return (
                 <TaskItem
-                  isSwipeable={isSwipeable}
                   task={item}
                   onPress={handlePress}
                   onSwipe={(id) => setSelectedTaskId(id)}
                   openModal={(modalName) =>
                     setModalState({ ...modalState, [modalName]: true })
                   }
+                  isCheckable={isCheckable}
                 />
               );
             }
@@ -119,7 +119,7 @@ const TaskList = ({
           data={filteredTasks as Task[]}
           renderItem={({ item }) => (
             <TaskItem
-              isSwipeable={isSwipeable}
+              isCheckable={isCheckable}
               task={item as Task}
               onPress={handlePress}
               onSwipe={(id) => setSelectedTaskId(id)}

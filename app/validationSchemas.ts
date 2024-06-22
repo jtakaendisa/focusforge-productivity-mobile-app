@@ -36,6 +36,12 @@ const subTaskSchema = z.object({
   isCompleted: z.boolean({ message: 'isCompleted must be a boolean (true / false)' }),
 });
 
+export const reminderSchema = z.object({
+  id: z.string().min(1, { message: 'ID must be at least 1 characters long' }),
+  type: z.enum(['notification', 'alarm']),
+  time: z.date({ message: 'Invalid time' }),
+});
+
 export const frequencySchema = z.object({
   type: z.enum(['daily', 'specific', 'repeats']),
   isRepeatedOn: z.array(z.string()).optional(),
@@ -46,19 +52,14 @@ export const taskSchema = z.object({
   title: titleSchema,
   category: z.enum(categoryArray),
   dueDate: z.date({ message: 'Invalid date string' }),
+  reminders: z.array(reminderSchema),
+  checklist: z.array(subTaskSchema),
   priority: priorityEnum,
   frequency: frequencySchema.optional(),
   note: z.string(),
   isCarriedOver: z.boolean({
     message: 'isCarriedOver must be a boolean (true / false)',
   }),
-  checklist: z.array(subTaskSchema),
-});
-
-const reminderSchema = z.object({
-  id: z.string().min(1, { message: 'ID must be at least 1 characters long' }),
-  type: z.enum(['notification', 'alarm']),
-  time: z.date({ message: 'Invalid time' }),
 });
 
 export const habitSchema = z.object({

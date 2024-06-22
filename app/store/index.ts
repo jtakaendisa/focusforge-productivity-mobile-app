@@ -45,6 +45,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Analyze data', isCompleted: false },
       { id: uuid.v4() as string, title: 'Write conclusion', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -61,6 +62,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Buy fruits', isCompleted: false },
       { id: uuid.v4() as string, title: 'Buy dairy', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -73,6 +75,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -85,6 +88,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -97,6 +101,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -112,6 +117,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Prepare slides', isCompleted: false },
       { id: uuid.v4() as string, title: 'Send agenda to team', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -124,6 +130,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -136,6 +143,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -151,6 +159,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Book hotel', isCompleted: false },
       { id: uuid.v4() as string, title: 'Pack essentials', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -163,6 +172,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -175,6 +185,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -191,6 +202,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Fill forms', isCompleted: false },
       { id: uuid.v4() as string, title: 'Submit online', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -203,6 +215,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -218,6 +231,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Organize tools', isCompleted: false },
       { id: uuid.v4() as string, title: 'Throw out junk', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -233,6 +247,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Buy ingredients', isCompleted: false },
       { id: uuid.v4() as string, title: 'Prepare dessert', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -245,6 +260,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -260,6 +276,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Sketch outline', isCompleted: false },
       { id: uuid.v4() as string, title: 'Mix colors', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -272,6 +289,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -284,6 +302,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [{ id: uuid.v4() as string, title: 'Take notes', isCompleted: false }],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -299,6 +318,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Backup files', isCompleted: false },
       { id: uuid.v4() as string, title: 'Install updates', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -311,6 +331,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -326,6 +347,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Outline topics', isCompleted: false },
       { id: uuid.v4() as string, title: 'Design slides', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -341,6 +363,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Sort by genre', isCompleted: false },
       { id: uuid.v4() as string, title: 'Dust shelves', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -353,6 +376,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -368,6 +392,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Invite family', isCompleted: false },
       { id: uuid.v4() as string, title: 'Buy meat and veggies', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -383,6 +408,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Watch lectures', isCompleted: false },
       { id: uuid.v4() as string, title: 'Submit assignments', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -395,6 +421,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -410,6 +437,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Buy camera', isCompleted: false },
       { id: uuid.v4() as string, title: 'Learn basics', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -425,6 +453,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Prepare menu', isCompleted: false },
       { id: uuid.v4() as string, title: 'Set table', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -440,6 +469,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Collect documents', isCompleted: false },
       { id: uuid.v4() as string, title: 'Submit claim', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -452,6 +482,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -471,6 +502,7 @@ const dummyTasks: Task[] = [
         isCompleted: false,
       },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -483,6 +515,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -498,6 +531,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Buy new washer', isCompleted: false },
       { id: uuid.v4() as string, title: 'Install washer', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -510,6 +544,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -522,6 +557,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -534,6 +570,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -549,6 +586,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Plan menu', isCompleted: false },
       { id: uuid.v4() as string, title: 'Cook meals', isCompleted: false },
     ],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -561,6 +599,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -573,6 +612,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: true,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -585,6 +625,7 @@ const dummyTasks: Task[] = [
     isCarriedOver: false,
     isRecurring: false,
     checklist: [],
+    reminders: [],
   },
   {
     id: uuid.v4() as string,
@@ -600,6 +641,7 @@ const dummyTasks: Task[] = [
       { id: uuid.v4() as string, title: 'Sort by date', isCompleted: false },
       { id: uuid.v4() as string, title: 'Delete duplicates', isCompleted: false },
     ],
+    reminders: [],
   },
 ];
 

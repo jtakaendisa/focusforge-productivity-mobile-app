@@ -1,54 +1,45 @@
-import { useEffect, useRef, useState } from 'react';
-import { TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import React, { useEffect, useRef, useState } from 'react';
+import { router } from 'expo-router';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import Svg, { Path } from 'react-native-svg';
+
+import { Task } from '@/app/entities';
+import { NewTaskData } from '@/app/newTask';
+import { useTaskStore } from '@/app/store';
+import { toFormattedDateString, toTruncatedText } from '@/app/utils';
+import { taskSchema } from '@/app/validationSchemas';
+import { View, Text, styled } from 'tamagui';
+import CategoryIcon from '../CategoryIcon';
+import { TODAYS_DATE } from '@/app/constants';
 import {
   DateTimePickerAndroid,
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import uuid from 'react-native-uuid';
-import Svg, { Path } from 'react-native-svg';
+import FrequencyBadge from '../../habits/FrequencyBadge';
+import CircularCheckbox from '../CircularCheckbox';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
-import { styled, Text, View } from 'tamagui';
+import FrequencyListModule from '../../habits/FrequencyListModule';
+import CategoryModalModule from '../modals/CategoryModalModule';
+import ChecklistModalModule from '../modals/ChecklistModalModule';
+import ModalContainer from '../modals/ModalContainer';
+import PriorityModalModule from '../modals/PriorityModalModule';
+import RemindersModalModule from '../modals/RemindersModalModule';
+import TextModalModule from '../modals/TextModalModule';
 
-import { PriorityType, useTaskStore } from './store';
-import { TODAYS_DATE } from './constants';
-import { toFormattedDateString, toTruncatedText } from './utils';
-import { taskSchema } from './validationSchemas';
-import ModalContainer from './components/tabs/modals/ModalContainer';
-import CategoryModalModule from './components/tabs/modals/CategoryModalModule';
-import ChecklistModalModule from './components/tabs/modals/ChecklistModalModule';
-import PriorityModalModule from './components/tabs/modals/PriorityModalModule';
-import TextModalModule from './components/tabs/modals/TextModalModule';
-import CircularCheckbox from './components/tabs/CircularCheckbox';
-import CategoryIcon from './components/tabs/CategoryIcon';
-import FrequencyBadge from './components/habits/FrequencyBadge';
-import FrequencyListModule from './components/habits/FrequencyListModule';
-import RemindersModalModule from './components/tabs/modals/RemindersModalModule';
-
-type SearchParams = {
-  isRecurring: string;
-  origin: '/' | '/habits' | '/tasks';
-};
-
-export type NewTaskData = z.infer<typeof taskSchema>;
+interface Props {
+  tasks: Task[];
+  selectedTask: Task;
+}
 
 const SVG_SIZE = 22;
+const EditTask = ({ tasks, selectedTask }: Props) => {
+  const { isRecurring } = selectedTask;
 
-const NewTaskScreen = () => {
-  const { isRecurring: isRecurringString, origin } =
-    useLocalSearchParams<SearchParams>();
-
-  const isRecurring: boolean = JSON.parse(isRecurringString);
-
-  const tasks = useTaskStore((s) => s.tasks);
   const setTasks = useTaskStore((s) => s.setTasks);
 
   const [modalState, setModalState] = useState({
+    isTitleOpen: false,
     isCategoryOpen: false,
     isRemindersOpen: false,
     isChecklistOpen: false,
@@ -61,33 +52,7 @@ const NewTaskScreen = () => {
   const setIsCarriedOverRef = useRef<((...event: any[]) => void) | null>(null);
 
   const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { isSubmitSuccessful },
-  } = useForm<NewTaskData>({
-    defaultValues: {
-      title: '',
-      category: 'Task',
-      dueDate: TODAYS_DATE,
-      priority: PriorityType.normal,
-      reminders: [],
-      frequency: isRecurring
-        ? {
-            type: 'daily',
-          }
-        : undefined,
-      checklist: [],
-      note: '',
-      isCarriedOver: true,
-    },
-    resolver: zodResolver(taskSchema),
-  });
-
-  const watchAllFields = watch();
-
-  const {
+    isTitleOpen,
     isCategoryOpen,
     isRemindersOpen,
     isChecklistOpen,
@@ -97,14 +62,30 @@ const NewTaskScreen = () => {
   } = modalState;
 
   const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isSubmitSuccessful },
+  } = useForm<NewTaskData>({
+    defaultValues: {
+      ...selectedTask,
+    },
+    resolver: zodResolver(taskSchema),
+  });
+
+  const watchAllFields = watch();
+
+  const {
+    title,
     category,
     dueDate,
     checklist,
     priority,
-    frequency,
-    reminders,
     note,
     isCarriedOver,
+    frequency,
+    reminders,
   } = watchAllFields;
 
   const isChecked = useSharedValue(isCarriedOver ? 1 : 0);
@@ -128,14 +109,19 @@ const NewTaskScreen = () => {
   };
 
   const onSubmit: SubmitHandler<NewTaskData> = (data) => {
-    const newTask = {
-      id: uuid.v4() as string,
-      isCompleted: false,
-      isRecurring,
-      ...data,
-    };
-    setTasks([...tasks, newTask]);
+    const updatedTasks = tasks.map((task) =>
+      task.id === selectedTask.id
+        ? {
+            ...selectedTask,
+            ...data,
+          }
+        : task
+    );
+    setTasks(updatedTasks);
   };
+
+  const toggleTitleModal = () =>
+    setModalState({ ...modalState, isTitleOpen: !isTitleOpen });
 
   const toggleCategoryModal = () =>
     setModalState({ ...modalState, isCategoryOpen: !isCategoryOpen });
@@ -163,27 +149,26 @@ const NewTaskScreen = () => {
     if (!isSubmitSuccessful) return;
 
     reset();
-    router.replace(origin);
+    router.replace('/tasks');
   }, [isSubmitSuccessful]);
 
   return (
     <Container>
       <ScreenLabel>
-        <LabelTextLarge>New Task</LabelTextLarge>
+        <LabelTextLarge>Edit Task</LabelTextLarge>
       </ScreenLabel>
-      <Controller
-        control={control}
-        name="title"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TitleInputField
-            placeholder="Task Title..."
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            autoFocus
-          />
-        )}
-      />
+      <OptionContainer onPress={toggleTitleModal}>
+        <OptionInfo>
+          <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 22 22" fill="none">
+            <Path
+              d="M16.8358 2.09756C17.2493 1.64101 17.835 1.37827 18.4509 1.37827C19.6483 1.37827 20.6217 2.35168 20.6217 3.54906C20.6217 4.16497 20.359 4.75074 19.9024 5.16422L10.9996 13.1798L8.82025 11.0004L16.8358 2.09756ZM18.4509 0C17.4431 0 16.4869 0.426404 15.8107 1.17584L7.48935 10.4232L4.20733 11.4311C3.35453 11.6938 2.68262 12.3485 2.40266 13.1927L0.0725099 20.1831C-0.28498 21.2599 0.740112 22.285 1.81689 21.9275L8.80302 19.5973C9.64721 19.3174 10.3062 18.6455 10.5646 17.7927L11.5768 14.5106L20.8242 6.18931C21.5736 5.51741 22 4.55692 22 3.54906C22 1.58932 20.4107 0 18.4509 0ZM10.1942 14.3211L9.25096 17.3878C9.12174 17.8142 8.7901 18.1502 8.368 18.288L2.84198 20.1314L5.74928 17.2284C5.76651 17.2284 5.78804 17.2284 5.80527 17.2284C6.37812 17.2284 6.83898 16.7676 6.83898 16.1947C6.83898 15.6219 6.37812 15.161 5.80527 15.161C5.23243 15.161 4.77157 15.6219 4.77157 16.1947C4.77157 16.212 4.77157 16.2335 4.77157 16.2507L1.86857 19.158L3.71202 13.632C3.85415 13.2099 4.19011 12.8826 4.6122 12.749L7.67886 11.8058L10.1942 14.3211Z"
+              fill="#C73A57"
+            />
+          </Svg>
+          <OptionTitle>Title</OptionTitle>
+        </OptionInfo>
+        <Text color="#8C8C8C">{toTruncatedText(title, 24)}</Text>
+      </OptionContainer>
       <OptionContainer onPress={toggleCategoryModal}>
         <OptionInfo>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 20 20" fill="none">
@@ -324,8 +309,9 @@ const NewTaskScreen = () => {
           }}
         />
       </OptionContainer>
+
       <ButtonsContainer>
-        <Button onPress={() => router.replace(origin)}>
+        <Button onPress={() => router.replace('/tasks')}>
           <ButtonText>CANCEL</ButtonText>
         </Button>
         <Button onPress={handleSubmit(onSubmit)}>
@@ -333,6 +319,14 @@ const NewTaskScreen = () => {
         </Button>
       </ButtonsContainer>
 
+      <ModalContainer isOpen={isTitleOpen} closeModal={toggleTitleModal}>
+        <TextModalModule
+          control={control}
+          name="title"
+          previousText={title}
+          closeModal={toggleTitleModal}
+        />
+      </ModalContainer>
       <ModalContainer isOpen={isCategoryOpen} closeModal={toggleCategoryModal}>
         <CategoryModalModule control={control} closeModal={toggleCategoryModal} />
       </ModalContainer>
@@ -373,14 +367,12 @@ const NewTaskScreen = () => {
           closeModal={toggleNoteModal}
         />
       </ModalContainer>
-      <StatusBar style="light" />
     </Container>
   );
 };
 
-const Container = styled(SafeAreaView, {
+const Container = styled(View, {
   flex: 1,
-  backgroundColor: '#111111',
 });
 
 const ScreenLabel = styled(View, {
@@ -397,21 +389,6 @@ const LabelTextLarge = styled(Text, {
   fontWeight: 'bold',
 });
 
-const TitleInputField = styled(TextInput, {
-  height: 48,
-  paddingHorizontal: 16,
-  paddingVertical: 6,
-  marginHorizontal: 8,
-  marginVertical: 28,
-  borderRadius: 8,
-  borderWidth: 2,
-  borderColor: '#C73A57',
-  placeholderTextColor: '#fff',
-  //@ts-ignore
-  fontSize: 16,
-  color: '#fff',
-});
-
 const OptionContainer = styled(View, {
   flexDirection: 'row',
   justifyContent: 'space-between',
@@ -426,19 +403,6 @@ const OptionInfo = styled(View, {
   flexDirection: 'row',
   alignItems: 'center',
   gap: 10,
-});
-
-const OptionTextContainer = styled(View, {
-  justifyContent: 'center',
-});
-
-const OptionTitle = styled(Text, {
-  fontSize: 16,
-});
-
-const OptionSubtitle = styled(Text, {
-  fontSize: 12,
-  color: '#8c8c8c',
 });
 
 const Row = styled(View, {
@@ -469,6 +433,19 @@ const LabelText = styled(Text, {
   color: '#C73A57',
 });
 
+const OptionTextContainer = styled(View, {
+  justifyContent: 'center',
+});
+
+const OptionTitle = styled(Text, {
+  fontSize: 16,
+});
+
+const OptionSubtitle = styled(Text, {
+  fontSize: 12,
+  color: '#8c8c8c',
+});
+
 const ButtonsContainer = styled(View, {
   flexDirection: 'row',
   position: 'absolute',
@@ -492,4 +469,4 @@ const ButtonText = styled(Text, {
   fontWeight: 'bold',
 });
 
-export default NewTaskScreen;
+export default EditTask;
