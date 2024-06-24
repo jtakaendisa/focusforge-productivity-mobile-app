@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Task } from './entities';
 import TabBar from './components/habits/TabBar';
 import EditTask from './components/tabs/tasks/EditTask';
+import { StatusBar } from 'expo-status-bar';
 
 export type TaskActiveTab = 'calendar' | 'edit';
 
@@ -41,13 +42,14 @@ const TaskDetailsScreen = () => {
       <TabBar mode="task" activeTab={activeTab} onSelect={handleSelectTab} />
       {activeTab === 'calendar' && <Text>Calendar</Text>}
       {activeTab === 'edit' && <EditTask tasks={tasks} selectedTask={selectedTask} />}
+      <StatusBar style="light" />
     </Container>
   );
 };
 
 const Container = styled(SafeAreaView, {
   flex: 1,
-  backgroundColor: '#111111',
+  // backgroundColor: '#111111',
 });
 
 const ScreenLabel = styled(View, {
