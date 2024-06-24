@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useState } from 'react';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 
 import { Priority, Task } from '@/app/entities';
@@ -8,6 +8,9 @@ import ModalContainer from '../modals/ModalContainer';
 import DeleteModalModule from '../modals/DeleteModalModule';
 import TaskSectionHeader from '../tasks/TaskSectionHeader';
 import PriorityModalModule from '../modals/PriorityModalModule';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import ActivityOptionsModal from '../../habits/ActivityOptionsModal';
+import { router } from 'expo-router';
 
 interface Props {
   taskListRef: MutableRefObject<FlashList<Task | (string | Task)> | null>;
@@ -28,10 +31,13 @@ const TaskList = ({
 
   const [currentPriority, setCurrentPriority] = useState<Priority | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalState, setModalState] = useState({
     isDeleteOpen: false,
     isPrioritizeOpen: false,
   });
+
+  const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
   const { isDeleteOpen, isPrioritizeOpen } = modalState;
 
@@ -61,15 +67,33 @@ const TaskList = ({
       }
     });
     setTasks(updatedTasks);
+    setSelectedTask(null);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id?: string) => {
     const filteredTasks = tasks.filter((task) => task.id !== id);
     setTasks(filteredTasks);
+    setSelectedTask(null);
     taskListRef.current?.prepareForLayoutAnimationRender();
   };
 
+  const navigateToTaskDetailsScreen = (activeTab: string, taskId: string) => {
+    if (!taskId.length) return;
+
+    activityOptionsRef.current?.dismiss();
+    router.push({
+      pathname: '/taskDetails',
+      params: { activeTab, taskId },
+    });
+  };
+
+  const handlePresentActivityOptionsModal = (task: Task) => {
+    setSelectedTask(task);
+    activityOptionsRef.current?.present();
+  };
+
   const closeDeleteModal = () => setModalState({ ...modalState, isDeleteOpen: false });
+
   const closePriorityModal = () =>
     setModalState({ ...modalState, isPrioritizeOpen: false });
 
@@ -107,7 +131,7 @@ const TaskList = ({
               );
             }
           }}
-          keyExtractor={(item: string | Task, index) => index.toString()}
+          keyExtractor={(item, index) => index.toString()}
           getItemType={(item) => {
             return typeof item === 'string' ? 'sectionHeader' : 'row';
           }}
@@ -119,6 +143,7 @@ const TaskList = ({
           data={filteredTasks as Task[]}
           renderItem={({ item }) => (
             <TaskItem
+              isRecurring
               isCheckable={isCheckable}
               task={item as Task}
               onPress={handlePress}
@@ -126,6 +151,7 @@ const TaskList = ({
               openModal={(modalName) =>
                 setModalState({ ...modalState, [modalName]: true })
               }
+              showOptions={handlePresentActivityOptionsModal}
             />
           )}
           keyExtractor={(item, index) => index.toString()}
@@ -149,6 +175,13 @@ const TaskList = ({
           closeModal={closeDeleteModal}
         />
       </ModalContainer>
+      <ActivityOptionsModal
+        mode="task"
+        activityOptionsRef={activityOptionsRef}
+        selectedActivity={selectedTask}
+        onDelete={handleDelete}
+        onNavigate={navigateToTaskDetailsScreen}
+      />
     </>
   );
 };

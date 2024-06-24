@@ -154,9 +154,6 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
 
   return (
     <Container>
-      <ScreenLabel>
-        <LabelTextLarge>Edit Task</LabelTextLarge>
-      </ScreenLabel>
       <OptionContainer onPress={toggleTitleModal}>
         <OptionInfo>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 22 22" fill="none">
@@ -373,20 +370,6 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
 
 const Container = styled(View, {
   flex: 1,
-});
-
-const ScreenLabel = styled(View, {
-  alignSelf: 'flex-start',
-  paddingHorizontal: 12,
-  paddingVertical: 8,
-  marginLeft: 8,
-  borderRadius: 6,
-  backgroundColor: '#262626',
-});
-
-const LabelTextLarge = styled(Text, {
-  fontSize: 18,
-  fontWeight: 'bold',
 });
 
 const OptionContainer = styled(View, {

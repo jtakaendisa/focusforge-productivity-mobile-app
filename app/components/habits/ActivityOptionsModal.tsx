@@ -8,47 +8,35 @@ import {
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { styled, View, Text } from 'tamagui';
 
-import { Habit } from '@/app/entities';
+import { Habit, Task } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
 import HabitOptionIcon from './HabitOptionIcon';
 import CategoryIcon from '../tabs/CategoryIcon';
 import FrequencyBadge from './FrequencyBadge';
 
 interface Props {
-  habitOptionsRef: MutableRefObject<BottomSheetModalMethods | null>;
-  selectedHabit: Habit | null;
-  onDelete: () => void;
+  mode: 'habit' | 'task';
+  activityOptionsRef: MutableRefObject<BottomSheetModalMethods | null>;
+  selectedActivity: Habit | Task | null;
+  onDelete: (id?: string) => void;
   onNavigate: (activeTab: string, habitId: string) => void;
 }
 
-const options = [
-  {
-    heading: 'Calendar',
-    icon: 'calendar',
-  },
-  {
-    heading: 'Statistics',
-    icon: 'statistics',
-  },
-  {
-    heading: 'Edit',
-    icon: 'edit',
-  },
-  {
-    heading: 'Delete',
-    icon: 'delete',
-  },
-] as const;
-
-const HabitOptionsModal = ({
-  habitOptionsRef,
-  selectedHabit,
+const ActivityOptionsModal = ({
+  mode,
+  activityOptionsRef,
+  selectedActivity,
   onDelete,
   onNavigate,
 }: Props) => {
+  const options =
+    mode === 'habit'
+      ? (['calendar', 'statistics', 'edit', 'delete'] as const)
+      : (['calendar', 'edit', 'delete'] as const);
+
   return (
     <BottomSheetModal
-      ref={habitOptionsRef}
+      ref={activityOptionsRef}
       backgroundStyle={{ backgroundColor: '#1C1C1C' }}
       handleIndicatorStyle={{ backgroundColor: 'gray' }}
       backdropComponent={renderBackdrop}
@@ -58,42 +46,43 @@ const HabitOptionsModal = ({
       <BottomSheetView>
         <TopRow>
           <DetailsContainer>
-            <TitleText>{selectedHabit?.title}</TitleText>
-            {!!selectedHabit?.note.length && (
-              <Text>{toTruncatedText(selectedHabit.note, 12)}</Text>
+            <TitleText>{selectedActivity?.title}</TitleText>
+            {!!selectedActivity?.note.length && (
+              <Text>{toTruncatedText(selectedActivity.note, 12)}</Text>
             )}
-            {selectedHabit?.frequency && (
-              <FrequencyBadge frequency={selectedHabit.frequency} />
+            {selectedActivity?.frequency && (
+              <FrequencyBadge frequency={selectedActivity.frequency} />
             )}
           </DetailsContainer>
           <CategoryContainer>
-            {selectedHabit?.category && (
-              <CategoryIcon category={selectedHabit.category} />
+            {selectedActivity?.category && (
+              <CategoryIcon category={selectedActivity.category} />
             )}
           </CategoryContainer>
         </TopRow>
         {options.map((option, index) => {
-          const { heading, icon } = option;
-
-          const isBordered = index === options.length - 2;
           const isLastIndex = index === options.length - 1;
 
           const fill = isLastIndex ? '#C73A57' : '#8C8C8C';
 
           return (
-            <View key={heading}>
-              {selectedHabit?.id && (
+            <View key={option}>
+              {selectedActivity?.id && (
                 <CardContainer
                   onPress={() =>
-                    isLastIndex ? onDelete() : onNavigate(icon, selectedHabit.id)
+                    isLastIndex
+                      ? mode === 'habit'
+                        ? onDelete()
+                        : onDelete()
+                      : onNavigate(option, selectedActivity.id)
                   }
-                  isBordered={isBordered}
+                  isBordered={isLastIndex}
                 >
                   <IconContainer>
-                    <HabitOptionIcon name={icon} fill={fill} />
+                    <HabitOptionIcon name={option} fill={fill} />
                   </IconContainer>
                   <CardTextContainer>
-                    <CardTitle isRed={isLastIndex}>{heading}</CardTitle>
+                    <CardTitle isRed={isLastIndex}>{option}</CardTitle>
                   </CardTextContainer>
                 </CardContainer>
               )}
@@ -145,10 +134,10 @@ const CardContainer = styled(View, {
   variants: {
     isBordered: {
       true: {
-        borderBottomWidth: 1,
+        borderTopWidth: 1,
       },
       false: {
-        borderBottomWidth: 0,
+        borderTopWidth: 0,
       },
     },
   } as const,
@@ -168,6 +157,7 @@ const CardTextContainer = styled(View, {
 
 const CardTitle = styled(Text, {
   fontSize: 15.5,
+  textTransform: 'capitalize',
   variants: {
     isRed: {
       true: {
@@ -180,4 +170,4 @@ const CardTitle = styled(Text, {
   } as const,
 });
 
-export default HabitOptionsModal;
+export default ActivityOptionsModal;

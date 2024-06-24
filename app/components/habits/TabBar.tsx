@@ -10,14 +10,16 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { ActiveTab } from '@/app/habitDetails';
+import { HabitActiveTab } from '@/app/habitDetails';
+import { TaskActiveTab } from '@/app/taskDetails';
 
 interface Props {
-  activeTab: ActiveTab;
-  onSelect: (activeTab: ActiveTab) => void;
+  mode: 'habit' | 'task';
+  activeTab: HabitActiveTab | TaskActiveTab;
+  onSelect: (activeTab: HabitActiveTab | TaskActiveTab) => void;
 }
 
-const TabBar = ({ activeTab, onSelect }: Props) => {
+const TabBar = ({ mode, activeTab, onSelect }: Props) => {
   const isCalendarSelected = useSharedValue(0);
   const isStatisticsSelected = useSharedValue(0);
   const isEditSelected = useSharedValue(0);
@@ -56,7 +58,7 @@ const TabBar = ({ activeTab, onSelect }: Props) => {
 
   return (
     <Container>
-      <Button onPress={() => onSelect('calendar')}>
+      <Button isHabit={mode === 'habit'} onPress={() => onSelect('calendar')}>
         <TextContainer>
           <AnimatedButtonText style={textColorAnimation(isCalendarSelected)}>
             Calendar
@@ -66,17 +68,19 @@ const TabBar = ({ activeTab, onSelect }: Props) => {
           />
         </TextContainer>
       </Button>
-      <Button onPress={() => onSelect('statistics')}>
-        <TextContainer>
-          <AnimatedButtonText style={textColorAnimation(isStatisticsSelected)}>
-            Statistics
-          </AnimatedButtonText>
-          <AnimatedSelectionIndicator
-            style={indicatorOpacityAnimation(isStatisticsSelected)}
-          />
-        </TextContainer>
-      </Button>
-      <Button onPress={() => onSelect('edit')}>
+      {mode === 'habit' && (
+        <Button isHabit={mode === 'habit'} onPress={() => onSelect('statistics')}>
+          <TextContainer>
+            <AnimatedButtonText style={textColorAnimation(isStatisticsSelected)}>
+              Statistics
+            </AnimatedButtonText>
+            <AnimatedSelectionIndicator
+              style={indicatorOpacityAnimation(isStatisticsSelected)}
+            />
+          </TextContainer>
+        </Button>
+      )}
+      <Button isHabit={mode === 'habit'} onPress={() => onSelect('edit')}>
         <TextContainer>
           <AnimatedButtonText style={textColorAnimation(isEditSelected)}>
             Edit
@@ -99,7 +103,16 @@ const Container = styled(View, {
 
 const Button = styled(View, {
   alignItems: 'center',
-  width: '33.333%',
+  variants: {
+    isHabit: {
+      true: {
+        width: '33.333%',
+      },
+      false: {
+        width: '50%',
+      },
+    },
+  } as const,
 });
 
 const TextContainer = styled(View, {

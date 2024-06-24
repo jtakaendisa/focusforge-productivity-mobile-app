@@ -17,6 +17,8 @@ const HabitsScreen = () => {
 
   const handlePresentTaskFrequencyModal = () => taskFrequencyRef.current?.present();
 
+  console.log(habits[1]);
+
   return (
     <Container>
       <HabitListContainer isCentered={isHabitsEmpty}>

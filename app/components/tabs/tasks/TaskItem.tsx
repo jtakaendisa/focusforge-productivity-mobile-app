@@ -22,12 +22,22 @@ import CircularCheckbox from '../CircularCheckbox';
 interface Props {
   task: Task;
   isCheckable?: boolean;
+  isRecurring?: boolean;
   onPress: (id: string) => void;
   onSwipe: (id: string) => void;
   openModal: (modalName: 'isPrioritizeOpen' | 'isDeleteOpen') => void;
+  showOptions?: (selectedTask: Task) => void;
 }
 
-const TaskItem = ({ task, isCheckable, onPress, onSwipe, openModal }: Props) => {
+const TaskItem = ({
+  task,
+  isCheckable,
+  isRecurring,
+  onPress,
+  onSwipe,
+  openModal,
+  showOptions,
+}: Props) => {
   const { id, title, isCompleted, note, category } = task;
 
   const swipeableRef = useRef<Swipeable | null>(null);
@@ -58,7 +68,10 @@ const TaskItem = ({ task, isCheckable, onPress, onSwipe, openModal }: Props) => 
       if (isCheckable) {
         openModal('isPrioritizeOpen');
       } else {
-        router.push({ pathname: '/editTask', params: { taskId: id } });
+        router.push({
+          pathname: '/taskDetails',
+          params: { taskId: id, activeTab: 'edit' },
+        });
       }
     }
 
@@ -73,7 +86,13 @@ const TaskItem = ({ task, isCheckable, onPress, onSwipe, openModal }: Props) => 
     <AnimatedContainer
       entering={FadeIn}
       exiting={FadeOut}
-      onPress={isCheckable ? handleTaskCompletion : null}
+      onPress={
+        isCheckable
+          ? handleTaskCompletion
+          : isRecurring
+          ? () => showOptions?.(task)
+          : null
+      }
     >
       <Swipeable
         ref={swipeableRef}

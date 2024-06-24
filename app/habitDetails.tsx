@@ -11,10 +11,10 @@ import HabitCalendar from './components/habits/HabitCalendar';
 import HabitStatistics from './components/habits/HabitStatistics';
 import EditHabit from './components/habits/EditHabit';
 
-export type ActiveTab = 'calendar' | 'statistics' | 'edit';
+export type HabitActiveTab = 'calendar' | 'statistics' | 'edit';
 
 type SearchParams = {
-  activeTab: ActiveTab;
+  activeTab: HabitActiveTab;
   habitId: string;
 };
 
@@ -26,7 +26,7 @@ const HabitDetailsScreen = () => {
   const [activeTab, setActiveTab] = useState(activeTabParam);
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
 
-  const handleSelectTab = (activeTab: ActiveTab) => setActiveTab(activeTab);
+  const handleSelectTab = (activeTab: HabitActiveTab) => setActiveTab(activeTab);
 
   useEffect(() => {
     const selectedHabit = habits.find((habit) => habit.id === habitId);
@@ -42,7 +42,7 @@ const HabitDetailsScreen = () => {
       <ScreenLabel>
         <LabelTextLarge>Habit Details</LabelTextLarge>
       </ScreenLabel>
-      <TabBar activeTab={activeTab} onSelect={handleSelectTab} />
+      <TabBar mode="habit" activeTab={activeTab} onSelect={handleSelectTab} />
       {activeTab === 'calendar' && <HabitCalendar selectedHabit={selectedHabit} />}
       {activeTab === 'statistics' && <HabitStatistics selectedHabit={selectedHabit} />}
       {activeTab === 'edit' && (

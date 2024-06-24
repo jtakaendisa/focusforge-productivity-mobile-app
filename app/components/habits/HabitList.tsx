@@ -7,7 +7,7 @@ import { View, styled } from 'tamagui';
 import { Habit } from '@/app/entities';
 import { useHabitStore } from '@/app/store';
 import HabitListItem from './HabitListItem';
-import HabitOptionsModal from './HabitOptionsModal';
+import ActivityOptionsModal from './ActivityOptionsModal';
 
 interface Props {
   habits: Habit[];
@@ -20,7 +20,7 @@ const HabitList = ({ habits, filteredHabits }: Props) => {
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
 
   const habitListRef = useRef<FlashList<Habit> | null>(null);
-  const habitOptionsRef = useRef<BottomSheetModal | null>(null);
+  const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
   const handleDelete = () => {
     const filteredHabits = habits.filter((habit) => habit.id !== selectedHabit?.id);
@@ -28,15 +28,15 @@ const HabitList = ({ habits, filteredHabits }: Props) => {
     setSelectedHabit(null);
   };
 
-  const handlePresentHabitOptionsModal = (habit: Habit) => {
+  const handlePresentActivityOptionsModal = (habit: Habit) => {
     setSelectedHabit(habit);
-    habitOptionsRef.current?.present();
+    activityOptionsRef.current?.present();
   };
 
   const navigateToHabitDetailsScreen = (activeTab: string, habitId: string) => {
     if (!habitId.length) return;
 
-    habitOptionsRef.current?.dismiss();
+    activityOptionsRef.current?.dismiss();
     router.push({
       pathname: '/habitDetails',
       params: { activeTab, habitId },
@@ -51,7 +51,7 @@ const HabitList = ({ habits, filteredHabits }: Props) => {
         renderItem={({ item }) => (
           <HabitListItem
             habit={item}
-            showOptions={handlePresentHabitOptionsModal}
+            showOptions={handlePresentActivityOptionsModal}
             onNavigate={navigateToHabitDetailsScreen}
           />
         )}
@@ -59,9 +59,10 @@ const HabitList = ({ habits, filteredHabits }: Props) => {
         keyExtractor={(item) => item.id}
         estimatedItemSize={180}
       />
-      <HabitOptionsModal
-        habitOptionsRef={habitOptionsRef}
-        selectedHabit={selectedHabit}
+      <ActivityOptionsModal
+        mode="habit"
+        activityOptionsRef={activityOptionsRef}
+        selectedActivity={selectedHabit}
         onDelete={handleDelete}
         onNavigate={navigateToHabitDetailsScreen}
       />
