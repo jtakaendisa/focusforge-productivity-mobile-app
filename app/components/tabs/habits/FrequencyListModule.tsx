@@ -11,7 +11,7 @@ import { styled, View, Text, Accordion } from 'tamagui';
 
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
 import { NewHabitData } from '@/app/newHabit';
-import CircularCheckbox from '../tabs/CircularCheckbox';
+import CircularCheckbox from '../CircularCheckbox';
 import WeekdayCard from './WeekdayCard';
 import { Frequency } from '@/app/entities';
 

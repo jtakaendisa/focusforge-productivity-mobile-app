@@ -3,7 +3,7 @@ import { useSharedValue, withTiming } from 'react-native-reanimated';
 import { styled, Text, View } from 'tamagui';
 
 import { SCREEN_WIDTH } from '@/app/constants';
-import SquareCheckbox from '../tabs/SquareCheckbox';
+import SquareCheckbox from '../SquareCheckbox';
 
 interface Props {
   day: string;

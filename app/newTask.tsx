@@ -26,8 +26,8 @@ import PriorityModalModule from './components/tabs/modals/PriorityModalModule';
 import TextModalModule from './components/tabs/modals/TextModalModule';
 import CircularCheckbox from './components/tabs/CircularCheckbox';
 import CategoryIcon from './components/tabs/CategoryIcon';
-import FrequencyBadge from './components/habits/FrequencyBadge';
-import FrequencyListModule from './components/habits/FrequencyListModule';
+import FrequencyBadge from './components/tabs/habits/FrequencyBadge';
+import FrequencyListModule from './components/tabs/habits/FrequencyListModule';
 import RemindersModalModule from './components/tabs/modals/RemindersModalModule';
 
 type SearchParams = {

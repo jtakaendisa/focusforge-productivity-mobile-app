@@ -12,8 +12,8 @@ import { View, Text, styled } from 'tamagui';
 import { PriorityType, useHabitStore } from './store';
 import { SCREEN_WIDTH, TODAYS_DATE } from './constants';
 import { habitSchema } from './validationSchemas';
-import NewHabitListItem from './components/habits/NewHabitListItem';
-import Dot from './components/habits/Dot';
+import NewHabitListItem from './components/tabs/habits/NewHabitListItem';
+import Dot from './components/tabs/habits/Dot';
 
 export type NewHabitData = z.infer<typeof habitSchema>;
 

@@ -9,7 +9,7 @@ import DeleteModalModule from '../modals/DeleteModalModule';
 import TaskSectionHeader from '../tasks/TaskSectionHeader';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import ActivityOptionsModal from '../../habits/ActivityOptionsModal';
+import ActivityOptionsModal from '../habits/ActivityOptionsModal';
 import { router } from 'expo-router';
 
 interface Props {
@@ -30,7 +30,6 @@ const TaskList = ({
   const setTasks = useTaskStore((s) => s.setTasks);
 
   const [currentPriority, setCurrentPriority] = useState<Priority | null>(null);
-  const [selectedTaskId, setSelectedTaskId] = useState<string>('');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalState, setModalState] = useState({
     isDeleteOpen: false,
@@ -41,9 +40,9 @@ const TaskList = ({
 
   const { isDeleteOpen, isPrioritizeOpen } = modalState;
 
-  const handlePress = (id: string) => {
+  const handlePress = (selectedTask: Task) => {
     const updatedTasks = tasks.map((task) => {
-      if (task.id === id) {
+      if (task.id === selectedTask.id) {
         return {
           ...task,
           isCompleted: !task.isCompleted,
@@ -57,7 +56,7 @@ const TaskList = ({
 
   const handlePrioritize = (priority: Priority) => {
     const updatedTasks = tasks.map((task) => {
-      if (task.id === selectedTaskId) {
+      if (task.id === selectedTask?.id) {
         return {
           ...task,
           priority,
@@ -70,7 +69,7 @@ const TaskList = ({
     setSelectedTask(null);
   };
 
-  const handleDelete = (id?: string) => {
+  const handleDelete = (id: string) => {
     const filteredTasks = tasks.filter((task) => task.id !== id);
     setTasks(filteredTasks);
     setSelectedTask(null);
@@ -99,14 +98,14 @@ const TaskList = ({
 
   useEffect(() => {
     if (isPrioritizeOpen) {
-      const priority = tasks.find((task) => task.id === selectedTaskId)?.priority;
+      const priority = tasks.find((task) => task.id === selectedTask?.id)?.priority;
       if (priority) {
         setCurrentPriority(priority);
       }
     } else {
       setCurrentPriority(null);
     }
-  }, [tasks, isPrioritizeOpen, selectedTaskId]);
+  }, [tasks, isPrioritizeOpen, selectedTask]);
 
   return (
     <>
@@ -122,7 +121,7 @@ const TaskList = ({
                 <TaskItem
                   task={item}
                   onPress={handlePress}
-                  onSwipe={(id) => setSelectedTaskId(id)}
+                  onSwipe={(selectedTask) => setSelectedTask(selectedTask)}
                   openModal={(modalName) =>
                     setModalState({ ...modalState, [modalName]: true })
                   }
@@ -147,7 +146,7 @@ const TaskList = ({
               isCheckable={isCheckable}
               task={item as Task}
               onPress={handlePress}
-              onSwipe={(id) => setSelectedTaskId(id)}
+              onSwipe={(selectedTask) => setSelectedTask(selectedTask)}
               openModal={(modalName) =>
                 setModalState({ ...modalState, [modalName]: true })
               }
@@ -169,11 +168,13 @@ const TaskList = ({
         )}
       </ModalContainer>
       <ModalContainer isOpen={isDeleteOpen} closeModal={closeDeleteModal}>
-        <DeleteModalModule
-          taskId={selectedTaskId}
-          deleteTask={handleDelete}
-          closeModal={closeDeleteModal}
-        />
+        {selectedTask && (
+          <DeleteModalModule
+            taskId={selectedTask.id}
+            deleteTask={handleDelete}
+            closeModal={closeDeleteModal}
+          />
+        )}
       </ModalContainer>
       <ActivityOptionsModal
         mode="task"

@@ -16,10 +16,10 @@ import {
   DateTimePickerAndroid,
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import FrequencyBadge from '../../habits/FrequencyBadge';
+import FrequencyBadge from '../habits/FrequencyBadge';
 import CircularCheckbox from '../CircularCheckbox';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
-import FrequencyListModule from '../../habits/FrequencyListModule';
+import FrequencyListModule from '../habits/FrequencyListModule';
 import CategoryModalModule from '../modals/CategoryModalModule';
 import ChecklistModalModule from '../modals/ChecklistModalModule';
 import ModalContainer from '../modals/ModalContainer';

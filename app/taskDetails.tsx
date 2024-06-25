@@ -4,7 +4,7 @@ import { styled, Text, View } from 'tamagui';
 import { useTaskStore } from './store';
 import { useEffect, useState } from 'react';
 import { Task } from './entities';
-import TabBar from './components/habits/TabBar';
+import TabBar from './components/tabs/habits/TabBar';
 import EditTask from './components/tabs/tasks/EditTask';
 import { StatusBar } from 'expo-status-bar';
 

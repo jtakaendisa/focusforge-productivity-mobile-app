@@ -23,10 +23,10 @@ interface Props {
   task: Task;
   isCheckable?: boolean;
   isRecurring?: boolean;
-  onPress: (id: string) => void;
-  onSwipe: (id: string) => void;
+  onPress: (selectedTask: Task) => void;
+  onSwipe: (selectedTask: Task) => void;
   openModal: (modalName: 'isPrioritizeOpen' | 'isDeleteOpen') => void;
-  showOptions?: (selectedTask: Task) => void;
+  showOptions?: (task: Task) => void;
 }
 
 const TaskItem = ({
@@ -58,11 +58,11 @@ const TaskItem = ({
 
   const handleTaskCompletion = () => {
     isChecked.value = isChecked.value === 1 ? withTiming(0) : withTiming(1);
-    onPress(id);
+    onPress(task);
   };
 
   const handleSwipeCompletion = (direction: 'left' | 'right') => {
-    onSwipe(id);
+    onSwipe(task);
 
     if (direction === 'left') {
       if (isCheckable) {

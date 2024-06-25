@@ -6,10 +6,10 @@ import { styled, Text, View } from 'tamagui';
 
 import { useHabitStore } from './store';
 import { Habit } from './entities';
-import TabBar from './components/habits/TabBar';
-import HabitCalendar from './components/habits/HabitCalendar';
-import HabitStatistics from './components/habits/HabitStatistics';
-import EditHabit from './components/habits/EditHabit';
+import TabBar from './components/tabs/habits/TabBar';
+import HabitCalendar from './components/tabs/habits/HabitCalendar';
+import HabitStatistics from './components/tabs/habits/HabitStatistics';
+import EditHabit from './components/tabs/habits/EditHabit';
 
 export type HabitActiveTab = 'calendar' | 'statistics' | 'edit';
 

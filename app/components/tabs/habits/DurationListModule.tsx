@@ -12,10 +12,10 @@ import { Priority, Reminder } from '@/app/entities';
 import { SCREEN_WIDTH, SCREEN_HEIGHT, TODAYS_DATE } from '@/app/constants';
 import { toFormattedDateString } from '@/app/utils';
 import { NewHabitData } from '@/app/newHabit';
-import Switch from '../tabs/settings/Switch';
-import ModalContainer from '../tabs/modals/ModalContainer';
-import PriorityModalModule from '../tabs/modals/PriorityModalModule';
-import RemindersModalModule from '../tabs/modals/RemindersModalModule';
+import Switch from '../settings/Switch';
+import ModalContainer from '../modals/ModalContainer';
+import PriorityModalModule from '../modals/PriorityModalModule';
+import RemindersModalModule from '../modals/RemindersModalModule';
 
 interface Props {
   control: Control<NewHabitData>;

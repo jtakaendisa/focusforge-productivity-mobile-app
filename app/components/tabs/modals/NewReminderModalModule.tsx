@@ -9,7 +9,7 @@ import { styled, View, Text } from 'tamagui';
 import { Reminder } from '@/app/entities';
 import { TODAYS_DATE } from '@/app/constants';
 import { toFormattedTimeString } from '@/app/utils';
-import ReminderButton from '../../habits/ReminderButton';
+import ReminderButton from '../habits/ReminderButton';
 
 interface Props {
   closeModal: () => void;

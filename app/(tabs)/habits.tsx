@@ -3,7 +3,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { styled, View } from 'tamagui';
 
 import { useHabitStore } from '../store';
-import HabitList from '../components/habits/HabitList';
+import HabitList from '../components/tabs/habits/HabitList';
 import CreateTaskButton from '../components/tabs/CreateTaskButton';
 import TaskFrequencyModal from '../components/tabs/modals/TaskFrequencyModal';
 import ActivityListPlaceholder from '../components/tabs/home/ActivityListPlaceholder';
@@ -16,8 +16,6 @@ const HabitsScreen = () => {
   const isHabitsEmpty = !habits.length;
 
   const handlePresentTaskFrequencyModal = () => taskFrequencyRef.current?.present();
-
-  console.log(habits[1]);
 
   return (
     <Container>

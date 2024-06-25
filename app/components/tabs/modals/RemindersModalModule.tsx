@@ -8,7 +8,7 @@ import { styled, View, Text, Image } from 'tamagui';
 import { Reminder } from '@/app/entities';
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { NewHabitData } from '@/app/newHabit';
-import ReminderListItem from '../../habits/ReminderListItem';
+import ReminderListItem from '../habits/ReminderListItem';
 import ModalContainer from './ModalContainer';
 import NewReminderModalModule from './NewReminderModalModule';
 

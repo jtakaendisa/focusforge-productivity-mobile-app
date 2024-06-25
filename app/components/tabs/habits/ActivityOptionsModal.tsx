@@ -11,15 +11,17 @@ import { styled, View, Text } from 'tamagui';
 import { Habit, Task } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
 import HabitOptionIcon from './HabitOptionIcon';
-import CategoryIcon from '../tabs/CategoryIcon';
+import CategoryIcon from '../CategoryIcon';
 import FrequencyBadge from './FrequencyBadge';
+import { TaskActiveTab } from '@/app/taskDetails';
+import { HabitActiveTab } from '@/app/habitDetails';
 
 interface Props {
   mode: 'habit' | 'task';
   activityOptionsRef: MutableRefObject<BottomSheetModalMethods | null>;
   selectedActivity: Habit | Task | null;
-  onDelete: (id?: string) => void;
-  onNavigate: (activeTab: string, habitId: string) => void;
+  onDelete: (id: string) => void;
+  onNavigate: (activeTab: TaskActiveTab | HabitActiveTab, habitId: string) => void;
 }
 
 const ActivityOptionsModal = ({
@@ -71,10 +73,11 @@ const ActivityOptionsModal = ({
                 <CardContainer
                   onPress={() =>
                     isLastIndex
-                      ? mode === 'habit'
-                        ? onDelete()
-                        : onDelete()
-                      : onNavigate(option, selectedActivity.id)
+                      ? onDelete(selectedActivity.id)
+                      : onNavigate(
+                          option as TaskActiveTab | HabitActiveTab,
+                          selectedActivity.id
+                        )
                   }
                   isBordered={isLastIndex}
                 >

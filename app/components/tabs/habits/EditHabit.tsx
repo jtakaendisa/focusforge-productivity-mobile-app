@@ -11,12 +11,12 @@ import { TODAYS_DATE } from '@/app/constants';
 import { toFormattedDateString, toTruncatedText } from '@/app/utils';
 import { habitSchema } from '@/app/validationSchemas';
 import { NewHabitData } from '@/app/newHabit';
-import CategoryIcon from '../tabs/CategoryIcon';
-import ModalContainer from '../tabs/modals/ModalContainer';
-import CategoryModalModule from '../tabs/modals/CategoryModalModule';
-import TextModalModule from '../tabs/modals/TextModalModule';
-import RemindersModalModule from '../tabs/modals/RemindersModalModule';
-import PriorityModalModule from '../tabs/modals/PriorityModalModule';
+import CategoryIcon from '../CategoryIcon';
+import ModalContainer from '../modals/ModalContainer';
+import CategoryModalModule from '../modals/CategoryModalModule';
+import TextModalModule from '../modals/TextModalModule';
+import RemindersModalModule from '../modals/RemindersModalModule';
+import PriorityModalModule from '../modals/PriorityModalModule';
 import {
   DateTimePickerAndroid,
   DateTimePickerEvent,

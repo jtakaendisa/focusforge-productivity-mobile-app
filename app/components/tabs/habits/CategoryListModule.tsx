@@ -4,7 +4,7 @@ import { View, Text, styled } from 'tamagui';
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { categoryArray } from '@/app/store';
 import { NewHabitData } from '@/app/newHabit';
-import CategoryIcon from '../tabs/CategoryIcon';
+import CategoryIcon from '../CategoryIcon';
 
 interface Props {
   control: Control<NewHabitData>;
