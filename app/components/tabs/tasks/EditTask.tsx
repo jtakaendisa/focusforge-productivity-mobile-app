@@ -336,6 +336,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
       </ModalContainer>
       <ModalContainer isOpen={isChecklistOpen} closeModal={toggleChecklistModal}>
         <ChecklistModalModule
+          isForm
           control={control}
           checklist={checklist}
           closeModal={toggleChecklistModal}

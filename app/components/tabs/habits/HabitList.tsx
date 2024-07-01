@@ -29,6 +29,9 @@ const HabitList = ({ habits, filteredHabits }: Props) => {
   const handleDelete = () => {
     const filteredHabits = habits.filter((habit) => habit.id !== selectedHabit?.id);
     setHabits(filteredHabits);
+    habitListRef.current?.prepareForLayoutAnimationRender();
+
+    activityOptionsRef.current?.close();
     setSelectedHabit(null);
   };
 

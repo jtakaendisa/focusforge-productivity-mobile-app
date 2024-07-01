@@ -36,6 +36,8 @@ const subTaskSchema = z.object({
   isCompleted: z.boolean({ message: 'isCompleted must be a boolean (true / false)' }),
 });
 
+export const checklistSchema = z.array(subTaskSchema);
+
 export const reminderSchema = z.object({
   id: z.string().min(1, { message: 'ID must be at least 1 characters long' }),
   type: z.enum(['notification', 'alarm']),
@@ -53,7 +55,7 @@ export const taskSchema = z.object({
   category: z.enum(categoryArray),
   dueDate: z.date({ message: 'Invalid date string' }),
   reminders: z.array(reminderSchema),
-  checklist: z.array(subTaskSchema),
+  checklist: checklistSchema,
   priority: priorityEnum,
   frequency: frequencySchema.optional(),
   note: z.string(),

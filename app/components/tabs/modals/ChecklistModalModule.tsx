@@ -1,23 +1,48 @@
 import { useRef } from 'react';
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, useForm } from 'react-hook-form';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { Text, View, styled } from 'tamagui';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { ChecklistItem as ChecklistItemType } from '@/app/entities';
+import { ChecklistItem as ChecklistItemType, Task } from '@/app/entities';
 import { SCREEN_HEIGHT } from '@/app/constants';
 import { NewTaskData } from '@/app/newTask';
 import CreateChecklistItem from '../tasks/CreateChecklistItem';
 import ChecklistItem from '../tasks/ChecklistItem';
+import CheckableChecklistItem from '../tasks/CheckableChecklistItem';
+import { useTaskStore } from '@/app/store';
+import { checklistSchema } from '@/app/validationSchemas';
 
 interface Props {
-  control: Control<NewTaskData>;
+  isForm?: boolean;
+  control?: Control<NewTaskData>;
+  tasks?: Task[];
+  taskId?: string;
   checklist: ChecklistItemType[];
   closeModal: () => void;
 }
 
-const ChecklistModalModule = ({ control, checklist, closeModal }: Props) => {
+const ChecklistModalModule = ({
+  isForm,
+  control,
+  tasks,
+  taskId,
+  checklist,
+  closeModal,
+}: Props) => {
+  const setTasks = useTaskStore((s) => s.setTasks);
+
   const listRef = useRef<FlashList<ChecklistItemType> | null>(null);
   const setChecklistRef = useRef<((...event: any[]) => void) | null>(null);
+
+  const { control: checklistControl, watch } = useForm<{
+    checklist: ChecklistItemType[];
+  }>({
+    defaultValues: { checklist },
+    resolver: zodResolver(checklistSchema),
+  });
+
+  const { checklist: watchChecklist } = watch();
 
   const handleCreateItem = (newChecklistItem: ChecklistItemType) => {
     const updatedChecklist = [...checklist, newChecklistItem];
@@ -25,6 +50,8 @@ const ChecklistModalModule = ({ control, checklist, closeModal }: Props) => {
   };
 
   const handleDelete = (id: string) => {
+    if (!checklist?.length) return;
+
     const filteredChecklistItems = checklist.filter(
       (checklistItem) => checklistItem.id !== id
     );
@@ -32,13 +59,47 @@ const ChecklistModalModule = ({ control, checklist, closeModal }: Props) => {
     listRef.current?.prepareForLayoutAnimationRender();
   };
 
+  const handleCheck = (id: string) => {
+    if (!tasks) return;
+
+    const updatedChecklist = watchChecklist.map((item) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          isCompleted: !item.isCompleted,
+        };
+      } else {
+        return item;
+      }
+    });
+
+    setChecklistRef.current?.(updatedChecklist);
+
+    const allCompleted = updatedChecklist.every((item) => item.isCompleted);
+
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === taskId) {
+        const updatedTask = {
+          ...task,
+          isCompleted: allCompleted ? true : false,
+          checklist: updatedChecklist,
+        };
+        return updatedTask;
+      } else {
+        return task;
+      }
+    });
+
+    setTasks(updatedTasks);
+  };
+
   return (
     <Container>
       <HeadingContainer>
-        <HeadingText>Create sub tasks</HeadingText>
+        <HeadingText>{isForm ? 'Create sub tasks' : 'Sub Tasks'}</HeadingText>
       </HeadingContainer>
       <Controller
-        control={control}
+        control={control || (checklistControl as any)}
         name="checklist"
         render={({ field: { onChange, value } }) => {
           setChecklistRef.current = onChange;
@@ -47,15 +108,20 @@ const ChecklistModalModule = ({ control, checklist, closeModal }: Props) => {
               <AnimatedFlashList
                 ref={listRef}
                 data={value}
-                renderItem={({ item }) => (
-                  <ChecklistItem listItem={item} onDelete={handleDelete} />
-                )}
+                renderItem={({ item }) =>
+                  isForm ? (
+                    <ChecklistItem listItem={item} onDelete={handleDelete} />
+                  ) : (
+                    <CheckableChecklistItem listItem={item} onCheck={handleCheck} />
+                  )
+                }
                 keyExtractor={(item) => item.id}
-                ItemSeparatorComponent={ItemSeparator}
                 estimatedItemSize={46}
-                ListHeaderComponent={() => (
-                  <CreateChecklistItem setChecklist={handleCreateItem} />
-                )}
+                ListHeaderComponent={() =>
+                  isForm ? (
+                    <CreateChecklistItem setChecklist={handleCreateItem} />
+                  ) : null
+                }
                 showsVerticalScrollIndicator={false}
               />
             </MainContent>
@@ -102,10 +168,6 @@ const ButtonText = styled(Text, {
   fontSize: 15.5,
   fontWeight: 'bold',
   textTransform: 'uppercase',
-});
-
-const ItemSeparator = styled(View, {
-  height: 6,
 });
 
 export default ChecklistModalModule;

@@ -146,14 +146,10 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
                       onChange({ type: 'daily' });
                     }}
                   >
-                    {({ open }: { open: boolean }) => (
-                      <>
-                        <CheckboxContainer>
-                          <CircularCheckbox isChecked={isDailyChecked} />
-                        </CheckboxContainer>
-                        <Title>Every day</Title>
-                      </>
-                    )}
+                    <CheckboxContainer>
+                      <CircularCheckbox isChecked={isDailyChecked} />
+                    </CheckboxContainer>
+                    <Title>Every day</Title>
                   </AccordionTrigger>
                 </Accordion.Item>
 
@@ -161,14 +157,10 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
                   <AccordionTrigger
                     onPress={() => handleSelection('isSpecificSelected')}
                   >
-                    {({ open }: { open: boolean }) => (
-                      <>
-                        <CheckboxContainer>
-                          <CircularCheckbox isChecked={isSpecificChecked} />
-                        </CheckboxContainer>
-                        <Title>Specific days of the week</Title>
-                      </>
-                    )}
+                    <CheckboxContainer>
+                      <CircularCheckbox isChecked={isSpecificChecked} />
+                    </CheckboxContainer>
+                    <Title>Specific days of the week</Title>
                   </AccordionTrigger>
                   <Accordion.HeightAnimator animation="medium">
                     <AccordionContent animation="medium" exitStyle={{ opacity: 0 }}>
@@ -188,14 +180,10 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
 
                 <Accordion.Item value="repeats">
                   <AccordionTrigger onPress={() => handleSelection('isRepeatSelected')}>
-                    {({ open }: { open: boolean }) => (
-                      <>
-                        <CheckboxContainer>
-                          <CircularCheckbox isChecked={isRepeatChecked} />
-                        </CheckboxContainer>
-                        <Title>Repeat</Title>
-                      </>
-                    )}
+                    <CheckboxContainer>
+                      <CircularCheckbox isChecked={isRepeatChecked} />
+                    </CheckboxContainer>
+                    <Title>Repeat</Title>
                   </AccordionTrigger>
                   <Accordion.HeightAnimator animation="medium">
                     <AccordionContent animation="medium" exitStyle={{ opacity: 0 }}>

@@ -11,6 +11,7 @@ import PriorityModalModule from '../modals/PriorityModalModule';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import ActivityOptionsModal from '../habits/ActivityOptionsModal';
 import { router } from 'expo-router';
+import ChecklistModalModule from '../modals/ChecklistModalModule';
 
 interface Props {
   taskListRef: MutableRefObject<FlashList<Task | (string | Task)> | null>;
@@ -34,17 +35,29 @@ const TaskList = ({
   const [modalState, setModalState] = useState({
     isDeleteOpen: false,
     isPrioritizeOpen: false,
+    isChecklistOpen: false,
   });
 
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
-  const { isDeleteOpen, isPrioritizeOpen } = modalState;
+  const { isDeleteOpen, isPrioritizeOpen, isChecklistOpen } = modalState;
 
-  const handlePress = (selectedTask: Task) => {
+  const handlePress = (selectedTask: Task, hasChecklist?: boolean) => {
+    const allCompleted = selectedTask.checklist.every((item) => item.isCompleted);
+
+    if (hasChecklist && !allCompleted) {
+      setSelectedTask(selectedTask);
+      return;
+    }
+
     const updatedTasks = tasks.map((task) => {
       if (task.id === selectedTask.id) {
         return {
           ...task,
+          checklist:
+            hasChecklist && task.isCompleted
+              ? task.checklist.map((item) => ({ ...item, isCompleted: false }))
+              : task.checklist,
           isCompleted: !task.isCompleted,
         };
       } else {
@@ -72,8 +85,10 @@ const TaskList = ({
   const handleDelete = (id: string) => {
     const filteredTasks = tasks.filter((task) => task.id !== id);
     setTasks(filteredTasks);
-    setSelectedTask(null);
     taskListRef.current?.prepareForLayoutAnimationRender();
+
+    activityOptionsRef.current?.close();
+    setSelectedTask(null);
   };
 
   const navigateToTaskDetailsScreen = (activeTab: string, taskId: string) => {
@@ -96,6 +111,11 @@ const TaskList = ({
   const closePriorityModal = () =>
     setModalState({ ...modalState, isPrioritizeOpen: false });
 
+  const toggleChecklistModal = () => {
+    setModalState({ ...modalState, isChecklistOpen: !isChecklistOpen });
+    setSelectedTask(null);
+  };
+
   useEffect(() => {
     if (isPrioritizeOpen) {
       const priority = tasks.find((task) => task.id === selectedTask?.id)?.priority;
@@ -106,6 +126,8 @@ const TaskList = ({
       setCurrentPriority(null);
     }
   }, [tasks, isPrioritizeOpen, selectedTask]);
+
+  console.log(filteredTasks[1]);
 
   return (
     <>
@@ -173,6 +195,16 @@ const TaskList = ({
             taskId={selectedTask.id}
             deleteTask={handleDelete}
             closeModal={closeDeleteModal}
+          />
+        )}
+      </ModalContainer>
+      <ModalContainer isOpen={isChecklistOpen} closeModal={toggleChecklistModal}>
+        {selectedTask?.checklist && (
+          <ChecklistModalModule
+            tasks={tasks}
+            taskId={selectedTask.id}
+            checklist={selectedTask.checklist}
+            closeModal={toggleChecklistModal}
           />
         )}
       </ModalContainer>

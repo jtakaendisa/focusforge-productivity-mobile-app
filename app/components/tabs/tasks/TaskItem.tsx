@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Swipeable } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
 import Animated, {
@@ -23,9 +23,11 @@ interface Props {
   task: Task;
   isCheckable?: boolean;
   isRecurring?: boolean;
-  onPress: (selectedTask: Task) => void;
+  onPress: (selectedTask: Task, hasChecklist?: boolean) => void;
   onSwipe: (selectedTask: Task) => void;
-  openModal: (modalName: 'isPrioritizeOpen' | 'isDeleteOpen') => void;
+  openModal: (
+    modalName: 'isPrioritizeOpen' | 'isDeleteOpen' | 'isChecklistOpen'
+  ) => void;
   showOptions?: (task: Task) => void;
 }
 
@@ -38,11 +40,14 @@ const TaskItem = ({
   openModal,
   showOptions,
 }: Props) => {
-  const { id, title, isCompleted, note, category } = task;
+  const { id, title, isCompleted, note, category, checklist } = task;
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const isChecked = useSharedValue(isCompleted ? 1 : 0);
+
+  const hasChecklist = !!checklist.length;
+  const allCompleted = checklist.every((item) => item.isCompleted);
 
   const white = getTokens().color.$white.val;
   const gray = getTokens().color.$gray1.val;
@@ -57,8 +62,13 @@ const TaskItem = ({
   }));
 
   const handleTaskCompletion = () => {
+    if (hasChecklist && !allCompleted) {
+      onPress(task, hasChecklist);
+      openModal('isChecklistOpen');
+      return;
+    }
     isChecked.value = isChecked.value === 1 ? withTiming(0) : withTiming(1);
-    onPress(task);
+    onPress(task, hasChecklist);
   };
 
   const handleSwipeCompletion = (direction: 'left' | 'right') => {
@@ -81,6 +91,10 @@ const TaskItem = ({
 
     swipeableRef.current?.close();
   };
+
+  useEffect(() => {
+    isChecked.value = isCompleted ? withTiming(1) : withTiming(0);
+  }, [isCompleted]);
 
   return (
     <AnimatedContainer
