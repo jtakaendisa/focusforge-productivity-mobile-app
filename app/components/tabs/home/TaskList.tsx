@@ -127,58 +127,37 @@ const TaskList = ({
     }
   }, [tasks, isPrioritizeOpen, selectedTask]);
 
-  console.log(filteredTasks[1]);
-
   return (
     <>
-      {isSectioned ? (
-        <AnimatedFlashList
-          ref={taskListRef}
-          data={filteredTasks as (string | Task)[]}
-          renderItem={({ item }) => {
-            if (typeof item === 'string') {
-              return <TaskSectionHeader title={item} />;
-            } else {
-              return (
-                <TaskItem
-                  task={item}
-                  onPress={handlePress}
-                  onSwipe={(selectedTask) => setSelectedTask(selectedTask)}
-                  openModal={(modalName) =>
-                    setModalState({ ...modalState, [modalName]: true })
-                  }
-                  isCheckable={isCheckable}
-                />
-              );
-            }
-          }}
-          keyExtractor={(item, index) => index.toString()}
-          getItemType={(item) => {
-            return typeof item === 'string' ? 'sectionHeader' : 'row';
-          }}
-          estimatedItemSize={72}
-        />
-      ) : (
-        <AnimatedFlashList
-          ref={taskListRef}
-          data={filteredTasks as Task[]}
-          renderItem={({ item }) => (
-            <TaskItem
-              isRecurring
-              isCheckable={isCheckable}
-              task={item as Task}
-              onPress={handlePress}
-              onSwipe={(selectedTask) => setSelectedTask(selectedTask)}
-              openModal={(modalName) =>
-                setModalState({ ...modalState, [modalName]: true })
-              }
-              showOptions={handlePresentActivityOptionsModal}
-            />
-          )}
-          keyExtractor={(item, index) => index.toString()}
-          estimatedItemSize={72}
-        />
-      )}
+      <AnimatedFlashList
+        ref={taskListRef}
+        data={filteredTasks as (string | Task)[]}
+        renderItem={({ item }) => {
+          if (typeof item === 'string') {
+            return <TaskSectionHeader title={item} />;
+          } else {
+            return (
+              <TaskItem
+                task={item}
+                onPress={handlePress}
+                onSwipe={(selectedTask) => setSelectedTask(selectedTask)}
+                openModal={(modalName) =>
+                  setModalState({ ...modalState, [modalName]: true })
+                }
+                isCheckable={isCheckable}
+                showOptions={handlePresentActivityOptionsModal}
+              />
+            );
+          }
+        }}
+        keyExtractor={(item) => {
+          return typeof item === 'string' ? item : item.id;
+        }}
+        getItemType={(item) => {
+          return typeof item === 'string' ? 'sectionHeader' : 'row';
+        }}
+        estimatedItemSize={72}
+      />
 
       <ModalContainer isOpen={isPrioritizeOpen} closeModal={closePriorityModal}>
         {currentPriority && (

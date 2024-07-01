@@ -22,7 +22,6 @@ import CircularCheckbox from '../CircularCheckbox';
 interface Props {
   task: Task;
   isCheckable?: boolean;
-  isRecurring?: boolean;
   onPress: (selectedTask: Task, hasChecklist?: boolean) => void;
   onSwipe: (selectedTask: Task) => void;
   openModal: (
@@ -34,13 +33,12 @@ interface Props {
 const TaskItem = ({
   task,
   isCheckable,
-  isRecurring,
   onPress,
   onSwipe,
   openModal,
   showOptions,
 }: Props) => {
-  const { id, title, isCompleted, note, category, checklist } = task;
+  const { id, title, isCompleted, isRecurring, note, category, checklist } = task;
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
