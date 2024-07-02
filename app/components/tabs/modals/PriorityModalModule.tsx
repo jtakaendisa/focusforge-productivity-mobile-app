@@ -1,10 +1,12 @@
 import { useRef } from 'react';
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, useForm } from 'react-hook-form';
 import { Text, View, styled } from 'tamagui';
 
 import { Priority } from '@/app/entities';
 import { NewTaskData } from '@/app/newTask';
 import PriorityButton from './PriorityButton';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { prioritySchema } from '@/app/validationSchemas';
 
 interface Props {
   currentPriority: Priority;
@@ -26,6 +28,32 @@ const PriorityModalModule = ({
   const previousPriorityRef = useRef<Priority>(currentPriority);
   const setPriorityRef = useRef<((...event: any[]) => void) | null>(null);
 
+  const { control: priorityControl, watch } = useForm<{
+    priority: Priority;
+  }>({
+    defaultValues: { priority: currentPriority },
+    resolver: zodResolver(prioritySchema),
+  });
+
+  const { priority: watchPriority } = watch();
+
+  const handleSelect = (priority: Priority) => {
+    setPriorityRef.current?.(priority);
+    if (!isForm) {
+      setPriority?.(priority);
+    }
+  };
+
+  const handleCancel = () => {
+    setPriorityRef.current?.(previousPriorityRef.current);
+    if (!isForm) {
+      setPriority?.(previousPriorityRef.current);
+    }
+    closeModal();
+  };
+
+  console.log({ watchPriority }, { previousPriority: previousPriorityRef.current });
+
   return (
     <Container>
       <HeadingContainer>
@@ -33,38 +61,25 @@ const PriorityModalModule = ({
       </HeadingContainer>
       <MainContent>
         <PrioritiesRow>
-          {isForm ? (
-            <Controller
-              control={control}
-              name="priority"
-              render={({ field: { onChange } }) => {
-                setPriorityRef.current = onChange;
-                return (
-                  <>
-                    {priorities.map((priority) => (
-                      <PriorityButton
-                        key={priority}
-                        priority={priority}
-                        currentPriority={currentPriority}
-                        onChange={onChange}
-                      />
-                    ))}
-                  </>
-                );
-              }}
-            />
-          ) : (
-            <>
-              {priorities.map((priority) => (
-                <PriorityButton
-                  key={priority}
-                  priority={priority}
-                  currentPriority={currentPriority}
-                  onChange={setPriority}
-                />
-              ))}
-            </>
-          )}
+          <Controller
+            control={control || (priorityControl as any)}
+            name="priority"
+            render={({ field: { onChange } }) => {
+              setPriorityRef.current = onChange;
+              return (
+                <>
+                  {priorities.map((priority) => (
+                    <PriorityButton
+                      key={priority}
+                      priority={priority}
+                      currentPriority={watchPriority || currentPriority}
+                      onChange={handleSelect}
+                    />
+                  ))}
+                </>
+              );
+            }}
+          />
         </PrioritiesRow>
         <PriorityInfo>
           <Text color="#8C8C8C">
@@ -73,25 +88,9 @@ const PriorityModalModule = ({
         </PriorityInfo>
       </MainContent>
       <ButtonsContainer>
-        {isForm ? (
-          <Button
-            onPress={() => {
-              setPriorityRef.current?.(previousPriorityRef.current);
-              closeModal();
-            }}
-          >
-            <Text>CANCEL</Text>
-          </Button>
-        ) : (
-          <Button
-            onPress={() => {
-              setPriority?.(previousPriorityRef.current);
-              closeModal();
-            }}
-          >
-            <Text>CANCEL</Text>
-          </Button>
-        )}
+        <Button onPress={handleCancel}>
+          <Text>CANCEL</Text>
+        </Button>
         <Button onPress={closeModal}>
           <ButtonText color="#C73A57">OK</ButtonText>
         </Button>

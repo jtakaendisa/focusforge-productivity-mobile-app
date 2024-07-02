@@ -69,12 +69,7 @@ const TasksScreen = () => {
     <Container>
       {/* <SearchBar /> */}
       <FilterBar filter={filter} onSelect={handleSelectFilter} />
-      <TaskList
-        taskListRef={tasklistRef}
-        filteredTasks={filteredTasks}
-        tasks={tasks}
-        isSectioned={filter === 'single'}
-      />
+      <TaskList taskListRef={tasklistRef} filteredTasks={filteredTasks} tasks={tasks} />
       <CreateTaskButton onPress={handlePresentModalPress} />
       <TaskFrequencyModal taskFrequencyRef={taskFrequencyRef} />
     </Container>

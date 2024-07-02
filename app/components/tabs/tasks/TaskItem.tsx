@@ -12,7 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { View, Text, styled, getTokens } from 'tamagui';
 
-import { Task } from '@/app/entities';
+import { ChecklistItem, Task } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
 import TaskItemLeftActions from './TaskItemLeftActions';
 import TaskItemRightActions from './TaskItemRightActions';
@@ -90,6 +90,15 @@ const TaskItem = ({
     swipeableRef.current?.close();
   };
 
+  const generateProgressText = (checklist: ChecklistItem[]) => {
+    if (!checklist.length) return '';
+
+    const totalItems = checklist.length;
+    const completedItems = checklist.filter((item) => item.isCompleted).length;
+
+    return completedItems === totalItems ? '' : `${completedItems}/${totalItems} done`;
+  };
+
   useEffect(() => {
     isChecked.value = isCompleted ? withTiming(1) : withTiming(0);
   }, [isCompleted]);
@@ -140,7 +149,7 @@ const TaskItem = ({
               <CategoryBadge>
                 <BadgeText>{category}</BadgeText>
               </CategoryBadge>
-              <ProgressText>0% done</ProgressText>
+              <ProgressText>{generateProgressText(checklist)}</ProgressText>
             </MetricsContainer>
             <CategoryContainer>
               <CategoryIcon category={category} />

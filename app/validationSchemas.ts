@@ -2,8 +2,6 @@ import { z } from 'zod';
 
 import { categoryArray } from './store';
 
-const priorityEnum = z.enum(['Low', 'Normal', 'High']);
-
 const emailSchema = z.string().email({ message: 'Invalid email address' });
 
 const passwordSchema = z
@@ -44,6 +42,8 @@ export const reminderSchema = z.object({
   time: z.date({ message: 'Invalid time' }),
 });
 
+export const prioritySchema = z.enum(['Low', 'Normal', 'High']);
+
 export const frequencySchema = z.object({
   type: z.enum(['daily', 'specific', 'repeats']),
   isRepeatedOn: z.array(z.string()).optional(),
@@ -56,7 +56,7 @@ export const taskSchema = z.object({
   dueDate: z.date({ message: 'Invalid date string' }),
   reminders: z.array(reminderSchema),
   checklist: checklistSchema,
-  priority: priorityEnum,
+  priority: prioritySchema,
   frequency: frequencySchema.optional(),
   note: z.string(),
   isCarriedOver: z.boolean({
@@ -70,7 +70,7 @@ export const habitSchema = z.object({
   category: z.enum(categoryArray),
   startDate: z.date({ message: 'Invalid date string' }),
   endDate: z.date({ message: 'Invalid date string' }).optional(),
-  priority: priorityEnum,
+  priority: prioritySchema,
   frequency: frequencySchema,
   reminders: z.array(reminderSchema),
 });

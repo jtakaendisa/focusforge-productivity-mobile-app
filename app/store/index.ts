@@ -35,7 +35,7 @@ const dummyTasks: Task[] = [
     title: 'Complete project report',
     isCompleted: false,
     category: 'Work',
-    dueDate: new Date('2024-06-26'),
+    dueDate: new Date('2024-07-02'),
     priority: 'High',
     note: 'Include all project milestones',
     isCarriedOver: false,
@@ -52,7 +52,7 @@ const dummyTasks: Task[] = [
     title: 'Grocery shopping',
     isCompleted: false,
     category: 'Home',
-    dueDate: new Date('2024-06-26'),
+    dueDate: new Date('2024-07-02'),
     priority: 'Normal',
     note: '',
     isCarriedOver: false,
@@ -70,7 +70,7 @@ const dummyTasks: Task[] = [
     title: 'Morning meditation',
     isCompleted: false,
     category: 'Meditation',
-    dueDate: new Date('2024-06-26'),
+    dueDate: new Date('2024-07-02'),
     priority: 'Normal',
     note: '20 minutes session',
     isCarriedOver: false,
@@ -658,7 +658,47 @@ const dummyTasks: Task[] = [
   },
 ];
 
-const dummyHabits: Habit[] = [];
+const dummyHabits: Habit[] = [
+  {
+    category: 'Task',
+    endDate: undefined,
+    frequency: { type: 'daily' },
+    id: '475d60e8-12fa-49c2-8d6f-44f64cf1fec1',
+    note: 'lorem ipsum',
+    priority: 'Normal',
+    reminders: [
+      {
+        id: '266666aa-5781-468a-844f-4116744892d0',
+        time: new Date('2024-07-02T07:00:00.000Z'),
+        type: 'notification',
+      },
+    ],
+    startDate: new Date('2024-07-02T07:49:59.672Z'),
+    title: 'Test 1',
+  },
+  {
+    category: 'Finance',
+    endDate: new Date('2024-07-31T07:55:00.000Z'),
+    frequency: { isRepeatedOn: ['Monday', 'Wednesday', 'Friday'], type: 'specific' },
+    id: '144daac9-07dd-4560-ae8e-a1cd6de8007a',
+    note: '',
+    priority: 'High',
+    reminders: [],
+    startDate: new Date('2024-07-02T07:49:59.672Z'),
+    title: 'Test 2',
+  },
+  {
+    category: 'Health',
+    endDate: undefined,
+    frequency: { isRepeatedEvery: 2, type: 'repeats' },
+    id: '788d33ec-f638-4ae9-bf0c-ea67073f6600',
+    note: 'the thing goes skrrrra',
+    priority: 'Low',
+    reminders: [],
+    startDate: new Date('2024-07-02T07:49:59.672Z'),
+    title: 'Test 3',
+  },
+];
 
 export const categoryArray = [
   'Task',

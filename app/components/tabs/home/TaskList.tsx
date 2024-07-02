@@ -17,17 +17,10 @@ interface Props {
   taskListRef: MutableRefObject<FlashList<Task | (string | Task)> | null>;
   tasks: Task[];
   filteredTasks: Task[] | (string | Task)[];
-  isSectioned?: boolean;
   isCheckable?: boolean;
 }
 
-const TaskList = ({
-  taskListRef,
-  tasks,
-  filteredTasks,
-  isSectioned,
-  isCheckable,
-}: Props) => {
+const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => {
   const setTasks = useTaskStore((s) => s.setTasks);
 
   const [currentPriority, setCurrentPriority] = useState<Priority | null>(null);
