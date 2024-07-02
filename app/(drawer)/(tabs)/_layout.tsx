@@ -3,11 +3,14 @@ import { Link, Redirect, Tabs } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import { getTokens } from 'tamagui';
 
-import { useAuthStore } from '../store';
-import { SCREEN_HEIGHT } from '../constants';
-import TabBarButton from '../components/tabs/TabBarButton';
+import { useAppStore, useAuthStore } from '../../store';
+import { SCREEN_HEIGHT } from '../../constants';
+import TabBarButton from '../../components/tabs/TabBarButton';
+import MenuIcon from '../../components/tabs/MenuIcon';
+import { TabRoute } from '../../entities';
 
 const TabLayout = () => {
+  const setCurrentTab = useAppStore((s) => s.setCurrentTab);
   const authUser = useAuthStore((s) => s.authUser);
 
   const gray = getTokens().color.$gray3.val;
@@ -19,13 +22,25 @@ const TabLayout = () => {
   return (
     <Tabs
       screenOptions={{
-        tabBarButton: TabBarButton,
+        headerStyle: {
+          backgroundColor: '#111111',
+          elevation: 0,
+        },
+        headerTintColor: '#fff',
+        // headerLeftContainerStyle: {
+        //   marginLeft: 8,
+        // },
+        // headerLeft: MenuIcon,
         tabBarStyle: {
           height: SCREEN_HEIGHT / 12,
           backgroundColor: gray,
           borderTopWidth: 0,
         },
+        tabBarButton: TabBarButton,
       }}
+      screenListeners={({ route }) => ({
+        tabPress: () => setCurrentTab(route.name as TabRoute),
+      })}
     >
       <Tabs.Screen
         name="index"
@@ -37,6 +52,7 @@ const TabLayout = () => {
                 {({ pressed }) => (
                   <AntDesign
                     name="infocirlceo"
+                    color="gray"
                     size={24}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
@@ -61,6 +77,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="timer"
         options={{
+          headerShown: false,
           title: 'Timer',
         }}
       />

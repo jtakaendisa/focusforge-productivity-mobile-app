@@ -3,13 +3,13 @@ import { FlashList } from '@shopify/flash-list';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, styled } from 'tamagui';
 
-import { Filter, Task } from '../entities';
-import { useTaskStore } from '../store';
-import { toDateGroupedTasks, toFormattedSections } from '../utils';
-import CreateTaskButton from '../components/tabs/CreateTaskButton';
-import TaskFrequencyModal from '../components/tabs/modals/TaskFrequencyModal';
-import FilterBar from '../components/tabs/tasks/FilterBar';
-import TaskList from '../components/tabs/home/TaskList';
+import { Filter, Task } from '../../entities';
+import { useTaskStore } from '../../store';
+import { toDateGroupedTasks, toFormattedSections } from '../../utils';
+import CreateTaskButton from '../../components/tabs/CreateTaskButton';
+import TaskFrequencyModal from '../../components/tabs/modals/TaskFrequencyModal';
+import FilterBar from '../../components/tabs/tasks/FilterBar';
+import TaskList from '../../components/tabs/home/TaskList';
 
 const TasksScreen = () => {
   const tasks = useTaskStore((s) => s.tasks);

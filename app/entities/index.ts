@@ -54,4 +54,4 @@ export interface Habit {
   reminders: Reminder[];
 }
 
-export type TabRoute = '' | 'habits' | 'tasks' | 'timer' | 'settings';
+export type TabRoute = 'index' | 'habits' | 'tasks' | 'timer' | 'settings';

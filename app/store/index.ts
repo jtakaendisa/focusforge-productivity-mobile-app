@@ -1,8 +1,13 @@
 import { create } from 'zustand';
 import uuid from 'react-native-uuid';
 
-import { AuthUser, Habit, Task } from '../entities';
+import { AuthUser, Habit, TabRoute, Task } from '../entities';
 import { TODAYS_DATE } from '../constants';
+
+interface AppStore {
+  currentTab: TabRoute;
+  setCurrentTab: (currentTab: TabRoute) => void;
+}
 
 interface AuthStore {
   authUser: AuthUser | null;
@@ -718,6 +723,11 @@ export const categoryArray = [
   'Other',
 ] as const;
 
+const useAppStore = create<AppStore>((set) => ({
+  currentTab: 'index',
+  setCurrentTab: (currentTab) => set((state) => ({ ...state, currentTab })),
+}));
+
 const useAuthStore = create<AuthStore>((set) => ({
   authUser: null,
   setAuthUser: (authUser) => set((state) => ({ ...state, authUser })),
@@ -737,4 +747,4 @@ const useHabitStore = create<HabitStore>((set) => ({
   setHabits: (habits) => set((state) => ({ ...state, habits })),
 }));
 
-export { useAuthStore, useTaskStore, useHabitStore };
+export { useAppStore, useAuthStore, useTaskStore, useHabitStore };

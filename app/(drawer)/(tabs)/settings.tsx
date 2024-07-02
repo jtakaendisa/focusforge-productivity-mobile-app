@@ -4,12 +4,12 @@ import * as ImagePicker from 'expo-image-picker';
 import Svg, { Path } from 'react-native-svg';
 import { styled, View, Text, Image } from 'tamagui';
 
-import { useAuthStore } from '../store';
-import { SCREEN_HEIGHT } from '../constants';
-import { signOutAuthUser } from '../services/auth';
-import Switch from '../components/tabs/settings/Switch';
-import ModalContainer from '../components/tabs/modals/ModalContainer';
-import EditPhotoModalModule from '../components/tabs/modals/EditPhotoModalModule';
+import { useAuthStore } from '../../store';
+import { SCREEN_HEIGHT } from '../../constants';
+import { signOutAuthUser } from '../../services/auth';
+import Switch from '../../components/tabs/settings/Switch';
+import ModalContainer from '../../components/tabs/modals/ModalContainer';
+import EditPhotoModalModule from '../../components/tabs/modals/EditPhotoModalModule';
 
 const SettingsScreen = () => {
   const authUser = useAuthStore((s) => s.authUser);

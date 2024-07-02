@@ -83,13 +83,13 @@ function RootLayoutNav() {
             >
               <Stack.Screen name="onboarding" />
               <Stack.Screen name="(auth)" />
-              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="(drawer)" />
               <Stack.Screen name="newHabit" options={{ presentation: 'modal' }} />
               <Stack.Screen name="newTask" options={{ presentation: 'modal' }} />
               <Stack.Screen name="habitDetails" options={{ presentation: 'modal' }} />
               <Stack.Screen name="taskDetails" options={{ presentation: 'modal' }} />
             </Stack>
-            <StatusBar />
+            <StatusBar style="light" />
           </BottomSheetModalProvider>
         </View>
       </GestureHandlerRootView>

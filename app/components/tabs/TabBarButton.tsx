@@ -23,7 +23,7 @@ const animationConfig = {
 };
 
 const TabBarButton = ({ accessibilityState, to, onPress }: Props) => {
-  const currentPath = (to?.substring(1) || '') as TabRoute;
+  const currentPath = (to?.substring(1) || 'index') as TabRoute;
 
   const isSelected = accessibilityState?.selected;
 
@@ -52,7 +52,7 @@ const TabBarButton = ({ accessibilityState, to, onPress }: Props) => {
       </IconContainer>
       <AnimatedIconBackground isSelected={isSelected} style={widthAnimation} />
       <AnimatedLabel color={color} style={fontAnimation}>
-        {!currentPath ? 'today' : currentPath}
+        {currentPath === 'index' ? 'today' : currentPath}
       </AnimatedLabel>
     </Container>
   );

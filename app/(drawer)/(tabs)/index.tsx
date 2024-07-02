@@ -3,14 +3,14 @@ import { FlashList } from '@shopify/flash-list';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, styled } from 'tamagui';
 
-import { Task } from '../entities';
-import { useTaskStore } from '../store';
-import { toFormattedDateString } from '../utils';
-import DateCarousel from '../components/tabs/home/DateCarousel';
-import ActivityListPlaceholder from '../components/tabs/home/ActivityListPlaceholder';
-import TaskList from '../components/tabs/home/TaskList';
-import CreateTaskButton from '../components/tabs/CreateTaskButton';
-import TaskFrequencyModal from '../components/tabs/modals/TaskFrequencyModal';
+import { Task } from '../../entities';
+import { useTaskStore } from '../../store';
+import { toFormattedDateString } from '../../utils';
+import DateCarousel from '../../components/tabs/home/DateCarousel';
+import ActivityListPlaceholder from '../../components/tabs/home/ActivityListPlaceholder';
+import TaskList from '../../components/tabs/home/TaskList';
+import CreateTaskButton from '../../components/tabs/CreateTaskButton';
+import TaskFrequencyModal from '../../components/tabs/modals/TaskFrequencyModal';
 
 const HomeScreen = () => {
   const tasks = useTaskStore((s) => s.tasks);

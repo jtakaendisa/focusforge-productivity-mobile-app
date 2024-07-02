@@ -2,11 +2,11 @@ import { useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { styled, View } from 'tamagui';
 
-import { useHabitStore } from '../store';
-import HabitList from '../components/tabs/habits/HabitList';
-import CreateTaskButton from '../components/tabs/CreateTaskButton';
-import TaskFrequencyModal from '../components/tabs/modals/TaskFrequencyModal';
-import ActivityListPlaceholder from '../components/tabs/home/ActivityListPlaceholder';
+import { useHabitStore } from '../../store';
+import HabitList from '../../components/tabs/habits/HabitList';
+import CreateTaskButton from '../../components/tabs/CreateTaskButton';
+import TaskFrequencyModal from '../../components/tabs/modals/TaskFrequencyModal';
+import ActivityListPlaceholder from '../../components/tabs/home/ActivityListPlaceholder';
 
 const HabitsScreen = () => {
   const habits = useHabitStore((s) => s.habits);

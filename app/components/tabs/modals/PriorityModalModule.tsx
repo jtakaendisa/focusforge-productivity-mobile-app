@@ -52,8 +52,6 @@ const PriorityModalModule = ({
     closeModal();
   };
 
-  console.log({ watchPriority }, { previousPriority: previousPriorityRef.current });
-
   return (
     <Container>
       <HeadingContainer>

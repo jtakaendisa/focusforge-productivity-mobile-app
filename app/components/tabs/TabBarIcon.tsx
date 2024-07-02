@@ -12,7 +12,7 @@ const SVG_SIZE = 22;
 
 const TabBarIcon = ({ currentPath, color, isSelected }: Props) => {
   switch (currentPath) {
-    case '':
+    case 'index':
       if (isSelected) {
         return (
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 20 20" fill="none">
