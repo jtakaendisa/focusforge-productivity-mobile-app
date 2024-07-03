@@ -150,6 +150,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
           return typeof item === 'string' ? 'sectionHeader' : 'row';
         }}
         estimatedItemSize={72}
+        showsVerticalScrollIndicator={false}
       />
 
       <ModalContainer isOpen={isPrioritizeOpen} closeModal={closePriorityModal}>

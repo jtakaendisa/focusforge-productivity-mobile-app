@@ -1,17 +1,17 @@
 import { Pressable } from 'react-native';
-import { Link, Redirect, Tabs } from 'expo-router';
+import { Link, Redirect, Tabs, useNavigation } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import { getTokens } from 'tamagui';
 
-import { useAppStore, useAuthStore } from '../../store';
+import { useAuthStore } from '../../store';
 import { SCREEN_HEIGHT } from '../../constants';
 import TabBarButton from '../../components/tabs/TabBarButton';
 import MenuIcon from '../../components/tabs/MenuIcon';
-import { TabRoute } from '../../entities';
+import { DrawerActions } from '@react-navigation/native';
 
 const TabLayout = () => {
-  const setCurrentTab = useAppStore((s) => s.setCurrentTab);
   const authUser = useAuthStore((s) => s.authUser);
+  const navigation = useNavigation();
 
   const gray = getTokens().color.$gray3.val;
 
@@ -27,10 +27,14 @@ const TabLayout = () => {
           elevation: 0,
         },
         headerTintColor: '#fff',
-        // headerLeftContainerStyle: {
-        //   marginLeft: 8,
-        // },
-        // headerLeft: MenuIcon,
+        headerLeftContainerStyle: {
+          paddingLeft: 8,
+        },
+        headerLeft: () => (
+          <Pressable onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
+            <MenuIcon />
+          </Pressable>
+        ),
         tabBarStyle: {
           height: SCREEN_HEIGHT / 12,
           backgroundColor: gray,
@@ -38,9 +42,6 @@ const TabLayout = () => {
         },
         tabBarButton: TabBarButton,
       }}
-      screenListeners={({ route }) => ({
-        tabPress: () => setCurrentTab(route.name as TabRoute),
-      })}
     >
       <Tabs.Screen
         name="index"

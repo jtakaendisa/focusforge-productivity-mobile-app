@@ -11,6 +11,8 @@ export type AuthUser = User & {
 
 export type AnimatedInterpolation = Animated.AnimatedInterpolation<string | number>;
 
+export type Theme = 'dark' | 'light';
+
 export type Filter = 'single' | 'recurring';
 
 export type Category = (typeof categoryArray)[number];
@@ -54,4 +56,4 @@ export interface Habit {
   reminders: Reminder[];
 }
 
-export type TabRoute = 'index' | 'habits' | 'tasks' | 'timer' | 'settings';
+export type TabRoute = 'home' | 'habits' | 'tasks' | 'timer' | 'settings';

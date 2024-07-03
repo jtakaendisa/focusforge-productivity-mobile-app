@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import Svg, { Path } from 'react-native-svg';
@@ -30,16 +30,8 @@ const SettingsScreen = () => {
     }
   };
 
-  const saveImage = async (photoUri: string) => {
-    try {
-      setPhotoUri(photoUri);
-    } catch (error) {
-      throw error;
-    }
-  };
-
   const removeImage = () => {
-    saveImage('');
+    setPhotoUri('');
     setIsModalOpen(false);
   };
 
@@ -67,7 +59,7 @@ const SettingsScreen = () => {
       }
 
       if (result && !result.canceled) {
-        await saveImage(result.assets[0].uri);
+        setPhotoUri(result.assets[0].uri);
       }
     } catch (error) {
       console.log((error as Error).message);
