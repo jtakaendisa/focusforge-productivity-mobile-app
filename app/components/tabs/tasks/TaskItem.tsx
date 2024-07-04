@@ -10,7 +10,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { View, Text, styled, getTokens } from 'tamagui';
+import { View, Text, styled, getTokenValue } from 'tamagui';
 
 import { ChecklistItem, Task } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
@@ -47,8 +47,8 @@ const TaskItem = ({
   const hasChecklist = !!checklist.length;
   const allCompleted = checklist.every((item) => item.isCompleted);
 
-  const white = getTokens().color.$white.val;
-  const gray = getTokens().color.$gray1.val;
+  const white = getTokenValue('$white');
+  const gray = getTokenValue('$gray1');
 
   const textColorAnimation = useAnimatedStyle(() => ({
     color: interpolateColor(isChecked.value, [0, 1], [white, gray]),

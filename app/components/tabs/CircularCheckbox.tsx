@@ -5,15 +5,15 @@ import Animated, {
   interpolateColor,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { View, getTokens, styled } from 'tamagui';
+import { View, getTokenValue, styled } from 'tamagui';
 
 interface Props {
   isChecked: SharedValue<number>;
 }
 
 const CircularCheckbox = ({ isChecked }: Props) => {
-  const gray = getTokens().color.$gray1.val;
-  const green = getTokens().color.$green1.val;
+  const gray = getTokenValue('$gray1');
+  const green = getTokenValue('$green1');
 
   const checkboxAnimation = useAnimatedStyle(() => ({
     borderColor: interpolateColor(isChecked.value, [0, 1], [gray, green]),

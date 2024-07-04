@@ -11,6 +11,9 @@ import { TamaguiProvider, View } from 'tamagui';
 import { useAuthStore } from './store';
 import { authStateChangeListener, formatAuthUserData } from './services/auth';
 import config from '../tamagui.config';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreAllLogs(true); // Ignore all logs (warnings and errors)
 
 export {
   // Catch any errors thrown by the Layout component.

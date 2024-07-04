@@ -1,12 +1,16 @@
 import { create } from 'zustand';
 import uuid from 'react-native-uuid';
 
-import { AuthUser, Habit, TabRoute, Task, Theme } from '../entities';
+import { AuthUser, Habit, SearchQuery, Task, Theme } from '../entities';
 import { TODAYS_DATE } from '../constants';
 
 interface AppStore {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  isSearchBarOpen: boolean;
+  setIsSearchBarOpen: (isSearchBarOpen: boolean) => void;
+  searchQuery: SearchQuery;
+  setSearchQuery: (searchQuery: SearchQuery) => void;
 }
 
 interface AuthStore {
@@ -16,10 +20,8 @@ interface AuthStore {
 
 interface TaskStore {
   tasks: Task[];
-  searchQuery: string;
   selectedDate: Date;
   setTasks: (tasks: Task[]) => void;
-  setSearchQuery: (searchQuery: string) => void;
   setSelectedDate: (selectedDate: Date) => void;
 }
 
@@ -725,7 +727,12 @@ export const categoryArray = [
 
 const useAppStore = create<AppStore>((set) => ({
   theme: 'dark',
+  isSearchBarOpen: false,
+  searchQuery: {} as SearchQuery,
   setTheme: (theme) => set((state) => ({ ...state, theme })),
+  setIsSearchBarOpen: (isSearchBarOpen) =>
+    set((state) => ({ ...state, isSearchBarOpen })),
+  setSearchQuery: (searchQuery) => set((state) => ({ ...state, searchQuery })),
 }));
 
 const useAuthStore = create<AuthStore>((set) => ({
@@ -735,10 +742,8 @@ const useAuthStore = create<AuthStore>((set) => ({
 
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: dummyTasks,
-  searchQuery: '',
   selectedDate: TODAYS_DATE,
   setTasks: (tasks) => set((state) => ({ ...state, tasks })),
-  setSearchQuery: (searchQuery) => set((state) => ({ ...state, searchQuery })),
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
 }));
 

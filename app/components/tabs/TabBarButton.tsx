@@ -4,7 +4,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import { styled, View, Text, getTokens } from 'tamagui';
+import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import { TabRoute } from '@/app/entities';
 import TabBarIcon from './TabBarIcon';
@@ -27,8 +27,8 @@ const TabBarButton = ({ accessibilityState, to, onPress }: Props) => {
 
   const isSelected = accessibilityState?.selected;
 
-  const red = getTokens().color.$red1.val;
-  const gray = getTokens().color.$gray1.val;
+  const red = getTokenValue('$red1');
+  const gray = getTokenValue('$gray1');
 
   const color = isSelected ? red : gray;
 

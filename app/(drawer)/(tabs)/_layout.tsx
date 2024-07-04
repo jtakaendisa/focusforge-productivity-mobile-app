@@ -1,19 +1,22 @@
-import { Pressable } from 'react-native';
-import { Link, Redirect, Tabs, useNavigation } from 'expo-router';
-import { AntDesign } from '@expo/vector-icons';
-import { getTokens } from 'tamagui';
+import { Redirect, Tabs, usePathname } from 'expo-router';
+import { getTokenValue } from 'tamagui';
 
-import { useAuthStore } from '../../store';
+import { useAppStore, useAuthStore } from '../../store';
 import { SCREEN_HEIGHT } from '../../constants';
 import TabBarButton from '../../components/tabs/TabBarButton';
-import MenuIcon from '../../components/tabs/MenuIcon';
-import { DrawerActions } from '@react-navigation/native';
+import CustomHeader from '@/app/components/tabs/CustomHeader';
+import { TabRoute } from '@/app/entities';
 
 const TabLayout = () => {
-  const authUser = useAuthStore((s) => s.authUser);
-  const navigation = useNavigation();
+  const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
-  const gray = getTokens().color.$gray3.val;
+  const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
+  const setisSearchBarOpen = useAppStore((s) => s.setIsSearchBarOpen);
+  const authUser = useAuthStore((s) => s.authUser);
+
+  const gray = getTokenValue('$gray3');
+
+  const handleCloseSearchBar = () => setisSearchBarOpen(false);
 
   if (!authUser) {
     return <Redirect href="/(auth)" />;
@@ -22,18 +25,13 @@ const TabLayout = () => {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: {
-          backgroundColor: '#111111',
-          elevation: 0,
-        },
-        headerTintColor: '#fff',
-        headerLeftContainerStyle: {
-          paddingLeft: 8,
-        },
-        headerLeft: () => (
-          <Pressable onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
-            <MenuIcon />
-          </Pressable>
+        header: (props: any) => (
+          <CustomHeader
+            {...props}
+            isCurrentScreenHome={pathname === 'home'}
+            isSearchBarOpen={isSearchBarOpen}
+            closeSearchBar={handleCloseSearchBar}
+          />
         ),
         tabBarStyle: {
           height: SCREEN_HEIGHT / 12,
@@ -42,25 +40,14 @@ const TabLayout = () => {
         },
         tabBarButton: TabBarButton,
       }}
+      screenListeners={{
+        tabPress: () => handleCloseSearchBar(),
+      }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Today',
-          headerRight: () => (
-            <Link href="/" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <AntDesign
-                    name="infocirlceo"
-                    color="gray"
-                    size={24}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
         }}
       />
       <Tabs.Screen

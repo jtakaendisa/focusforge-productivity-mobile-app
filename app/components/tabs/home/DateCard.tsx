@@ -5,7 +5,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { styled, View, Text, getTokens } from 'tamagui';
+import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import { DATE_CARD_HEIGHT } from '@/app/constants';
 import { toFormattedDateString } from '@/app/utils';
@@ -24,12 +24,12 @@ const DateCard = ({ day, selectedDate, onPress }: Props) => {
 
   const isSelected = useSharedValue(0);
 
-  const white = getTokens().color.$white.val;
-  const textGray = getTokens().color.$gray1.val;
-  const lightGray = getTokens().color.$gray2.val;
-  const darkGray = getTokens().color.$gray3.val;
-  const lightRed = getTokens().color.$red1.val;
-  const darkRed = getTokens().color.$red3.val;
+  const white = getTokenValue('$white');
+  const textGray = getTokenValue('$gray1');
+  const lightGray = getTokenValue('$gray2');
+  const darkGray = getTokenValue('$gray3');
+  const lightRed = getTokenValue('$red1');
+  const darkRed = getTokenValue('$red3');
 
   const textColorAnimation = useAnimatedStyle(() => ({
     color: interpolateColor(isSelected.value, [0, 1], [textGray, white]),
