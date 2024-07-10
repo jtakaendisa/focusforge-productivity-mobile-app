@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { User } from 'firebase/auth';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { TamaguiProvider, View } from 'tamagui';
+import { getTokenValue, TamaguiProvider, View } from 'tamagui';
 
 import { useAuthStore } from './store';
 import { authStateChangeListener, formatAuthUserData } from './services/auth';
@@ -73,15 +73,17 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const customBlack1 = getTokenValue('$customBlack1');
+
   return (
     <TamaguiProvider config={config}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={{ flex: 1, backgroundColor: '#111111' }}>
+        <View style={{ flex: 1, backgroundColor: customBlack1 }}>
           <BottomSheetModalProvider>
             <Stack
               screenOptions={{
                 headerShown: false,
-                contentStyle: { backgroundColor: '#111111' },
+                contentStyle: { backgroundColor: customBlack1 },
               }}
             >
               <Stack.Screen name="onboarding" />

@@ -63,11 +63,13 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
   const handlePrioritize = (priority: Priority) => {
     const updatedTasks = tasks.map((task) => {
       if (task.id === selectedTask?.id) {
+        console.log('here', task.id);
         return {
           ...task,
           priority,
         };
       } else {
+        console.log('or here', task.id);
         return task;
       }
     });
@@ -101,8 +103,10 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
 
   const closeDeleteModal = () => setModalState({ ...modalState, isDeleteOpen: false });
 
-  const closePriorityModal = () =>
+  const closePriorityModal = () => {
     setModalState({ ...modalState, isPrioritizeOpen: false });
+    setSelectedTask(null);
+  };
 
   const toggleChecklistModal = () => {
     setModalState({ ...modalState, isChecklistOpen: !isChecklistOpen });

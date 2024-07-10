@@ -1,16 +1,16 @@
 import { create } from 'zustand';
 import uuid from 'react-native-uuid';
 
-import { AuthUser, Habit, SearchQuery, Task, Theme } from '../entities';
+import { AuthUser, Habit, Task, Theme } from '../entities';
 import { TODAYS_DATE } from '../constants';
 
 interface AppStore {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
+  headerHeight: number;
   isSearchBarOpen: boolean;
+  setTheme: (theme: Theme) => void;
+  setHeaderHeight: (headerHeight: number) => void;
   setIsSearchBarOpen: (isSearchBarOpen: boolean) => void;
-  searchQuery: SearchQuery;
-  setSearchQuery: (searchQuery: SearchQuery) => void;
 }
 
 interface AuthStore {
@@ -727,12 +727,12 @@ export const categoryArray = [
 
 const useAppStore = create<AppStore>((set) => ({
   theme: 'dark',
+  headerHeight: 0,
   isSearchBarOpen: false,
-  searchQuery: {} as SearchQuery,
   setTheme: (theme) => set((state) => ({ ...state, theme })),
+  setHeaderHeight: (headerHeight) => set((state) => ({ ...state, headerHeight })),
   setIsSearchBarOpen: (isSearchBarOpen) =>
     set((state) => ({ ...state, isSearchBarOpen })),
-  setSearchQuery: (searchQuery) => set((state) => ({ ...state, searchQuery })),
 }));
 
 const useAuthStore = create<AuthStore>((set) => ({

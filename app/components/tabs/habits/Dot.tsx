@@ -5,7 +5,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { View, styled } from 'tamagui';
+import { View, getTokenValue, styled } from 'tamagui';
 
 interface Props {
   listItem: number;
@@ -15,11 +15,13 @@ interface Props {
 const Dot = ({ listItem, listIndex }: Props) => {
   const isFilled = useSharedValue(listItem <= listIndex ? 1 : 0);
 
+  const customRed1 = getTokenValue('$customRed1');
+
   const backgroundColorAnimation = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
       isFilled.value,
       [0, 1],
-      ['transparent', '#C73A57']
+      ['transparent', customRed1]
     ),
   }));
 
@@ -35,7 +37,7 @@ const Container = styled(View, {
   height: 8,
   borderRadius: 4,
   borderWidth: 1,
-  borderColor: '#C73A57',
+  borderColor: '$customRed1',
 });
 
 const AnimatedContainer = Animated.createAnimatedComponent(Container);

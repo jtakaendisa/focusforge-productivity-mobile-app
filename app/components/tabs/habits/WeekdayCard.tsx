@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
-import { styled, Text, View } from 'tamagui';
+import { getTokenValue, styled, Text, View } from 'tamagui';
 
 import { SCREEN_WIDTH } from '@/app/constants';
 import SquareCheckbox from '../SquareCheckbox';
@@ -14,6 +14,8 @@ interface Props {
 const WeekdayCard = ({ day, isSelected, onSelect }: Props) => {
   const isChecked = useSharedValue(isSelected ? 1 : 0);
 
+  const customGray1 = getTokenValue('$customGray1');
+
   useEffect(() => {
     isChecked.value = isSelected ? withTiming(1) : withTiming(0);
   }, [isSelected]);
@@ -21,7 +23,7 @@ const WeekdayCard = ({ day, isSelected, onSelect }: Props) => {
   return (
     <Container onPress={() => onSelect(day)}>
       <SquareCheckbox isChecked={isChecked} />
-      <Text color="#8C8C8C">{day}</Text>
+      <Text color={customGray1}>{day}</Text>
     </Container>
   );
 };

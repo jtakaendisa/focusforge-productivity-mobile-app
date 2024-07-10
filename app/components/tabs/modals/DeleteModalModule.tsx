@@ -1,4 +1,4 @@
-import { Text, View, styled } from 'tamagui';
+import { Text, View, getTokenValue, styled } from 'tamagui';
 
 interface Props {
   taskId: string;
@@ -12,6 +12,8 @@ const DeleteModalModule = ({ taskId, deleteTask, closeModal }: Props) => {
     closeModal();
   };
 
+  const customRed1 = getTokenValue('$customRed1');
+
   return (
     <Container>
       <MainContent>
@@ -22,7 +24,7 @@ const DeleteModalModule = ({ taskId, deleteTask, closeModal }: Props) => {
           <ButtonText>Cancel</ButtonText>
         </Button>
         <Button onPress={onDelete}>
-          <ButtonText color="#C73A57">Delete</ButtonText>
+          <ButtonText color={customRed1}>Delete</ButtonText>
         </Button>
       </ButtonsContainer>
     </Container>
@@ -32,7 +34,7 @@ const DeleteModalModule = ({ taskId, deleteTask, closeModal }: Props) => {
 const Container = styled(View, {
   width: '80%',
   borderRadius: 16,
-  backgroundColor: '#1C1C1C',
+  backgroundColor: '$customGray3',
 });
 
 const MainContent = styled(View, {
@@ -40,12 +42,12 @@ const MainContent = styled(View, {
   alignItems: 'center',
   paddingVertical: 16,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const Message = styled(Text, {
   fontSize: 16,
-  color: '#C73A57',
+  color: '$customRed1',
 });
 
 const ButtonsContainer = styled(View, {

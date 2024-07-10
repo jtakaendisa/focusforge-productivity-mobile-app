@@ -43,7 +43,7 @@ const Container = styled(View, {
         alignSelf: 'flex-start',
         paddingHorizontal: 6,
         paddingVertical: 2,
-        backgroundColor: 'rgba(140, 140, 140, 0.25)',
+        backgroundColor: '$customGray4',
         borderRadius: 4,
       },
     },
@@ -54,12 +54,12 @@ const BadgeText = styled(Text, {
   variants: {
     isForm: {
       true: {
-        color: '#8C8C8C',
+        color: '$customGray1',
       },
       undefined: {
         fontSize: 12,
         fontWeight: 'bold',
-        color: '#fff',
+        color: 'white',
       },
     },
   } as const,

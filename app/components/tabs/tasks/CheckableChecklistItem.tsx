@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import Svg, { Path } from 'react-native-svg';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -41,7 +40,7 @@ const Container = styled(View, {
   height: 46,
   paddingLeft: 12,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const Title = styled(Text, {

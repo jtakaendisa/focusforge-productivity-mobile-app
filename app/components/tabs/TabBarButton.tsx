@@ -27,10 +27,10 @@ const TabBarButton = ({ accessibilityState, to, onPress }: Props) => {
 
   const isSelected = accessibilityState?.selected;
 
-  const red = getTokenValue('$red1');
-  const gray = getTokenValue('$gray1');
+  const customRed1 = getTokenValue('$customRed1');
+  const customGray1 = getTokenValue('$customGray1');
 
-  const color = isSelected ? red : gray;
+  const color = isSelected ? customRed1 : customGray1;
 
   const fontAnimation = useAnimatedStyle(() => ({
     fontSize: isSelected
@@ -84,7 +84,7 @@ const IconBackground = styled(View, {
   variants: {
     isSelected: {
       true: {
-        backgroundColor: '#652533',
+        backgroundColor: '$customRed4',
       },
       false: {
         backgroundColor: 'transparent',

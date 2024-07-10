@@ -47,11 +47,10 @@ const TaskItem = ({
   const hasChecklist = !!checklist.length;
   const allCompleted = checklist.every((item) => item.isCompleted);
 
-  const white = getTokenValue('$white');
-  const gray = getTokenValue('$gray1');
+  const customGray1 = getTokenValue('$customGray1');
 
   const textColorAnimation = useAnimatedStyle(() => ({
-    color: interpolateColor(isChecked.value, [0, 1], [white, gray]),
+    color: interpolateColor(isChecked.value, [0, 1], ['white', customGray1]),
     textDecorationLine: isChecked.value ? 'line-through' : 'none',
   }));
 
@@ -169,7 +168,7 @@ const TaskContainer = styled(View, {
   paddingHorizontal: 6,
   paddingVertical: 12,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const CheckboxContainer = styled(View, {
@@ -197,7 +196,7 @@ const MetricsContainer = styled(View, {
 const CategoryBadge = styled(View, {
   paddingHorizontal: 3,
   paddingVertical: 2,
-  backgroundColor: 'rgba(140, 140, 140, 0.25)',
+  backgroundColor: '$customGray4',
   borderRadius: 4,
 });
 
@@ -207,7 +206,7 @@ const BadgeText = styled(Text, {
 
 const ProgressText = styled(Text, {
   fontSize: 10,
-  color: '#8c8c8c',
+  color: '$customGray1',
 });
 
 const CategoryContainer = styled(View, {
@@ -225,7 +224,7 @@ const Title = styled(Text, {
 
 const Note = styled(Text, {
   fontSize: 12,
-  color: '#8C8C8C',
+  color: '$customGray1',
 });
 
 const AnimatedContainer = Animated.createAnimatedComponent(View);

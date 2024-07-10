@@ -7,7 +7,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, styled } from 'tamagui';
+import { View, Text, styled, getTokenValue } from 'tamagui';
 
 import { PriorityType, useHabitStore } from './store';
 import { SCREEN_WIDTH, TODAYS_DATE } from './constants';
@@ -35,6 +35,8 @@ const NewHabitScreen = () => {
 
   const isFirstIndex = listIndex === 0;
   const isLastIndex = listIndex === listItems.length - 1;
+
+  const customRed1 = getTokenValue('$customRed1');
 
   const {
     control,
@@ -147,7 +149,7 @@ const NewHabitScreen = () => {
           disabled={isFirstIndex}
         >
           {!isFirstIndex && (
-            <ButtonText color="#C73A57">{isLastIndex ? 'SAVE' : 'NEXT'}</ButtonText>
+            <ButtonText color={customRed1}>{isLastIndex ? 'SAVE' : 'NEXT'}</ButtonText>
           )}
         </Button>
       </ButtonsContainer>
@@ -158,7 +160,7 @@ const NewHabitScreen = () => {
 
 const Container = styled(SafeAreaView, {
   flex: 1,
-  backgroundColor: '#111111',
+  backgroundColor: '$customBlack1',
 });
 
 const ButtonsContainer = styled(View, {
@@ -168,9 +170,9 @@ const ButtonsContainer = styled(View, {
   left: 0,
   right: 0,
   height: 60,
-  backgroundColor: '#1C1C1C',
+  backgroundColor: '$customGray3',
   borderTopWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const Button = styled(View, {

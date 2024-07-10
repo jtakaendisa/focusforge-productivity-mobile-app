@@ -63,7 +63,7 @@ const HeadingContainer = styled(View, {
 const Heading = styled(Text, {
   fontSize: 20,
   fontWeight: 'bold',
-  color: '#C73A57',
+  color: '$customRed1',
 });
 
 const CategoriesContainer = styled(View, {
@@ -80,7 +80,7 @@ const CategoryContainer = styled(View, {
 const CategoryCard = styled(View, {
   flex: 1,
   marginHorizontal: 8,
-  backgroundColor: '#1C1C1C',
+  backgroundColor: '$customGray3',
   borderRadius: 14,
 });
 

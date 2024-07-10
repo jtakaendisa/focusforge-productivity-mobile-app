@@ -2,13 +2,19 @@ import { useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { styled, View } from 'tamagui';
 
-import { useHabitStore } from '../../store';
+import { useAppStore, useHabitStore } from '../../store';
 import HabitList from '../../components/tabs/habits/HabitList';
 import CreateTaskButton from '../../components/tabs/CreateTaskButton';
 import TaskFrequencyModal from '../../components/tabs/modals/TaskFrequencyModal';
 import ActivityListPlaceholder from '../../components/tabs/home/ActivityListPlaceholder';
+import SearchBarSpacer from '@/app/components/tabs/SearchBarSpacer';
+import { usePathname } from 'expo-router';
+import { TabRoute } from '@/app/entities';
 
 const HabitsScreen = () => {
+  const pathname = (usePathname().substring(1) || 'home') as TabRoute;
+
+  const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
   const habits = useHabitStore((s) => s.habits);
 
   const taskFrequencyRef = useRef<BottomSheetModal | null>(null);
@@ -19,6 +25,7 @@ const HabitsScreen = () => {
 
   return (
     <Container>
+      <SearchBarSpacer isExpanded={pathname === 'habits' && isSearchBarOpen} />
       <HabitListContainer isCentered={isHabitsEmpty}>
         {isHabitsEmpty ? (
           <ActivityListPlaceholder />
@@ -35,7 +42,7 @@ const HabitsScreen = () => {
 const Container = styled(View, {
   flex: 1,
   position: 'relative',
-  backgroundColor: '#111111',
+  backgroundColor: '$customBlack1',
 });
 
 const HabitListContainer = styled(View, {

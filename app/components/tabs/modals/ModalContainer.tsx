@@ -5,11 +5,18 @@ import { View, styled } from 'tamagui';
 interface Props {
   children: ReactNode;
   isOpen: boolean;
+  transparentBackdrop?: boolean;
   dismissKeyboard?: boolean;
   closeModal: () => void;
 }
 
-const ModalContainer = ({ children, isOpen, dismissKeyboard, closeModal }: Props) => {
+const ModalContainer = ({
+  children,
+  isOpen,
+  transparentBackdrop,
+  dismissKeyboard,
+  closeModal,
+}: Props) => {
   useEffect(() => {
     if (!dismissKeyboard) return;
 
@@ -25,7 +32,7 @@ const ModalContainer = ({ children, isOpen, dismissKeyboard, closeModal }: Props
       statusBarTranslucent
     >
       <MainContainer>
-        <Backdrop onPress={closeModal} />
+        <Backdrop onPress={closeModal} isTransparent={transparentBackdrop} />
         {children}
       </MainContainer>
     </Modal>
@@ -42,7 +49,14 @@ const Backdrop = styled(View, {
   position: 'absolute',
   width: '100%',
   height: '100%',
-  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  backgroundColor: '$customBlack3',
+  variants: {
+    isTransparent: {
+      true: {
+        backgroundColor: 'transparent',
+      },
+    },
+  } as const,
 });
 
 export default ModalContainer;

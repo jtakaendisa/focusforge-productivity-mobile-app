@@ -55,7 +55,7 @@ const HabitDetailsScreen = () => {
 
 const Container = styled(SafeAreaView, {
   flex: 1,
-  backgroundColor: '#111111',
+  backgroundColor: '$customBlack1',
 });
 
 const ScreenLabel = styled(View, {
@@ -65,7 +65,7 @@ const ScreenLabel = styled(View, {
   marginLeft: 8,
   marginBottom: 8,
   borderRadius: 6,
-  backgroundColor: '#262626',
+  backgroundColor: '$customGray2',
 });
 
 const LabelTextLarge = styled(Text, {

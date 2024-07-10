@@ -3,17 +3,21 @@ import { FlashList } from '@shopify/flash-list';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, styled } from 'tamagui';
 
-import { Filter, Task } from '../../entities';
-import { useTaskStore } from '../../store';
+import { Filter, TabRoute, Task } from '../../entities';
+import { useAppStore, useTaskStore } from '../../store';
 import { toDateGroupedTasks, toFormattedSections } from '../../utils';
 import CreateTaskButton from '../../components/tabs/CreateTaskButton';
 import TaskFrequencyModal from '../../components/tabs/modals/TaskFrequencyModal';
 import FilterBar from '../../components/tabs/tasks/FilterBar';
 import TaskList from '../../components/tabs/home/TaskList';
+import SearchBarSpacer from '@/app/components/tabs/SearchBarSpacer';
+import { usePathname } from 'expo-router';
 
 const TasksScreen = () => {
+  const pathname = (usePathname().substring(1) || 'home') as TabRoute;
+
+  const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
   const tasks = useTaskStore((s) => s.tasks);
-  const searchQuery = useTaskStore((s) => s.searchQuery);
 
   const [filter, setFilter] = useState<Filter>('single');
   const [filteredTasks, setFilteredTasks] = useState<(string | Task)[]>([]);
@@ -36,18 +40,6 @@ const TasksScreen = () => {
 
   const handlePresentModalPress = () => taskFrequencyRef.current?.present();
 
-  // useEffect(() => {
-  //   if (searchQuery.length) {
-  //     const filteredTasks = tasks.filter((task) =>
-  //       task.title.toLowerCase().includes(searchQuery)
-  //     );
-  //     setFilteredTasks(filteredTasks);
-  //   } else {
-  //     setFilteredTasks(tasks);
-  //   }
-  //   tasklistRef.current?.prepareForLayoutAnimationRender();
-  // }, [searchQuery, tasks, tasklistRef]);
-
   useEffect(() => {
     let filteredTasks: (string | Task)[] = [];
 
@@ -67,6 +59,7 @@ const TasksScreen = () => {
 
   return (
     <Container>
+      <SearchBarSpacer isExpanded={pathname === 'tasks' && isSearchBarOpen} />
       <FilterBar filter={filter} onSelect={handleSelectFilter} />
       <TaskList taskListRef={tasklistRef} filteredTasks={filteredTasks} tasks={tasks} />
       <CreateTaskButton onPress={handlePresentModalPress} />
@@ -77,7 +70,7 @@ const TasksScreen = () => {
 
 const Container = styled(View, {
   flex: 1,
-  backgroundColor: '#111111',
+  backgroundColor: '$customBlack1',
 });
 
 export default TasksScreen;

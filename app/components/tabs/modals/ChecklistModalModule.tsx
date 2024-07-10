@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Control, Controller, useForm } from 'react-hook-form';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
-import { Text, View, styled } from 'tamagui';
+import { Text, View, getTokenValue, styled } from 'tamagui';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { ChecklistItem as ChecklistItemType, Task } from '@/app/entities';
@@ -93,6 +93,8 @@ const ChecklistModalModule = ({
     setTasks(updatedTasks);
   };
 
+  const customRed1 = getTokenValue('$customRed1');
+
   return (
     <Container>
       <HeadingContainer>
@@ -129,7 +131,7 @@ const ChecklistModalModule = ({
         }}
       />
       <CloseButton onPress={closeModal}>
-        <ButtonText color="#C73A57">CLOSE</ButtonText>
+        <ButtonText color={customRed1}>CLOSE</ButtonText>
       </CloseButton>
     </Container>
   );
@@ -138,14 +140,14 @@ const ChecklistModalModule = ({
 const Container = styled(View, {
   width: '80%',
   borderRadius: 16,
-  backgroundColor: '#1C1C1C',
+  backgroundColor: '$customGray3',
 });
 
 const HeadingContainer = styled(View, {
   alignItems: 'center',
   paddingVertical: 10,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const HeadingText = styled(Text, {
@@ -161,7 +163,7 @@ const CloseButton = styled(View, {
   alignItems: 'center',
   paddingVertical: 16,
   borderTopWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const ButtonText = styled(Text, {

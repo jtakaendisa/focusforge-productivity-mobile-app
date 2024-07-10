@@ -4,7 +4,7 @@ import {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import uuid from 'react-native-uuid';
-import { styled, View, Text } from 'tamagui';
+import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import { Reminder } from '@/app/entities';
 import { TODAYS_DATE } from '@/app/constants';
@@ -47,6 +47,8 @@ const NewReminderModalModule = ({ closeModal, onAdd }: Props) => {
     });
   };
 
+  const customRed1 = getTokenValue('$customRed1');
+
   return (
     <Container>
       <HeadingContainer>
@@ -55,7 +57,7 @@ const NewReminderModalModule = ({ closeModal, onAdd }: Props) => {
       <MainContent>
         <TimePicker onPress={showTimePicker}>
           <TimeText>{toFormattedTimeString(time)}</TimeText>
-          <Text color="#C73A57">Reminder time</Text>
+          <Text color={customRed1}>Reminder time</Text>
         </TimePicker>
         <ReminderButtonsContainer>
           <Row>
@@ -70,7 +72,7 @@ const NewReminderModalModule = ({ closeModal, onAdd }: Props) => {
               variant="alarm"
             />
           </Row>
-          <Text color="#C73A57">Reminder type</Text>
+          <Text color={customRed1}>Reminder type</Text>
         </ReminderButtonsContainer>
       </MainContent>
       <ButtonsContainer>
@@ -83,7 +85,7 @@ const NewReminderModalModule = ({ closeModal, onAdd }: Props) => {
             closeModal();
           }}
         >
-          <ButtonText color="#C73A57">CONFIRM</ButtonText>
+          <ButtonText color={customRed1}>CONFIRM</ButtonText>
         </Button>
       </ButtonsContainer>
     </Container>
@@ -93,14 +95,14 @@ const NewReminderModalModule = ({ closeModal, onAdd }: Props) => {
 const Container = styled(View, {
   width: '80%',
   borderRadius: 16,
-  backgroundColor: '#1C1C1C',
+  backgroundColor: '$customGray3',
 });
 
 const HeadingContainer = styled(View, {
   alignItems: 'center',
   paddingVertical: 10,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const HeadingText = styled(Text, {
@@ -119,7 +121,7 @@ const TimePicker = styled(View, {
   paddingBottom: 12,
   marginBottom: 20,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const TimeText = styled(Text, {
@@ -142,7 +144,7 @@ const ButtonsContainer = styled(View, {
   flexDirection: 'row',
   alignItems: 'center',
   borderTopWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const Button = styled(View, {

@@ -1,46 +1,36 @@
 import { SafeAreaView, StatusBar } from 'react-native';
-import SearchBar from './tasks/SearchBar';
+import SearchBar from './SearchBar';
 import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getDefaultHeaderHeight } from '@react-navigation/elements';
 import { styled } from 'tamagui';
 import DefaultHeader from './DefaultHeader';
+import { useAppStore } from '@/app/store';
 import { useEffect } from 'react';
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
 
 interface Props {
-  options: {
-    title: string;
-  };
-  isSearchBarOpen: boolean;
-  isCurrentScreenHome: boolean;
-  closeSearchBar: () => boolean;
+  title?: string;
 }
 
-const CustomHeader = ({
-  options: { title },
-  isSearchBarOpen,
-  isCurrentScreenHome,
-  closeSearchBar,
-}: Props) => {
+const CustomHeader = ({ title }: Props) => {
+  const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
+  const setHeaderHeight = useAppStore((s) => s.setHeaderHeight);
+
   const frame = useSafeAreaFrame();
   const insets = useSafeAreaInsets();
   const defaultHeaderHeight = getDefaultHeaderHeight(frame, false, insets.top);
   const statusBarHeight = StatusBar.currentHeight || 0;
   const headerHeight = defaultHeaderHeight - statusBarHeight;
 
+  useEffect(() => {
+    if (headerHeight) {
+      setHeaderHeight(headerHeight);
+    }
+  }, [headerHeight, setHeaderHeight]);
+
   return (
     <Container height={defaultHeaderHeight} isSearchBarOpen={isSearchBarOpen}>
       {isSearchBarOpen ? (
-        <SearchBar
-          height={headerHeight}
-          isCurrentScreenHome={isCurrentScreenHome}
-          closeSearchBar={closeSearchBar}
-        />
+        <SearchBar height={headerHeight} />
       ) : (
         <DefaultHeader height={headerHeight} title={title} />
       )}
@@ -53,10 +43,10 @@ const Container = styled(SafeAreaView, {
   variants: {
     isSearchBarOpen: {
       true: {
-        backgroundColor: '#1C1C1C',
+        backgroundColor: '$customGray3',
       },
       false: {
-        backgroundColor: '#111111',
+        backgroundColor: '$customBlack1',
       },
     },
   } as const,

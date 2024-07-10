@@ -290,12 +290,12 @@ const TextContainer = styled(View, {
 
 const Heading = styled(Text, {
   fontSize: 17,
-  color: '#FFF',
+  color: 'white',
 });
 
 const SubText = styled(Text, {
   fontSize: 14.5,
-  color: '#8C8C8C',
+  color: '$customGray1',
 });
 
 const AnimatedContainer = Animated.createAnimatedComponent(Container);

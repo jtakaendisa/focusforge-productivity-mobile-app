@@ -22,13 +22,13 @@ const Container = styled(View, {
   height: 50,
   paddingLeft: 6,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const HeaderLabel = styled(View, {
   paddingVertical: 2,
   paddingHorizontal: 8,
-  backgroundColor: 'rgba(140, 140, 140, 0.25)',
+  backgroundColor: '$customGray4',
   borderRadius: 8,
 });
 

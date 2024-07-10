@@ -12,12 +12,16 @@ interface Props {
 }
 
 const CircularCheckbox = ({ isChecked }: Props) => {
-  const gray = getTokenValue('$gray1');
-  const green = getTokenValue('$green1');
+  const customGray1 = getTokenValue('$customGray1');
+  const customGreen1 = getTokenValue('$customGreen1');
 
   const checkboxAnimation = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(isChecked.value, [0, 1], [gray, green]),
-    backgroundColor: interpolateColor(isChecked.value, [0, 1], ['transparent', green]),
+    borderColor: interpolateColor(isChecked.value, [0, 1], [customGray1, customGreen1]),
+    backgroundColor: interpolateColor(
+      isChecked.value,
+      [0, 1],
+      ['transparent', customGreen1]
+    ),
   }));
 
   const checkboxIconAnimation = useAnimatedStyle(() => ({
@@ -30,7 +34,7 @@ const CircularCheckbox = ({ isChecked }: Props) => {
         <Svg width="10" height="8" viewBox="0 0 10 8" fill="none">
           <Path
             d="M9.79076 0.20924C10.0697 0.488227 10.0697 0.941301 9.79076 1.22029L4.07711 6.93394C3.79813 7.21292 3.34505 7.21292 3.06606 6.93394L0.20924 4.07711C-0.0697467 3.79813 -0.0697467 3.34505 0.20924 3.06606C0.488227 2.78708 0.941301 2.78708 1.22029 3.06606L3.5727 5.41625L8.78194 0.20924C9.06093 -0.0697467 9.51401 -0.0697467 9.79299 0.20924H9.79076Z"
-            fill="#fff"
+            fill="white"
           />
         </Svg>
       </AnimatedCheckboxIcon>
@@ -45,7 +49,7 @@ const CheckboxCircle = styled(View, {
   height: 26,
   borderRadius: 13,
   borderWidth: 2,
-  borderColor: '#8C8C8C',
+  borderColor: '$customGray1',
 });
 
 const CheckboxIcon = styled(View, {

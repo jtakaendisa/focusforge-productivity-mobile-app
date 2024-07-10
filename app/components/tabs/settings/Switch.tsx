@@ -6,7 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { View, styled } from 'tamagui';
+import { View, getTokenValue, styled } from 'tamagui';
 
 interface Props {
   value: 0 | 1;
@@ -16,17 +16,25 @@ interface Props {
 const Switch = ({ value, onToggle }: Props) => {
   const sharedValue = useSharedValue(value);
 
+  const customGray5 = getTokenValue('$customGray5');
+  const customGray6 = getTokenValue('$customGray6');
+  const customRed3 = getTokenValue('$customRed3');
+
   const backgroundAnimation = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
       sharedValue.value,
       [0, 1],
-      ['#a8a8a8', '#962C42']
+      [customGray5, customRed3]
     ),
   }));
 
   const thumbAnimation = useAnimatedStyle(() => ({
     transform: [{ translateX: interpolate(sharedValue.value, [0, 1], [2, 20]) }],
-    backgroundColor: interpolateColor(sharedValue.value, [0, 1], ['#333', 'white']),
+    backgroundColor: interpolateColor(
+      sharedValue.value,
+      [0, 1],
+      [customGray6, 'white']
+    ),
   }));
 
   useEffect(() => {

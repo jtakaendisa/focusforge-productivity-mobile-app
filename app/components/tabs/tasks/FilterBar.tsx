@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { View, Text, styled } from 'tamagui';
+import { View, Text, styled, getTokenValue } from 'tamagui';
 
 import Animated, {
   SharedValue,
@@ -21,9 +21,11 @@ const FilterBar = ({ filter, onSelect }: Props) => {
   const isSingleTaskSelected = useSharedValue(0);
   const isRecurringTaskSelected = useSharedValue(0);
 
+  const customGray1 = getTokenValue('$customGray1');
+
   const textColorAnimation = (filter: SharedValue<number>) => {
     return useAnimatedStyle(() => ({
-      color: interpolateColor(filter.value, [0, 1], ['#8C8C8C', '#fff']),
+      color: interpolateColor(filter.value, [0, 1], [customGray1, 'white']),
     }));
   };
 
@@ -76,7 +78,7 @@ const Container = styled(View, {
   flexDirection: 'row',
   height: 48,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const Button = styled(View, {
@@ -100,7 +102,7 @@ const SelectionIndicator = styled(View, {
   left: 0,
   right: 0,
   height: 4,
-  backgroundColor: '#C33756',
+  backgroundColor: '$customRed2',
   borderTopLeftRadius: 4,
   borderTopRightRadius: 4,
 });

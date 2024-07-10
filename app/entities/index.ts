@@ -25,11 +25,9 @@ export interface ChecklistItem {
   isCompleted: boolean;
 }
 
-export interface SearchQuery {
-  searchTerm: string;
-  type: 'all' | 'habits' | 'tasks';
-  category?: Category;
-}
+export type ActivityFilter = 'all' | 'habits' | 'tasks';
+
+export type Activity = Habit | Task;
 
 export type Frequency = z.infer<typeof frequencySchema>;
 

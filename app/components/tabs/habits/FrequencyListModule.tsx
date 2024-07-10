@@ -7,7 +7,7 @@ import {
 import Constants from 'expo-constants';
 import { Control, Controller } from 'react-hook-form';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
-import { styled, View, Text, Accordion } from 'tamagui';
+import { styled, View, Text, Accordion, getTokenValue } from 'tamagui';
 
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
 import { NewHabitData } from '@/app/newHabit';
@@ -125,6 +125,9 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
     isRepeatChecked.value = isRepeatSelected ? withTiming(1) : withTiming(0);
   }, [isDailySelected, isSpecificSelected, isRepeatSelected]);
 
+  const customGray1 = getTokenValue('$customGray1');
+  const customRed1 = getTokenValue('$customRed1');
+
   return (
     <Container isFullScreen={isModal}>
       <HeadingContainer>
@@ -189,7 +192,7 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
                     <AccordionContent animation="medium" exitStyle={{ opacity: 0 }}>
                       <RepeatFieldContainer>
                         <RepeatFieldCard>
-                          <Text color="#8C8C8C" fontSize={15}>
+                          <Text color={customGray1} fontSize={15}>
                             Every
                           </Text>
                           <DaysInputField
@@ -197,7 +200,7 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
                             maxLength={3}
                             onChange={handleRepeatSelect}
                           />
-                          <Text color="#8C8C8C" fontSize={15}>
+                          <Text color={customGray1} fontSize={15}>
                             days
                           </Text>
                         </RepeatFieldCard>
@@ -217,7 +220,7 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
             <ButtonText>CANCEL</ButtonText>
           </Button>
           <Button onPress={closeModal}>
-            <ButtonText color="#C73A57">CONFIRM</ButtonText>
+            <ButtonText color={customRed1}>CONFIRM</ButtonText>
           </Button>
         </ButtonsContainer>
       )}
@@ -227,7 +230,7 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
 
 const Container = styled(View, {
   width: SCREEN_WIDTH,
-  backgroundColor: '#111111',
+  backgroundColor: '$customBlack1',
   variants: {
     isFullScreen: {
       true: {
@@ -250,7 +253,7 @@ const HeadingContainer = styled(View, {
 const Heading = styled(Text, {
   fontSize: 20,
   fontWeight: 'bold',
-  color: '#C73A57',
+  color: '$customRed1',
 });
 
 const AccordionTrigger = styled(Accordion.Trigger, {
@@ -263,13 +266,13 @@ const AccordionTrigger = styled(Accordion.Trigger, {
   borderLeftWidth: 0,
   borderRightWidth: 0,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const AccordionContent = styled(Accordion.Content, {
   paddingHorizontal: 0,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const CheckboxContainer = styled(View, {
@@ -295,7 +298,7 @@ const RepeatFieldCard = styled(View, {
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: '#262626',
+  backgroundColor: '$customGray2',
   gap: 12,
   padding: 16,
   borderRadius: 12,
@@ -305,7 +308,7 @@ const DaysInputField = styled(TextInput, {
   width: 56,
   textAlign: 'center',
   borderBottomWidth: 2,
-  borderColor: '#8C8C8C',
+  borderColor: '$customGray1',
   //@ts-ignore
   fontSize: 16,
   color: 'white',
@@ -318,9 +321,9 @@ const ButtonsContainer = styled(View, {
   left: 0,
   right: 0,
   height: 60,
-  backgroundColor: '#1C1C1C',
+  backgroundColor: '$customGray3',
   borderTopWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const Button = styled(View, {

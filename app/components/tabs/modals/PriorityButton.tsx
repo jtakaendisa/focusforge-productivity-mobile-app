@@ -5,7 +5,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { styled, View, Text } from 'tamagui';
+import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import { Priority } from '@/app/entities';
 
@@ -18,12 +18,20 @@ interface Props {
 const PriorityButton = ({ priority, currentPriority, onChange }: Props) => {
   const isSelected = useSharedValue(priority === currentPriority ? 1 : 0);
 
+  const customGray1 = getTokenValue('$customGray1');
+  const customGray2 = getTokenValue('$customGray2');
+  const customRed1 = getTokenValue('$customRed1');
+
   const backgroundColorAnimation = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(isSelected.value, [0, 1], ['#262626', '#C73A57']),
+    backgroundColor: interpolateColor(
+      isSelected.value,
+      [0, 1],
+      [customGray2, customRed1]
+    ),
   }));
 
   const textColorAnimation = useAnimatedStyle(() => ({
-    color: interpolateColor(isSelected.value, [0, 1], ['#8C8C8C', '#fff']),
+    color: interpolateColor(isSelected.value, [0, 1], [customGray1, 'white']),
   }));
 
   useEffect(() => {
@@ -46,7 +54,7 @@ const PriorityButton = ({ priority, currentPriority, onChange }: Props) => {
 const Container = styled(View, {
   paddingHorizontal: 20,
   paddingVertical: 16,
-  borderColor: '#8C8C8C',
+  borderColor: '$customGray1',
 });
 
 const AnimatedContainer = Animated.createAnimatedComponent(Container);

@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Control, Controller } from 'react-hook-form';
-import { styled, View, Text } from 'tamagui';
+import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { NewHabitData } from '@/app/newHabit';
@@ -27,16 +27,19 @@ const DetailsListModule = ({ control }: Props) => {
   const sharedIsTitleFocused = useSharedValue(isTitleFocused ? 1 : 0);
   const sharedIsNoteFocused = useSharedValue(isNoteFocused ? 1 : 0);
 
+  const customGray1 = getTokenValue('$customGray1');
+  const customRed1 = getTokenValue('$customRed1');
+
   const titleFieldColorAnimation = useAnimatedStyle(() => ({
     borderColor: interpolateColor(
       sharedIsTitleFocused.value,
       [0, 1],
-      ['#8C8C8C', '#C73A57']
+      [customGray1, customRed1]
     ),
     placeholderTextColor: interpolateColor(
       sharedIsTitleFocused.value,
       [0, 1],
-      ['#8C8C8C', '#fff']
+      [customGray1, 'white']
     ),
   }));
 
@@ -44,12 +47,12 @@ const DetailsListModule = ({ control }: Props) => {
     borderColor: interpolateColor(
       sharedIsNoteFocused.value,
       [0, 1],
-      ['#8C8C8C', '#C73A57']
+      [customGray1, customRed1]
     ),
     placeholderTextColor: interpolateColor(
       sharedIsNoteFocused.value,
       [0, 1],
-      ['#8C8C8C', '#fff']
+      [customGray1, 'white']
     ),
   }));
 
@@ -114,7 +117,7 @@ const HeadingContainer = styled(View, {
 const Heading = styled(Text, {
   fontSize: 20,
   fontWeight: 'bold',
-  color: '#C73A57',
+  color: '$customRed1',
 });
 
 const InputField = styled(TextInput, {
@@ -127,13 +130,13 @@ const InputField = styled(TextInput, {
   borderWidth: 2,
   //@ts-ignore
   fontSize: 16,
-  color: '#fff',
+  color: 'white',
 });
 
 const ExampleHabit = styled(Text, {
   alignSelf: 'center',
   fontSize: 14,
-  color: '#8C8C8C',
+  color: '$customGray1',
 });
 
 const AnimatedInputField = Animated.createAnimatedComponent(InputField);

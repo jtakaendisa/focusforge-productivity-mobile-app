@@ -24,23 +24,30 @@ const DateCard = ({ day, selectedDate, onPress }: Props) => {
 
   const isSelected = useSharedValue(0);
 
-  const white = getTokenValue('$white');
-  const textGray = getTokenValue('$gray1');
-  const lightGray = getTokenValue('$gray2');
-  const darkGray = getTokenValue('$gray3');
-  const lightRed = getTokenValue('$red1');
-  const darkRed = getTokenValue('$red3');
+  const customGray1 = getTokenValue('$customGray1');
+  const customGray2 = getTokenValue('$customGray2');
+  const customGray3 = getTokenValue('$customGray3');
+  const customRed1 = getTokenValue('$customRed1');
+  const customRed3 = getTokenValue('$customRed3');
 
   const textColorAnimation = useAnimatedStyle(() => ({
-    color: interpolateColor(isSelected.value, [0, 1], [textGray, white]),
+    color: interpolateColor(isSelected.value, [0, 1], [customGray1, 'white']),
   }));
 
   const weekdayBackgroundAnimation = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(isSelected.value, [0, 1], [darkGray, lightRed]),
+    backgroundColor: interpolateColor(
+      isSelected.value,
+      [0, 1],
+      [customGray3, customRed1]
+    ),
   }));
 
   const dateBackgroundAnimation = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(isSelected.value, [0, 1], [lightGray, darkRed]),
+    backgroundColor: interpolateColor(
+      isSelected.value,
+      [0, 1],
+      [customGray2, customRed3]
+    ),
   }));
 
   useEffect(() => {

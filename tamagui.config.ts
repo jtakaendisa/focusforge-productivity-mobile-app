@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { createInterFont } from '@tamagui/font-inter';
 import { createMedia } from '@tamagui/react-native-media-driver';
 import { shorthands } from '@tamagui/shorthands';
@@ -13,16 +11,25 @@ const bodyFont = createInterFont();
 const tokens = createTokens({
   ...defaultTokens,
   color: {
-    white: '#FFF',
-    black1: '#111111',
-    black2: '#121212',
-    gray1: '#8C8C8C',
-    gray2: '#262626',
-    gray3: '#1C1C1C',
-    green1: '#2A8844',
-    red1: '#C73A57',
-    red2: '#C33756',
-    red3: '#962C42',
+    ...defaultTokens.color,
+    customBlack1: '#111111',
+    customBlack2: '#121212',
+    customBlack3: 'rgba(0, 0, 0, 0.6)',
+    customGray1: '#8C8C8C',
+    customGray2: '#262626',
+    customGray3: '#1C1C1C',
+    customGray4: 'rgba(140, 140, 140, 0.25)',
+    customGray5: '#a8a8a8',
+    customGray6: '#333333',
+    customGray7: '#dddddd',
+    customGray8: '#d3d1d1',
+    customGreen1: '#2A8844',
+    customRed1: '#C73A57',
+    customRed2: '#C33756',
+    customRed3: '#962C42',
+    customRed4: '#652533',
+    customRed5: '#31181E',
+    customRed6: 'rgba(150, 44, 66, 0.25)',
   },
 });
 

@@ -1,5 +1,5 @@
 import { Control, Controller } from 'react-hook-form';
-import { View, Text, styled, ScrollView } from 'tamagui';
+import { View, Text, styled, ScrollView, getTokenValue } from 'tamagui';
 
 import { categoryArray } from '@/app/store';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
@@ -14,6 +14,8 @@ interface Props {
 const CARD_SIZE = (0.8 * SCREEN_WIDTH - 56) / 3;
 
 const CategoryModalModule = ({ control, closeModal }: Props) => {
+  const customRed1 = getTokenValue('$customRed1');
+
   return (
     <Container>
       <HeadingContainer>
@@ -46,7 +48,7 @@ const CategoryModalModule = ({ control, closeModal }: Props) => {
         </MainContent>
       </ScrollView>
       <CloseButton onPress={closeModal}>
-        <ButtonText color="#C73A57">CLOSE</ButtonText>
+        <ButtonText color={customRed1}>CLOSE</ButtonText>
       </CloseButton>
     </Container>
   );
@@ -55,14 +57,14 @@ const CategoryModalModule = ({ control, closeModal }: Props) => {
 const Container = styled(View, {
   width: '80%',
   borderRadius: 16,
-  backgroundColor: '#1C1C1C',
+  backgroundColor: '$customGray3',
 });
 
 const HeadingContainer = styled(View, {
   alignItems: 'center',
   paddingVertical: 10,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const HeadingText = styled(Text, {
@@ -89,7 +91,7 @@ const CategoryContainer = styled(View, {
   alignItems: 'center',
   width: 36,
   height: 36,
-  backgroundColor: '#C73A57',
+  backgroundColor: '$customRed1',
   borderRadius: 8,
 });
 
@@ -102,7 +104,7 @@ const CloseButton = styled(View, {
   alignItems: 'center',
   paddingVertical: 16,
   borderTopWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const ButtonText = styled(Text, {

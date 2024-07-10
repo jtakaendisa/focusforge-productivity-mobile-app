@@ -7,6 +7,7 @@ import { NewTaskData } from '@/app/newTask';
 import PriorityButton from './PriorityButton';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { prioritySchema } from '@/app/validationSchemas';
+import { getTokenValue } from 'tamagui';
 
 interface Props {
   currentPriority: Priority;
@@ -47,10 +48,14 @@ const PriorityModalModule = ({
   const handleCancel = () => {
     setPriorityRef.current?.(previousPriorityRef.current);
     if (!isForm) {
+      console.log('here now', previousPriorityRef.current);
       setPriority?.(previousPriorityRef.current);
     }
     closeModal();
   };
+
+  const customGray1 = getTokenValue('$customGray1');
+  const customRed1 = getTokenValue('$customRed1');
 
   return (
     <Container>
@@ -80,7 +85,7 @@ const PriorityModalModule = ({
           />
         </PrioritiesRow>
         <PriorityInfo>
-          <Text color="#8C8C8C">
+          <Text color={customGray1}>
             Higher priority activities will be displayed higher in the list.
           </Text>
         </PriorityInfo>
@@ -90,7 +95,7 @@ const PriorityModalModule = ({
           <Text>CANCEL</Text>
         </Button>
         <Button onPress={closeModal}>
-          <ButtonText color="#C73A57">OK</ButtonText>
+          <ButtonText color={customRed1}>OK</ButtonText>
         </Button>
       </ButtonsContainer>
     </Container>
@@ -100,14 +105,14 @@ const PriorityModalModule = ({
 const Container = styled(View, {
   width: '80%',
   borderRadius: 16,
-  backgroundColor: '#1C1C1C',
+  backgroundColor: '$customGray3',
 });
 
 const HeadingContainer = styled(View, {
   alignItems: 'center',
   paddingVertical: 10,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const HeadingText = styled(Text, {
@@ -120,7 +125,7 @@ const MainContent = styled(View, {
   gap: 16,
   paddingVertical: 16,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const PrioritiesRow = styled(View, {

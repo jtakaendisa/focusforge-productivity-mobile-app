@@ -6,7 +6,7 @@ import {
   BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { styled, View, Text } from 'tamagui';
+import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import { Habit, Task } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
@@ -36,10 +36,14 @@ const ActivityOptionsModal = ({
       ? (['calendar', 'statistics', 'edit', 'delete'] as const)
       : (['calendar', 'edit', 'delete'] as const);
 
+  const customGray1 = getTokenValue('$customGray1');
+  const customGray3 = getTokenValue('$customGray3');
+  const customRed1 = getTokenValue('$customRed1');
+
   return (
     <BottomSheetModal
       ref={activityOptionsRef}
-      backgroundStyle={{ backgroundColor: '#1C1C1C' }}
+      backgroundStyle={{ backgroundColor: customGray3 }}
       handleIndicatorStyle={{ backgroundColor: 'gray' }}
       backdropComponent={renderBackdrop}
       enableDynamicSizing
@@ -65,7 +69,7 @@ const ActivityOptionsModal = ({
         {options.map((option, index) => {
           const isLastIndex = index === options.length - 1;
 
-          const fill = isLastIndex ? '#C73A57' : '#8C8C8C';
+          const fill = isLastIndex ? customRed1 : customGray1;
 
           return (
             <View key={option}>
@@ -108,7 +112,7 @@ const TopRow = styled(View, {
   paddingHorizontal: 12,
   paddingBottom: 12,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 const DetailsContainer = styled(View, {
@@ -133,7 +137,7 @@ const CardContainer = styled(View, {
   flexDirection: 'row',
   alignItems: 'center',
   padding: 12,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
   variants: {
     isBordered: {
       true: {
@@ -164,10 +168,10 @@ const CardTitle = styled(Text, {
   variants: {
     isRed: {
       true: {
-        color: '#C73A57',
+        color: '$customRed1',
       },
       false: {
-        color: '#fff',
+        color: 'white',
       },
     },
   } as const,

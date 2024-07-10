@@ -8,6 +8,7 @@ import { StyleSheet, View, Image, Text } from 'react-native';
 import { TabRoute } from '../entities';
 import DrawerItemIcon from './tabs/DrawerItemIcon';
 import { useAuthStore } from '../store';
+import { getTokenValue } from 'tamagui';
 
 const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
@@ -53,6 +54,10 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     },
   ] as const;
 
+  const customGray1 = getTokenValue('$customGray1');
+  const customRed1 = getTokenValue('$customRed1');
+  const customRed4 = getTokenValue('$customRed4');
+
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.profileContainer}>
@@ -72,22 +77,25 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
         return (
           <DrawerItem
             key={label}
-            pressColor="#652533"
+            pressColor={customRed4}
             icon={({ size }) => (
               <View style={styles.iconContainer}>
                 <DrawerItemIcon
                   icon={icon}
                   size={size}
-                  fill={isSelected ? '#C73A57' : '#8C8C8C'}
+                  fill={isSelected ? customRed1 : customGray1}
                 />
               </View>
             )}
             label={label}
-            labelStyle={[styles.label, { color: isSelected ? '#C73A57' : '#8C8C8C' }]}
+            labelStyle={[
+              styles.label,
+              { color: isSelected ? customRed1 : customGray1 },
+            ]}
             style={[
               styles.drawerItem,
               {
-                backgroundColor: isSelected ? '#652533' : 'transparent',
+                backgroundColor: isSelected ? customRed4 : 'transparent',
               },
             ]}
             onPress={onNavigate}
@@ -116,7 +124,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: 'white',
     overflow: 'hidden',
   },
   infoContainer: {
@@ -124,7 +132,7 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 20,
-    color: '#fff',
+    color: 'white',
   },
   email: {
     fontSize: 14,

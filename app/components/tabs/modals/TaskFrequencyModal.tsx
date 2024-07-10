@@ -7,7 +7,7 @@ import {
   BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { styled, View, Text } from 'tamagui';
+import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import TaskFrequencyIcon from './TaskFrequencyIcon';
 
@@ -62,10 +62,14 @@ const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
     }
   };
 
+  const customGray1 = getTokenValue('$customGray1');
+  const customGray3 = getTokenValue('$customGray3');
+  const customRed1 = getTokenValue('$customRed1');
+
   return (
     <BottomSheetModal
       ref={taskFrequencyRef}
-      backgroundStyle={{ backgroundColor: '#1C1C1C' }}
+      backgroundStyle={{ backgroundColor: customGray3 }}
       handleIndicatorStyle={{ backgroundColor: 'gray' }}
       backdropComponent={renderBackdrop}
       enableDynamicSizing
@@ -82,14 +86,14 @@ const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
                 onPress={() => handleCreateTask(pathname, isRecurring)}
               >
                 <IconContainer isTransparent={false}>
-                  <TaskFrequencyIcon name={icon} fill="#C73A57" />
+                  <TaskFrequencyIcon name={icon} fill={customRed1} />
                 </IconContainer>
                 <CardTextContainer>
                   <CardHeading>{heading}</CardHeading>
                   <CardDescription>{description}</CardDescription>
                 </CardTextContainer>
                 <IconContainer>
-                  <TaskFrequencyIcon name="proceed" fill="#8C8C8C" />
+                  <TaskFrequencyIcon name="proceed" fill={customGray1} />
                 </IconContainer>
               </CardContainer>
               {index < options.length - 1 && <Separator />}
@@ -120,7 +124,7 @@ const IconContainer = styled(View, {
         backgroundColor: 'transparent',
       },
       false: {
-        backgroundColor: 'rgba(150, 44, 66, 0.25)',
+        backgroundColor: '$customRed6',
       },
     },
   } as const,
@@ -138,13 +142,13 @@ const CardHeading = styled(Text, {
 
 const CardDescription = styled(Text, {
   fontSize: 12,
-  color: '#d3d1d1',
+  color: '$customGray8',
 });
 
 const Separator = styled(View, {
   height: 1,
   borderBottomWidth: 1,
-  borderColor: '#262626',
+  borderColor: '$customGray2',
 });
 
 export default TaskFrequencyModal;
