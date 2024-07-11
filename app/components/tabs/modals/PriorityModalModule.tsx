@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Control, Controller, useForm } from 'react-hook-form';
 import { Text, View, styled } from 'tamagui';
 
@@ -26,7 +26,7 @@ const PriorityModalModule = ({
   setPriority,
   closeModal,
 }: Props) => {
-  const previousPriorityRef = useRef<Priority>(currentPriority);
+  const initialPriority = useMemo(() => currentPriority, []);
   const setPriorityRef = useRef<((...event: any[]) => void) | null>(null);
 
   const { control: priorityControl, watch } = useForm<{
@@ -40,16 +40,17 @@ const PriorityModalModule = ({
 
   const handleSelect = (priority: Priority) => {
     setPriorityRef.current?.(priority);
-    if (!isForm) {
-      setPriority?.(priority);
-    }
+  };
+
+  const handleConfirm = () => {
+    setPriority?.(watchPriority);
+    closeModal();
   };
 
   const handleCancel = () => {
-    setPriorityRef.current?.(previousPriorityRef.current);
+    setPriorityRef.current?.(initialPriority);
     if (!isForm) {
-      console.log('here now', previousPriorityRef.current);
-      setPriority?.(previousPriorityRef.current);
+      setPriority?.(initialPriority);
     }
     closeModal();
   };
@@ -75,7 +76,7 @@ const PriorityModalModule = ({
                     <PriorityButton
                       key={priority}
                       priority={priority}
-                      currentPriority={watchPriority || currentPriority}
+                      currentPriority={control?._getWatch('priority') || watchPriority}
                       onChange={handleSelect}
                     />
                   ))}
@@ -94,7 +95,7 @@ const PriorityModalModule = ({
         <Button onPress={handleCancel}>
           <Text>CANCEL</Text>
         </Button>
-        <Button onPress={closeModal}>
+        <Button onPress={handleConfirm}>
           <ButtonText color={customRed1}>OK</ButtonText>
         </Button>
       </ButtonsContainer>

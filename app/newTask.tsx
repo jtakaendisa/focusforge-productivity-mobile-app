@@ -71,7 +71,7 @@ const NewTaskScreen = () => {
       title: '',
       category: 'Task',
       dueDate: TODAYS_DATE,
-      priority: PriorityType.normal,
+      priority: 'Normal',
       reminders: [],
       frequency: isRecurring
         ? {

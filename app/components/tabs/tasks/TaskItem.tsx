@@ -22,7 +22,7 @@ import CircularCheckbox from '../CircularCheckbox';
 interface Props {
   task: Task;
   isCheckable?: boolean;
-  onPress: (selectedTask: Task, hasChecklist?: boolean) => void;
+  onPress: (selectedTask: Task, hasChecklist: boolean) => void;
   onSwipe: (selectedTask: Task) => void;
   openModal: (
     modalName: 'isPrioritizeOpen' | 'isDeleteOpen' | 'isChecklistOpen'

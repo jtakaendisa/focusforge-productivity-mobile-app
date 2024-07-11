@@ -35,7 +35,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
 
   const { isDeleteOpen, isPrioritizeOpen, isChecklistOpen } = modalState;
 
-  const handlePress = (selectedTask: Task, hasChecklist?: boolean) => {
+  const handlePress = (selectedTask: Task, hasChecklist: boolean) => {
     const allCompleted = selectedTask.checklist.every((item) => item.isCompleted);
 
     if (hasChecklist && !allCompleted) {
@@ -58,18 +58,17 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
       }
     });
     setTasks(updatedTasks);
+    setSelectedTask(null);
   };
 
   const handlePrioritize = (priority: Priority) => {
     const updatedTasks = tasks.map((task) => {
       if (task.id === selectedTask?.id) {
-        console.log('here', task.id);
         return {
           ...task,
           priority,
         };
       } else {
-        console.log('or here', task.id);
         return task;
       }
     });
@@ -101,10 +100,13 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
     activityOptionsRef.current?.present();
   };
 
-  const closeDeleteModal = () => setModalState({ ...modalState, isDeleteOpen: false });
+  const toggleDeleteModal = () => {
+    setModalState({ ...modalState, isDeleteOpen: !isDeleteOpen });
+    setSelectedTask(null);
+  };
 
-  const closePriorityModal = () => {
-    setModalState({ ...modalState, isPrioritizeOpen: false });
+  const togglePriorityModal = () => {
+    setModalState({ ...modalState, isPrioritizeOpen: !isPrioritizeOpen });
     setSelectedTask(null);
   };
 
@@ -139,7 +141,12 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
                 onPress={handlePress}
                 onSwipe={(selectedTask) => setSelectedTask(selectedTask)}
                 openModal={(modalName) =>
-                  setModalState({ ...modalState, [modalName]: true })
+                  setModalState({
+                    isChecklistOpen: false,
+                    isDeleteOpen: false,
+                    isPrioritizeOpen: false,
+                    [modalName]: true,
+                  })
                 }
                 isCheckable={isCheckable}
                 showOptions={handlePresentActivityOptionsModal}
@@ -157,21 +164,21 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
         showsVerticalScrollIndicator={false}
       />
 
-      <ModalContainer isOpen={isPrioritizeOpen} closeModal={closePriorityModal}>
+      <ModalContainer isOpen={isPrioritizeOpen} closeModal={togglePriorityModal}>
         {currentPriority && (
           <PriorityModalModule
             currentPriority={currentPriority}
             setPriority={handlePrioritize}
-            closeModal={closePriorityModal}
+            closeModal={togglePriorityModal}
           />
         )}
       </ModalContainer>
-      <ModalContainer isOpen={isDeleteOpen} closeModal={closeDeleteModal}>
+      <ModalContainer isOpen={isDeleteOpen} closeModal={toggleDeleteModal}>
         {selectedTask && (
           <DeleteModalModule
             taskId={selectedTask.id}
             deleteTask={handleDelete}
-            closeModal={closeDeleteModal}
+            closeModal={toggleDeleteModal}
           />
         )}
       </ModalContainer>
