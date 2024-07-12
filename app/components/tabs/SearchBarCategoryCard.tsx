@@ -24,7 +24,7 @@ const SearchBarCategoryCard = ({ item, onSelect }: Props) => {
   }, [isSelected]);
 
   return (
-    <RippleButton noFade onPress={() => onSelect(name)}>
+    <RippleButton onPress={() => onSelect(name)}>
       <Container>
         <InnerRow>
           <CategoryContainer>

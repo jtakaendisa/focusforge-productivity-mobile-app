@@ -5,12 +5,12 @@ import { getTokenValue } from 'tamagui';
 interface Props {
   children: ReactNode;
   rippleColor?: string;
-  noFade?: boolean;
+  fade?: boolean;
   flex?: boolean;
   onPress: () => void;
 }
 
-const RippleButton = ({ children, rippleColor, noFade, flex, onPress }: Props) => {
+const RippleButton = ({ children, rippleColor, fade, flex, onPress }: Props) => {
   const customGray2 = getTokenValue('$customGray2');
 
   return (
@@ -23,7 +23,7 @@ const RippleButton = ({ children, rippleColor, noFade, flex, onPress }: Props) =
       }}
     >
       {({ pressed }) => (
-        <View style={{ opacity: pressed && !noFade ? 0.5 : 1 }}>{children}</View>
+        <View style={{ opacity: pressed && fade ? 0.5 : 1 }}>{children}</View>
       )}
     </Pressable>
   );

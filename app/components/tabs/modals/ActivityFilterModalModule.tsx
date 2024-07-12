@@ -20,7 +20,7 @@ const ActivityFilterModalModule = ({ offsetTop, width, onSelect }: Props) => {
       width={width}
     >
       {options.map((option) => (
-        <RippleButton key={option} noFade onPress={() => onSelect(option)}>
+        <RippleButton key={option} onPress={() => onSelect(option)}>
           <OptionContainer>
             <OptionText>{option}</OptionText>
           </OptionContainer>

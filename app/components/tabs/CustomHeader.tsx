@@ -4,7 +4,7 @@ import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { getDefaultHeaderHeight } from '@react-navigation/elements';
 import { styled } from 'tamagui';
 import DefaultHeader from './DefaultHeader';
-import { useAppStore } from '@/app/store';
+import { useAppStore, useHabitStore, useTaskStore } from '@/app/store';
 import { useEffect } from 'react';
 
 interface Props {
@@ -13,6 +13,8 @@ interface Props {
 
 const CustomHeader = ({ title }: Props) => {
   const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
+  const habits = useHabitStore((s) => s.habits);
+  const tasks = useTaskStore((s) => s.tasks);
   const setHeaderHeight = useAppStore((s) => s.setHeaderHeight);
 
   const frame = useSafeAreaFrame();
@@ -30,7 +32,7 @@ const CustomHeader = ({ title }: Props) => {
   return (
     <Container height={defaultHeaderHeight} isSearchBarOpen={isSearchBarOpen}>
       {isSearchBarOpen ? (
-        <SearchBar height={headerHeight} />
+        <SearchBar height={headerHeight} habits={habits} tasks={tasks} />
       ) : (
         <DefaultHeader height={headerHeight} title={title} />
       )}

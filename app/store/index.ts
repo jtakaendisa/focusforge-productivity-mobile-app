@@ -30,12 +30,6 @@ interface HabitStore {
   setHabits: (habits: Habit[]) => void;
 }
 
-export enum PriorityType {
-  low = 'Low',
-  normal = 'Normal',
-  high = 'High',
-}
-
 const dummyTasks: Task[] = [
   {
     id: uuid.v4() as string,
@@ -740,16 +734,16 @@ const useAuthStore = create<AuthStore>((set) => ({
   setAuthUser: (authUser) => set((state) => ({ ...state, authUser })),
 }));
 
+const useHabitStore = create<HabitStore>((set) => ({
+  habits: dummyHabits,
+  setHabits: (habits) => set((state) => ({ ...state, habits })),
+}));
+
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: dummyTasks,
   selectedDate: TODAYS_DATE,
   setTasks: (tasks) => set((state) => ({ ...state, tasks })),
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
-}));
-
-const useHabitStore = create<HabitStore>((set) => ({
-  habits: dummyHabits,
-  setHabits: (habits) => set((state) => ({ ...state, habits })),
 }));
 
 export { useAppStore, useAuthStore, useTaskStore, useHabitStore };

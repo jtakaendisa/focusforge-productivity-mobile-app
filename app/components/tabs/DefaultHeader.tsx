@@ -36,7 +36,7 @@ const DefaultHeader = ({ height, title }: Props) => {
 
       <View flexDirection="row">
         {pathname === 'home' && (
-          <RippleButton onPress={() => {}}>
+          <RippleButton fade onPress={() => {}}>
             <IconContainer width={height} height={height}>
               <Svg width="24" height="24" viewBox="0 0 20 20" fill="none">
                 <Path
@@ -48,7 +48,7 @@ const DefaultHeader = ({ height, title }: Props) => {
           </RippleButton>
         )}
         {pathname !== 'settings' && (
-          <RippleButton onPress={() => setIsSearchBarOpen(true)}>
+          <RippleButton fade onPress={() => setIsSearchBarOpen(true)}>
             <IconContainer width={height} height={height}>
               <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <Path

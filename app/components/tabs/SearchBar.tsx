@@ -27,20 +27,20 @@ import ActivityFilterModalModule from './modals/ActivityFilterModalModule';
 
 interface Props {
   height: number;
+  habits: Habit[];
+  tasks: Task[];
 }
 
 const animationConfig = {
   duration: 350,
 };
 
-const SearchBar = ({ height }: Props) => {
+const SearchBar = ({ height, habits, tasks }: Props) => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
   const isCurrentScreenHome = pathname === 'home';
 
   const statusBarHeight = StatusBar.currentHeight;
 
-  const habits = useHabitStore((s) => s.habits);
-  const tasks = useTaskStore((s) => s.tasks);
   const setHabits = useHabitStore((s) => s.setHabits);
   const setTasks = useTaskStore((s) => s.setTasks);
   const setIsSearchBarOpen = useAppStore((s) => s.setIsSearchBarOpen);
@@ -171,7 +171,7 @@ const SearchBar = ({ height }: Props) => {
         {isCurrentScreenHome && (
           <ActivityFilterContainer width={SCREEN_WIDTH / 3}>
             <FilterText textTransform="capitalize">{activityFilter}</FilterText>
-            <RippleButton onPress={toggleActivityFilterModal}>
+            <RippleButton fade onPress={toggleActivityFilterModal}>
               <IconContainer width={height * 0.75}>
                 <Svg width="14" height="14" viewBox="0 0 20 11" fill="none">
                   <Path
@@ -199,7 +199,7 @@ const SearchBar = ({ height }: Props) => {
           value={searchTerm}
         />
         <ButtonContainer>
-          <RippleButton onPress={handleSearchTermClear}>
+          <RippleButton fade onPress={handleSearchTermClear}>
             <IconContainer width={height} height={height}>
               <Svg width="22" height="22" viewBox="0 0 20 22" fill="none">
                 <Path
@@ -209,7 +209,7 @@ const SearchBar = ({ height }: Props) => {
               </Svg>
             </IconContainer>
           </RippleButton>
-          <RippleButton onPress={handleSearchBarClose}>
+          <RippleButton fade onPress={handleSearchBarClose}>
             <IconContainer width={height} height={height}>
               <Svg width="18" height="18" viewBox="0 0 43 24" fill="none">
                 <Path
