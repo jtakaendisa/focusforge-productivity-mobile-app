@@ -7,7 +7,7 @@ import {
   TabRoute,
   Task,
 } from '@/app/entities';
-import { useHabitStore, useAppStore, useTaskStore } from '@/app/store';
+import { useAppStore, useTaskStore, useActivityStore } from '@/app/store';
 import { usePathname } from 'expo-router';
 import { StatusBar, TextInput } from 'react-native';
 import Animated, {
@@ -20,38 +20,41 @@ import Animated, {
 import Svg, { Path } from 'react-native-svg';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 import RippleButton from './RippleButton';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ModalContainer from './modals/ModalContainer';
 import SearchBarCategoryModalModule from './modals/SearchBarCategoryModalModule';
 import ActivityFilterModalModule from './modals/ActivityFilterModalModule';
+import { toDateGroupedTasks, toFormattedSections } from '@/app/utils';
 
 interface Props {
   height: number;
+  habits: Habit[];
+  singleTasks: (Task | string)[];
+  recurringTasks: Task[];
 }
 
 const animationConfig = {
   duration: 350,
 };
 
-const SearchBar = ({ height }: Props) => {
+const SearchBar = ({ height, habits, singleTasks, recurringTasks }: Props) => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
   const isCurrentScreenHome = pathname === 'home';
 
   const statusBarHeight = StatusBar.currentHeight;
 
-  const habits = useHabitStore((s) => s.habits);
-  const tasks = useTaskStore((s) => s.tasks);
-  const setHabits = useHabitStore((s) => s.setHabits);
-  const setTasks = useTaskStore((s) => s.setTasks);
   const setIsSearchBarOpen = useAppStore((s) => s.setIsSearchBarOpen);
-
-  const initialHabits = useMemo(() => habits, []);
-  const initialTasks = useMemo(() => tasks, []);
+  const setFilteredHabits = useActivityStore((s) => s.setFilteredHabits);
+  const setFilteredSingleTasks = useActivityStore((s) => s.setFilteredSingleTasks);
+  const setFilteredRecurringTasks = useActivityStore(
+    (s) => s.setFilteredRecurringTasks
+  );
+  const filter = useTaskStore((s) => s.filter);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [activityFilter, setActivityFilter] = useState<ActivityFilter>('all');
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<Activity[] | (Task | string)[]>([]);
   const [modalState, setModalState] = useState({
     isActivityFilterOpen: false,
     isCategoryOpen: false,
@@ -61,24 +64,27 @@ const SearchBar = ({ height }: Props) => {
 
   const isSearchRowVisible = useSharedValue(0);
 
+  const handleActivitiesReset = () => {
+    switch (pathname) {
+      case 'habits':
+        setFilteredHabits(habits);
+        break;
+      case 'tasks':
+        if (filter === 'single') {
+          setFilteredSingleTasks(singleTasks);
+        } else {
+          setFilteredRecurringTasks(recurringTasks);
+        }
+        break;
+    }
+  };
+
   const handleActivityFilterChange = (activityFilter: ActivityFilter) => {
     setActivityFilter(activityFilter);
     toggleActivityFilterModal();
   };
 
-  const handleActivitiesReset = () => {
-    switch (pathname) {
-      case 'habits':
-        setHabits(initialHabits);
-        break;
-      case 'tasks':
-        setTasks(initialTasks);
-        break;
-    }
-  };
-
-  const handleSearchTermChange = (text: string) =>
-    setSearchTerm(text.trim().toLowerCase());
+  const handleSearchTermChange = (text: string) => setSearchTerm(text);
 
   const handleSearchTermClear = () => {
     setSearchTerm('');
@@ -88,25 +94,35 @@ const SearchBar = ({ height }: Props) => {
   const handleSearchTermSubmit = () => {
     if (!searchTerm.trim().length) return;
 
-    const filteredActivities = activities.filter((activity) =>
-      activity.title.toLowerCase().includes(searchTerm)
-    );
+    const filteredActivities = activities.filter((activity) => {
+      if (typeof activity !== 'string') {
+        return activity.title.toLowerCase().includes(searchTerm.trim().toLowerCase());
+      }
+    });
 
     switch (pathname) {
       case 'habits':
-        setHabits(filteredActivities as Habit[]);
+        setFilteredHabits(filteredActivities as Habit[]);
         break;
       case 'tasks':
-        setTasks(filteredActivities as Task[]);
+        if (filter === 'single') {
+          const dateGroupedTasks = toDateGroupedTasks(filteredActivities as Task[]);
+          setFilteredSingleTasks(toFormattedSections(dateGroupedTasks));
+        } else {
+          setFilteredRecurringTasks(filteredActivities as Task[]);
+        }
         break;
     }
   };
 
-  const handleCategorySelect = (category: Category, mode: 'add' | 'remove') => {
-    if (mode === 'add') {
-      setSelectedCategories([...selectedCategories, category]);
-    } else {
+  const handleCategorySelect = (category: Category) => {
+    const isCategorySelected = selectedCategories.includes(category);
+
+    if (isCategorySelected) {
       setSelectedCategories(selectedCategories.filter((cat) => cat !== category));
+    } else {
+      const updatedSelectedCategories = [...selectedCategories, category];
+      setSelectedCategories(updatedSelectedCategories);
     }
   };
 
@@ -135,29 +151,46 @@ const SearchBar = ({ height }: Props) => {
         setActivities(habits);
         break;
       case 'tasks':
-        setActivities(tasks);
+        if (filter === 'single') {
+          setActivities(singleTasks);
+        } else {
+          setActivities(recurringTasks);
+        }
         break;
       case 'home':
-        setActivities([...habits, ...tasks]);
+        // setActivities([...habits, ...tasks]);
         break;
     }
-  }, [pathname, habits]);
+  }, [pathname, habits, singleTasks, recurringTasks]);
 
   useEffect(() => {
-    if (!selectedCategories.length || !isCategoryOpen) return;
-    const filteredActivities = activities.filter((activity) =>
-      selectedCategories.includes(activity.category)
-    );
+    if (!isCategoryOpen) return;
+
+    if (!selectedCategories.length) {
+      handleActivitiesReset();
+      return;
+    }
+
+    const filteredActivities = activities.filter((activity) => {
+      if (typeof activity !== 'string') {
+        return selectedCategories.includes(activity.category);
+      }
+    });
 
     switch (pathname) {
       case 'habits':
-        setHabits(filteredActivities as Habit[]);
+        setFilteredHabits(filteredActivities as Habit[]);
         break;
       case 'tasks':
-        setTasks(filteredActivities as Task[]);
+        if (filter === 'single') {
+          const dateGroupedTasks = toDateGroupedTasks(filteredActivities as Task[]);
+          setFilteredSingleTasks(toFormattedSections(dateGroupedTasks));
+        } else {
+          setFilteredRecurringTasks(filteredActivities as Task[]);
+        }
         break;
     }
-  }, [activities, selectedCategories, isCategoryOpen, pathname]);
+  }, [activities, selectedCategories, isCategoryOpen, pathname, filter]);
 
   useEffect(() => {
     isSearchRowVisible.value = 1;
@@ -238,6 +271,7 @@ const SearchBar = ({ height }: Props) => {
       <ModalContainer isOpen={isCategoryOpen} closeModal={toggleCategoryModal}>
         <SearchBarCategoryModalModule
           activities={activities}
+          selectedCategories={selectedCategories}
           onSelect={handleCategorySelect}
           onClear={handleCategoryClear}
           closeModal={toggleCategoryModal}

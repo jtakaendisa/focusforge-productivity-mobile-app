@@ -7,30 +7,28 @@ import { useSharedValue } from 'react-native-reanimated';
 import { useEffect } from 'react';
 
 interface Props {
-  item: {
-    name: Category;
-    isSelected: boolean;
-  };
-  onSelect: (name: Category) => void;
+  category: Category;
+  isSelected: boolean;
+  onSelect: (category: Category) => void;
 }
 
-const SearchBarCategoryCard = ({ item, onSelect }: Props) => {
-  const { name, isSelected } = item;
-
+const SearchBarCategoryCard = ({ category, isSelected, onSelect }: Props) => {
   const isChecked = useSharedValue(isSelected ? 1 : 0);
+
+  const handleSelect = () => onSelect(category);
 
   useEffect(() => {
     isChecked.value = isSelected ? 1 : 0;
   }, [isSelected]);
 
   return (
-    <RippleButton noFade onPress={() => onSelect(name)}>
+    <RippleButton onPress={handleSelect}>
       <Container>
         <InnerRow>
           <CategoryContainer>
-            <CategoryIcon category={name} />
+            <CategoryIcon category={category} />
           </CategoryContainer>
-          <TitleText>{name}</TitleText>
+          <TitleText>{category}</TitleText>
         </InnerRow>
         <CircularCheckbox isChecked={isChecked} />
       </Container>

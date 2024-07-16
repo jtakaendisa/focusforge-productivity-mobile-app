@@ -13,7 +13,7 @@ export type AnimatedInterpolation = Animated.AnimatedInterpolation<string | numb
 
 export type Theme = 'dark' | 'light';
 
-export type Filter = 'single' | 'recurring';
+export type TaskFilter = 'single' | 'recurring';
 
 export type Category = (typeof categoryArray)[number];
 

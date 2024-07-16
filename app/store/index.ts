@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import uuid from 'react-native-uuid';
 
-import { AuthUser, Habit, Task, Theme } from '../entities';
+import { Theme, AuthUser, Activity, Habit, Task, TaskFilter } from '../entities';
 import { TODAYS_DATE } from '../constants';
 
 interface AppStore {
@@ -18,22 +18,29 @@ interface AuthStore {
   setAuthUser: (authUser: AuthUser | null) => void;
 }
 
+interface ActivityStore {
+  filteredActivities: Activity[];
+  filteredHabits: Habit[];
+  filteredSingleTasks: (Task | string)[];
+  filteredRecurringTasks: Task[];
+  setFilteredActivities: (filteredActivities: Activity[]) => void;
+  setFilteredHabits: (filteredHabits: Habit[]) => void;
+  setFilteredSingleTasks: (filteredSingleTasks: (Task | string)[]) => void;
+  setFilteredRecurringTasks: (filteredRecurringTasks: Task[]) => void;
+}
+
 interface TaskStore {
   tasks: Task[];
   selectedDate: Date;
+  filter: TaskFilter;
   setTasks: (tasks: Task[]) => void;
   setSelectedDate: (selectedDate: Date) => void;
+  setFilter: (filter: TaskFilter) => void;
 }
 
 interface HabitStore {
   habits: Habit[];
   setHabits: (habits: Habit[]) => void;
-}
-
-export enum PriorityType {
-  low = 'Low',
-  normal = 'Normal',
-  high = 'High',
 }
 
 const dummyTasks: Task[] = [
@@ -740,11 +747,27 @@ const useAuthStore = create<AuthStore>((set) => ({
   setAuthUser: (authUser) => set((state) => ({ ...state, authUser })),
 }));
 
+const useActivityStore = create<ActivityStore>((set) => ({
+  filteredActivities: [...dummyHabits, ...dummyTasks],
+  filteredHabits: dummyHabits,
+  filteredSingleTasks: [],
+  filteredRecurringTasks: [],
+  setFilteredActivities: (filteredActivities) =>
+    set((state) => ({ ...state, filteredActivities })),
+  setFilteredHabits: (filteredHabits) => set((state) => ({ ...state, filteredHabits })),
+  setFilteredSingleTasks: (filteredSingleTasks) =>
+    set((state) => ({ ...state, filteredSingleTasks })),
+  setFilteredRecurringTasks: (filteredRecurringTasks) =>
+    set((state) => ({ ...state, filteredRecurringTasks })),
+}));
+
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: dummyTasks,
   selectedDate: TODAYS_DATE,
+  filter: 'single',
   setTasks: (tasks) => set((state) => ({ ...state, tasks })),
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
+  setFilter: (filter) => set((state) => ({ ...state, filter })),
 }));
 
 const useHabitStore = create<HabitStore>((set) => ({
@@ -752,4 +775,4 @@ const useHabitStore = create<HabitStore>((set) => ({
   setHabits: (habits) => set((state) => ({ ...state, habits })),
 }));
 
-export { useAppStore, useAuthStore, useTaskStore, useHabitStore };
+export { useAppStore, useAuthStore, useActivityStore, useTaskStore, useHabitStore };

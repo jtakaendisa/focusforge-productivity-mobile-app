@@ -10,11 +10,11 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { Filter } from '@/app/entities';
+import { TaskFilter } from '@/app/entities';
 
 interface Props {
-  filter: Filter;
-  onSelect: (filter: Filter) => void;
+  filter: TaskFilter;
+  onSelect: (filter: TaskFilter) => void;
 }
 
 const FilterBar = ({ filter, onSelect }: Props) => {
@@ -36,15 +36,12 @@ const FilterBar = ({ filter, onSelect }: Props) => {
   };
 
   useEffect(() => {
-    switch (filter) {
-      case 'single':
-        isSingleTaskSelected.value = withTiming(1);
-        isRecurringTaskSelected.value = withTiming(0);
-        break;
-      case 'recurring':
-        isRecurringTaskSelected.value = withTiming(1);
-        isSingleTaskSelected.value = withTiming(0);
-        break;
+    if (filter === 'single') {
+      isSingleTaskSelected.value = withTiming(1);
+      isRecurringTaskSelected.value = withTiming(0);
+    } else {
+      isRecurringTaskSelected.value = withTiming(1);
+      isSingleTaskSelected.value = withTiming(0);
     }
   }, [filter]);
 

@@ -1,61 +1,33 @@
 import { useEffect, useState } from 'react';
-import { Activity, Category } from '@/app/entities';
+import { Activity, Category, Task } from '@/app/entities';
 import { styled, View, Text, ScrollView, getTokenValue } from 'tamagui';
 import { SCREEN_HEIGHT } from '@/app/constants';
 import { FlashList } from '@shopify/flash-list';
 import SearchBarCategoryCard from '../SearchBarCategoryCard';
 
 interface Props {
-  activities: Activity[];
-  onSelect: (category: Category, mode: 'add' | 'remove') => void;
+  activities: Activity[] | (Task | string)[];
+  selectedCategories: Category[];
+  onSelect: (category: Category) => void;
   onClear: () => void;
   closeModal: () => void;
 }
 
 const SearchBarCategoryModalModule = ({
   activities,
+  selectedCategories,
   onSelect,
   onClear,
   closeModal,
 }: Props) => {
-  const [uniqueCategories, setUniqueCategories] = useState<
-    { name: Category; isSelected: boolean }[]
-  >([]);
-
-  const handleSelect = (name: Category) => {
-    const categoryIsSelected = uniqueCategories.find(
-      (category) => category.name === name
-    )?.isSelected;
-
-    if (categoryIsSelected) {
-      onSelect(name, 'remove');
-    } else {
-      onSelect(name, 'add');
-    }
-
-    setUniqueCategories(
-      uniqueCategories.map((category) =>
-        category.name === name
-          ? { ...category, isSelected: !category.isSelected }
-          : category
-      )
-    );
-  };
-
-  const handleClear = () => {
-    setUniqueCategories(
-      uniqueCategories.map((category) => ({ ...category, isSelected: false }))
-    );
-    onClear();
-  };
+  const [uniqueCategories, setUniqueCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    const categories = activities.map((activity) => activity.category);
-    const uniqueCategories = [...new Set(categories)].map((category) => ({
-      name: category,
-      isSelected: false,
-    }));
-    setUniqueCategories(uniqueCategories);
+    const categories = activities
+      .map((activity) => typeof activity !== 'string' && activity.category)
+      .filter((category) => !!category);
+
+    setUniqueCategories([...new Set(categories)]);
   }, [activities]);
 
   const customRed1 = getTokenValue('$customRed1');
@@ -71,15 +43,20 @@ const SearchBarCategoryModalModule = ({
           <FlashList
             data={uniqueCategories}
             renderItem={({ item }) => (
-              <SearchBarCategoryCard item={item} onSelect={handleSelect} />
+              <SearchBarCategoryCard
+                isSelected={selectedCategories.includes(item)}
+                category={item}
+                onSelect={onSelect}
+              />
             )}
-            keyExtractor={(item) => item.name}
+            keyExtractor={(item) => item}
             estimatedItemSize={54}
+            extraData={selectedCategories}
           />
         </MainContent>
       </ScrollView>
 
-      <Button onPress={handleClear}>
+      <Button onPress={onClear}>
         <ButtonText>Clear Selection</ButtonText>
       </Button>
       <Button onPress={closeModal}>
