@@ -80,9 +80,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
     router.replace('/habits');
   };
 
-  const handleClearEndDate = () => {
-    setEndDateRef.current?.();
-  };
+  const handleEndDateClear = () => setEndDateRef.current?.();
 
   const handleDateSelect = (
     event: DateTimePickerEvent,
@@ -286,7 +284,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
               <LabelRow>
                 {endDate && (
                   <AnimatedIconContainer
-                    onPress={handleClearEndDate}
+                    onPress={handleEndDateClear}
                     entering={FadeIn}
                     exiting={FadeOut}
                   >

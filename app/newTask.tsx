@@ -11,11 +11,16 @@ import {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import uuid from 'react-native-uuid';
-import Svg, { Path } from 'react-native-svg';
-import { useSharedValue, withTiming } from 'react-native-reanimated';
+import Svg, { Path, Rect } from 'react-native-svg';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { getTokenValue, styled, Text, View } from 'tamagui';
 
-import { PriorityType, useTaskStore } from './store';
+import { useTaskStore } from './store';
 import { TODAYS_DATE } from './constants';
 import { toFormattedDateString, toTruncatedText } from './utils';
 import { taskSchema } from './validationSchemas';
@@ -58,6 +63,7 @@ const NewTaskScreen = () => {
   });
 
   const setDueDateRef = useRef<((...event: any[]) => void) | null>(null);
+  const setEndDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setIsCarriedOverRef = useRef<((...event: any[]) => void) | null>(null);
 
   const {
@@ -70,7 +76,7 @@ const NewTaskScreen = () => {
     defaultValues: {
       title: '',
       category: 'Task',
-      dueDate: TODAYS_DATE,
+      [isRecurring ? 'startDate' : 'dueDate']: TODAYS_DATE,
       priority: 'Normal',
       reminders: [],
       frequency: isRecurring
@@ -99,6 +105,8 @@ const NewTaskScreen = () => {
   const {
     category,
     dueDate,
+    startDate,
+    endDate,
     checklist,
     priority,
     frequency,
@@ -113,17 +121,30 @@ const NewTaskScreen = () => {
 
   const handleDateSelect = (
     event: DateTimePickerEvent,
-    selectedDate: Date | undefined
+    selectedDate: Date | undefined,
+    mode: 'start' | 'end'
   ) => {
     if (selectedDate) {
-      setDueDateRef.current?.(selectedDate);
+      if (mode === 'start') {
+        setDueDateRef.current?.(selectedDate);
+      } else {
+        if (
+          toFormattedDateString(selectedDate) !== toFormattedDateString(TODAYS_DATE)
+        ) {
+          setEndDateRef.current?.(selectedDate);
+        } else {
+          setEndDateRef.current?.();
+        }
+      }
     }
   };
 
-  const showDatePicker = () => {
+  const handleEndDateClear = () => setEndDateRef.current?.();
+
+  const showDatePicker = (mode: 'start' | 'end') => {
     DateTimePickerAndroid.open({
       value: new Date(),
-      onChange: handleDateSelect,
+      onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
       minimumDate: TODAYS_DATE,
     });
@@ -168,6 +189,8 @@ const NewTaskScreen = () => {
     router.replace(origin);
   }, [isSubmitSuccessful]);
 
+  const customGray1 = getTokenValue('$customGray1');
+
   return (
     <Container>
       <ScreenLabel>
@@ -203,7 +226,7 @@ const NewTaskScreen = () => {
           </CategoryContainer>
         </Row>
       </OptionContainer>
-      <OptionContainer onPress={showDatePicker}>
+      <OptionContainer onPress={() => showDatePicker('start')}>
         <OptionInfo>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 19 20" fill="none">
             <Path
@@ -211,25 +234,82 @@ const NewTaskScreen = () => {
               fill={customRed1}
             />
           </Svg>
-          <OptionTitle>Date</OptionTitle>
+          <OptionTitle>{isRecurring ? 'Start Date' : 'Due Date'}</OptionTitle>
         </OptionInfo>
         <Controller
           control={control}
-          name="dueDate"
+          name={isRecurring ? 'startDate' : 'dueDate'}
           render={({ field: { onChange } }) => {
             setDueDateRef.current = onChange;
             return (
               <CategoryLabel>
                 <LabelText>
-                  {toFormattedDateString(dueDate) === toFormattedDateString(TODAYS_DATE)
+                  {toFormattedDateString(isRecurring ? startDate! : dueDate!) ===
+                  toFormattedDateString(TODAYS_DATE)
                     ? 'Today'
-                    : toFormattedDateString(dueDate)}
+                    : toFormattedDateString(isRecurring ? startDate! : dueDate!)}
                 </LabelText>
               </CategoryLabel>
             );
           }}
         />
       </OptionContainer>
+
+      {isRecurring && (
+        <OptionContainer onPress={() => showDatePicker('end')}>
+          <OptionInfo>
+            <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 21 22" fill="none">
+              <Path
+                d="M19.1102 1.55977H17.5504V3.93164C17.5504 4.37422 17.2109 4.70938 16.7727 4.70938H13.6188C13.1762 4.70938 12.841 4.36992 12.841 3.93164V1.55977H8.09297V3.93164C8.09297 4.37422 7.75352 4.70938 7.31524 4.70938H4.16133C3.71875 4.70938 3.38359 4.36992 3.38359 3.93164V1.55977H1.81953C0.938672 1.55977 0.259766 2.27305 0.259766 3.11953V20.4402C0.259766 21.3211 0.973047 22 1.81953 22H19.1402C20.0211 22 20.7 21.2867 20.7 20.4402V3.15391C20.7043 2.27305 19.991 1.55977 19.1102 1.55977ZM19.1102 20.4746H1.81953V6.30352H19.1402V20.4746H19.1102ZM6.5332 3.15391H4.97344V1.03301e-07H6.5332V3.15391ZM15.9906 3.15391H14.4309V1.03301e-07H15.9906V3.15391Z"
+                fill={customRed1}
+              />
+              <Rect x="12" y="13" width="5.60938" height="5.60938" fill={customRed1} />
+            </Svg>
+            <OptionTitle>End date</OptionTitle>
+          </OptionInfo>
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field: { onChange } }) => {
+              setEndDateRef.current = onChange;
+              return (
+                <Row>
+                  {endDate && (
+                    <AnimatedIconContainer
+                      onPress={handleEndDateClear}
+                      entering={FadeIn}
+                      exiting={FadeOut}
+                    >
+                      <Svg
+                        width={SVG_SIZE / 1.2}
+                        height={SVG_SIZE / 1.2}
+                        viewBox="0 0 21 24"
+                        fill="none"
+                      >
+                        <Path
+                          d="M7.67813 0H13.3219C13.8891 0 14.4094 0.31875 14.6625 0.829688L15 1.5H19.5C20.3297 1.5 21 2.17031 21 3C21 3.82969 20.3297 4.5 19.5 4.5H1.5C0.670312 4.5 0 3.82969 0 3C0 2.17031 0.670312 1.5 1.5 1.5H6L6.3375 0.829688C6.59062 0.31875 7.11094 0 7.67813 0ZM1.5 6H19.5L18.5062 21.8906C18.4312 23.0766 17.4469 24 16.2609 24H4.73906C3.55312 24 2.56875 23.0766 2.49375 21.8906L1.5 6ZM6.70312 11.2031C6.2625 11.6437 6.2625 12.3562 6.70312 12.7922L8.90625 14.9953L6.70312 17.1984C6.2625 17.6391 6.2625 18.3516 6.70312 18.7875C7.14375 19.2234 7.85625 19.2281 8.29219 18.7875L10.4953 16.5844L12.6984 18.7875C13.1391 19.2281 13.8516 19.2281 14.2875 18.7875C14.7234 18.3469 14.7281 17.6344 14.2875 17.1984L12.0844 14.9953L14.2875 12.7922C14.7281 12.3516 14.7281 11.6391 14.2875 11.2031C13.8469 10.7672 13.1344 10.7625 12.6984 11.2031L10.4953 13.4062L8.29219 11.2031C7.85156 10.7625 7.13906 10.7625 6.70312 11.2031Z"
+                          fill={customGray1}
+                        />
+                      </Svg>
+                    </AnimatedIconContainer>
+                  )}
+                  <OptionLabel>
+                    <LabelText>
+                      {endDate
+                        ? toFormattedDateString(endDate) ===
+                          toFormattedDateString(TODAYS_DATE)
+                          ? 'Today'
+                          : toFormattedDateString(endDate)
+                        : '---'}
+                    </LabelText>
+                  </OptionLabel>
+                </Row>
+              );
+            }}
+          />
+        </OptionContainer>
+      )}
+
       <OptionContainer onPress={toggleRemindersModal}>
         <OptionInfo>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 20 22" fill="none">
@@ -425,6 +505,13 @@ const OptionContainer = styled(View, {
   borderColor: '$customGray2',
 });
 
+const IconContainer = styled(View, {
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 36,
+  height: 36,
+});
+
 const OptionInfo = styled(View, {
   flexDirection: 'row',
   alignItems: 'center',
@@ -466,6 +553,13 @@ const CategoryLabel = styled(View, {
   backgroundColor: '$customRed5',
 });
 
+const OptionLabel = styled(View, {
+  paddingHorizontal: 26,
+  paddingVertical: 10,
+  borderRadius: 8,
+  backgroundColor: '$customRed5',
+});
+
 const LabelText = styled(Text, {
   fontSize: 14,
   fontWeight: 'bold',
@@ -494,5 +588,7 @@ const ButtonText = styled(Text, {
   fontSize: 15,
   fontWeight: 'bold',
 });
+
+const AnimatedIconContainer = Animated.createAnimatedComponent(IconContainer);
 
 export default NewTaskScreen;

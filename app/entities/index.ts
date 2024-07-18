@@ -38,7 +38,9 @@ export interface Task {
   title: string;
   isCompleted: boolean;
   category: Category;
-  dueDate: Date;
+  dueDate?: Date;
+  startDate?: Date;
+  endDate?: Date;
   priority: Priority;
   note: string;
   frequency?: Frequency;

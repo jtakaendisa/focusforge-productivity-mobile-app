@@ -16,11 +16,10 @@ import ChecklistModalModule from '../modals/ChecklistModalModule';
 interface Props {
   taskListRef: MutableRefObject<FlashList<Task | (string | Task)> | null>;
   tasks: Task[];
-  filteredTasks: Task[] | (string | Task)[];
   isCheckable?: boolean;
 }
 
-const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => {
+const TaskList = ({ taskListRef, tasks, isCheckable }: Props) => {
   const setTasks = useTaskStore((s) => s.setTasks);
 
   const [currentPriority, setCurrentPriority] = useState<Priority | null>(null);
@@ -130,7 +129,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
     <>
       <AnimatedFlashList
         ref={taskListRef}
-        data={filteredTasks as (string | Task)[]}
+        data={tasks as (string | Task)[]}
         renderItem={({ item }) => {
           if (typeof item === 'string') {
             return <TaskSectionHeader title={item} />;

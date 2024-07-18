@@ -4,7 +4,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, styled } from 'tamagui';
 
 import { TabRoute, Task } from '../../entities';
-import { useAppStore, useTaskStore } from '../../store';
+import { useActivityStore, useAppStore, useTaskStore } from '../../store';
 import { toFormattedDateString } from '../../utils';
 import DateCarousel from '../../components/tabs/home/DateCarousel';
 import ActivityListPlaceholder from '../../components/tabs/home/ActivityListPlaceholder';
@@ -18,39 +18,26 @@ const HomeScreen = () => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
   const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
-  const tasks = useTaskStore((s) => s.tasks);
-  const selectedDate = useTaskStore((s) => s.selectedDate);
-
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+  const filteredActivities = useActivityStore((s) => s.filteredActivities);
 
   const taskListRef = useRef<FlashList<Task | (string | Task)> | null>(null);
   const taskFrequencyRef = useRef<BottomSheetModal | null>(null);
 
-  const isTasksEmpty = !filteredTasks.length;
+  const isActivitiesEmpty = !filteredActivities.length;
 
   const handlePresentModalPress = () => taskFrequencyRef.current?.present();
-
-  useEffect(() => {
-    const filteredTasks = tasks.filter(
-      (task) =>
-        toFormattedDateString(task.dueDate) === toFormattedDateString(selectedDate)
-    );
-    setFilteredTasks(filteredTasks);
-    taskListRef.current?.prepareForLayoutAnimationRender();
-  }, [tasks, selectedDate, taskListRef]);
 
   return (
     <Container>
       <SearchBarSpacer isExpanded={pathname === 'home' && isSearchBarOpen} />
       <DateCarousel />
-      <TaskListContainer isTasksEmpty={isTasksEmpty}>
-        {isTasksEmpty ? (
+      <TaskListContainer isTasksEmpty={isActivitiesEmpty}>
+        {isActivitiesEmpty ? (
           <ActivityListPlaceholder />
         ) : (
           <TaskList
             taskListRef={taskListRef}
-            filteredTasks={filteredTasks}
-            tasks={tasks}
+            tasks={filteredActivities as Task[]}
             isCheckable
           />
         )}
