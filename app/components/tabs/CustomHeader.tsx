@@ -18,7 +18,8 @@ import {
   toFormattedSections,
 } from '@/app/utils';
 import { usePathname } from 'expo-router';
-import { Activity, TabRoute } from '@/app/entities';
+import { Activity, TabRoute, Task } from '@/app/entities';
+import { TODAYS_DATE } from '@/app/constants';
 
 interface Props {
   title?: string;
@@ -59,6 +60,20 @@ const CustomHeader = ({ title }: Props) => {
     const dateGroupedTasks = toDateGroupedTasks(singleTasks);
     return toFormattedSections(dateGroupedTasks);
   }, [singleTasks]);
+
+  const carryOverTasks = useCallback((tasks: Task[]) => {
+    console.log('was called', tasks);
+    return tasks.map((task) => {
+      if (!task.isRecurring && task.isCarriedOver && !task.isCompleted) {
+        const dueDate = new Date(task.dueDate!);
+        console.log(task.title, { dueDate }, { TODAYS_DATE });
+        if (dueDate < TODAYS_DATE) {
+          return { ...task, dueDate: TODAYS_DATE };
+        }
+      }
+      return task;
+    });
+  }, []);
 
   const filterActivitiesByDate = useCallback((date: Date, activities: Activity[]) => {
     const filtered = activities.filter((activity) => {
@@ -103,7 +118,7 @@ const CustomHeader = ({ title }: Props) => {
 
   useEffect(() => {
     if (pathname === 'home') {
-      const filteredSingleTasks = singleTasks.filter(
+      const filteredSingleTasks = carryOverTasks(singleTasks).filter(
         (task) =>
           toFormattedDateString(task.dueDate!) === toFormattedDateString(selectedDate)
       );
@@ -121,6 +136,7 @@ const CustomHeader = ({ title }: Props) => {
     habits,
     selectedDate,
     pathname,
+    carryOverTasks,
     filterActivitiesByDate,
   ]);
 

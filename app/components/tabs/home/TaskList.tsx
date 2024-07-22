@@ -15,11 +15,12 @@ import ChecklistModalModule from '../modals/ChecklistModalModule';
 
 interface Props {
   taskListRef: MutableRefObject<FlashList<Task | (string | Task)> | null>;
-  tasks: Task[];
+  filteredTasks: Task[];
   isCheckable?: boolean;
 }
 
-const TaskList = ({ taskListRef, tasks, isCheckable }: Props) => {
+const TaskList = ({ taskListRef, filteredTasks, isCheckable }: Props) => {
+  const tasks = useTaskStore((s) => s.tasks);
   const setTasks = useTaskStore((s) => s.setTasks);
 
   const [currentPriority, setCurrentPriority] = useState<Priority | null>(null);
@@ -76,8 +77,8 @@ const TaskList = ({ taskListRef, tasks, isCheckable }: Props) => {
   };
 
   const handleDelete = (id: string) => {
-    const filteredTasks = tasks.filter((task) => task.id !== id);
-    setTasks(filteredTasks);
+    const updatedTasks = tasks.filter((task) => task.id !== id);
+    setTasks(updatedTasks);
     taskListRef.current?.prepareForLayoutAnimationRender();
 
     activityOptionsRef.current?.close();
@@ -116,20 +117,22 @@ const TaskList = ({ taskListRef, tasks, isCheckable }: Props) => {
 
   useEffect(() => {
     if (isPrioritizeOpen) {
-      const priority = tasks.find((task) => task.id === selectedTask?.id)?.priority;
+      const priority = filteredTasks.find(
+        (task) => task.id === selectedTask?.id
+      )?.priority;
       if (priority) {
         setCurrentPriority(priority);
       }
     } else {
       setCurrentPriority(null);
     }
-  }, [tasks, isPrioritizeOpen, selectedTask]);
+  }, [filteredTasks, isPrioritizeOpen, selectedTask]);
 
   return (
     <>
       <AnimatedFlashList
         ref={taskListRef}
-        data={tasks as (string | Task)[]}
+        data={filteredTasks as (string | Task)[]}
         renderItem={({ item }) => {
           if (typeof item === 'string') {
             return <TaskSectionHeader title={item} />;
@@ -184,7 +187,7 @@ const TaskList = ({ taskListRef, tasks, isCheckable }: Props) => {
       <ModalContainer isOpen={isChecklistOpen} closeModal={toggleChecklistModal}>
         {selectedTask?.checklist && (
           <ChecklistModalModule
-            tasks={tasks}
+            tasks={filteredTasks}
             taskId={selectedTask.id}
             checklist={selectedTask.checklist}
             closeModal={toggleChecklistModal}

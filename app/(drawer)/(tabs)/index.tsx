@@ -37,7 +37,7 @@ const HomeScreen = () => {
         ) : (
           <TaskList
             taskListRef={taskListRef}
-            tasks={filteredActivities as Task[]}
+            filteredTasks={filteredActivities as Task[]}
             isCheckable
           />
         )}

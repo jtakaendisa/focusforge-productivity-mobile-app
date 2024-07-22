@@ -52,7 +52,7 @@ const dummyTasks: Task[] = [
     dueDate: new Date('2024-07-18'),
     priority: 'High',
     note: 'Include all project milestones',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [
       { id: uuid.v4() as string, title: 'Draft introduction', isCompleted: false },
@@ -102,7 +102,7 @@ const dummyTasks: Task[] = [
     dueDate: new Date('2024-07-19'),
     priority: 'Low',
     note: 'Last 3 chapters',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [],
     reminders: [],
@@ -129,7 +129,7 @@ const dummyTasks: Task[] = [
     dueDate: new Date('2024-07-19'),
     priority: 'High',
     note: 'Discuss project deadlines',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [
       { id: uuid.v4() as string, title: 'Prepare slides', isCompleted: false },
@@ -174,7 +174,7 @@ const dummyTasks: Task[] = [
     dueDate: new Date('2024-05-29'),
     priority: 'Normal',
     note: 'Look for hiking spots',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [
       { id: uuid.v4() as string, title: 'Book hotel', isCompleted: false },
@@ -219,7 +219,7 @@ const dummyTasks: Task[] = [
     dueDate: new Date('2024-05-22'),
     priority: 'High',
     note: 'Include all receipts',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [
       { id: uuid.v4() as string, title: 'Collect receipts', isCompleted: false },
@@ -775,7 +775,7 @@ const useTaskStore = create<TaskStore>((set) => ({
 }));
 
 const useHabitStore = create<HabitStore>((set) => ({
-  habits: dummyHabits,
+  habits: [],
   setHabits: (habits) => set((state) => ({ ...state, habits })),
 }));
 
