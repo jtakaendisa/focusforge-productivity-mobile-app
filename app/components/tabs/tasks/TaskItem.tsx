@@ -135,7 +135,7 @@ const TaskItem = ({
           )}
           <TextContainer>
             <AnimatedTitle style={textColorAnimation}>
-              {toTruncatedText(title, 30)} {'isRecurring : ' + isRecurring}
+              {toTruncatedText(title, 30)}
             </AnimatedTitle>
             {note && (
               <AnimatedNote style={textOpacityAnimation}>

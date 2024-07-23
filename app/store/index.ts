@@ -775,7 +775,7 @@ const useTaskStore = create<TaskStore>((set) => ({
 }));
 
 const useHabitStore = create<HabitStore>((set) => ({
-  habits: [],
+  habits: dummyHabits,
   setHabits: (habits) => set((state) => ({ ...state, habits })),
 }));
 

@@ -61,50 +61,6 @@ const CustomHeader = ({ title }: Props) => {
     return toFormattedSections(dateGroupedTasks);
   }, [singleTasks]);
 
-  const carryOverTasks = useCallback((tasks: Task[]) => {
-    console.log('was called', tasks);
-    return tasks.map((task) => {
-      if (!task.isRecurring && task.isCarriedOver && !task.isCompleted) {
-        const dueDate = new Date(task.dueDate!);
-        console.log(task.title, { dueDate }, { TODAYS_DATE });
-        if (dueDate < TODAYS_DATE) {
-          return { ...task, dueDate: TODAYS_DATE };
-        }
-      }
-      return task;
-    });
-  }, []);
-
-  const filterActivitiesByDate = useCallback((date: Date, activities: Activity[]) => {
-    const filtered = activities.filter((activity) => {
-      const activityStartDate = new Date(activity.startDate!);
-      const activityEndDate = activity.endDate ? new Date(activity.endDate) : null;
-
-      // Check if the habit is within the date range
-      if (activityEndDate && date > activityEndDate) return false;
-      if (date < activityStartDate) return false;
-
-      // Check habit frequency
-      switch (activity.frequency!.type) {
-        case 'daily':
-          return true;
-        case 'specific':
-          return activity.frequency!.isRepeatedOn!.includes(
-            date.toLocaleDateString('en-US', { weekday: 'long' })
-          );
-        case 'repeats':
-          const daysDifference = Math.floor(
-            (date.getTime() - activityStartDate.getTime()) / (1000 * 60 * 60 * 24)
-          );
-          return daysDifference % activity.frequency!.isRepeatedEvery! === 0;
-        default:
-          return false;
-      }
-    });
-
-    return filtered;
-  }, []);
-
   useEffect(() => {
     if (headerHeight) {
       setHeaderHeight(headerHeight);
@@ -112,11 +68,57 @@ const CustomHeader = ({ title }: Props) => {
   }, [headerHeight, setHeaderHeight]);
 
   useEffect(() => {
+    setFilteredHabits(habits);
+  }, [habits]);
+
+  useEffect(() => {
     setFilteredSingleTasks(singleSectionedTasks);
     setFilteredRecurringTasks(recurringTasks);
   }, [singleSectionedTasks, recurringTasks]);
 
   useEffect(() => {
+    const carryOverTasks = (tasks: Task[]) => {
+      return tasks.map((task) => {
+        if (!task.isRecurring && task.isCarriedOver && !task.isCompleted) {
+          const dueDate = new Date(task.dueDate!);
+          if (dueDate < TODAYS_DATE) {
+            return { ...task, dueDate: TODAYS_DATE };
+          }
+        }
+        return task;
+      });
+    };
+
+    const filterActivitiesByDate = (date: Date, activities: Activity[]) => {
+      const filtered = activities.filter((activity) => {
+        const activityStartDate = new Date(activity.startDate!);
+        const activityEndDate = activity.endDate ? new Date(activity.endDate) : null;
+
+        // Check if the habit is within the date range
+        if (activityEndDate && date > activityEndDate) return false;
+        if (date < activityStartDate) return false;
+
+        // Check habit frequency
+        switch (activity.frequency!.type) {
+          case 'daily':
+            return true;
+          case 'specific':
+            return activity.frequency!.isRepeatedOn!.includes(
+              date.toLocaleDateString('en-US', { weekday: 'long' })
+            );
+          case 'repeats':
+            const daysDifference = Math.floor(
+              (date.getTime() - activityStartDate.getTime()) / (1000 * 60 * 60 * 24)
+            );
+            return daysDifference % activity.frequency!.isRepeatedEvery! === 0;
+          default:
+            return false;
+        }
+      });
+
+      return filtered;
+    };
+
     if (pathname === 'home') {
       const filteredSingleTasks = carryOverTasks(singleTasks).filter(
         (task) =>
@@ -130,15 +132,7 @@ const CustomHeader = ({ title }: Props) => {
 
       setFilteredActivities([...filteredSingleTasks, ...filteredRecurringActivities]);
     }
-  }, [
-    singleTasks,
-    recurringTasks,
-    habits,
-    selectedDate,
-    pathname,
-    carryOverTasks,
-    filterActivitiesByDate,
-  ]);
+  }, [singleTasks, recurringTasks, habits, selectedDate, pathname]);
 
   return (
     <Container height={defaultHeaderHeight} isSearchBarOpen={isSearchBarOpen}>

@@ -20,7 +20,7 @@ import Animated, {
 import Svg, { Path } from 'react-native-svg';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 import RippleButton from './RippleButton';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ModalContainer from './modals/ModalContainer';
 import SearchBarCategoryModalModule from './modals/SearchBarCategoryModalModule';
 import ActivityFilterModalModule from './modals/ActivityFilterModalModule';
@@ -43,13 +43,15 @@ const SearchBar = ({ height, habits, singleTasks, recurringTasks }: Props) => {
 
   const statusBarHeight = StatusBar.currentHeight;
 
+  const filter = useTaskStore((s) => s.filter);
+  const filteredActivities = useActivityStore((s) => s.filteredActivities);
   const setIsSearchBarOpen = useAppStore((s) => s.setIsSearchBarOpen);
+  const setFilteredActivities = useActivityStore((s) => s.setFilteredActivities);
   const setFilteredHabits = useActivityStore((s) => s.setFilteredHabits);
   const setFilteredSingleTasks = useActivityStore((s) => s.setFilteredSingleTasks);
   const setFilteredRecurringTasks = useActivityStore(
     (s) => s.setFilteredRecurringTasks
   );
-  const filter = useTaskStore((s) => s.filter);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [activityFilter, setActivityFilter] = useState<ActivityFilter>('all');
@@ -62,10 +64,15 @@ const SearchBar = ({ height, habits, singleTasks, recurringTasks }: Props) => {
 
   const { isActivityFilterOpen, isCategoryOpen } = modalState;
 
+  const initialFilteredActivities = useMemo(() => filteredActivities, []);
+
   const isSearchRowVisible = useSharedValue(0);
 
   const handleActivitiesReset = () => {
     switch (pathname) {
+      case 'home':
+        setFilteredActivities(initialFilteredActivities);
+        break;
       case 'habits':
         setFilteredHabits(habits);
         break;
@@ -79,7 +86,33 @@ const SearchBar = ({ height, habits, singleTasks, recurringTasks }: Props) => {
     }
   };
 
+  const filterActivitiesByActivityFilter = (filter: ActivityFilter) => {
+    let filtered: any[] = [];
+    if (filter === 'all') {
+      filtered = initialFilteredActivities;
+    }
+    if (filter === 'habits') {
+      filtered = initialFilteredActivities.filter((activity) => {
+        const isHabit = Boolean((activity as Task)?.checklist) === false;
+        if (isHabit) {
+          return activity;
+        }
+      });
+    }
+    if (filter === 'tasks') {
+      filtered = initialFilteredActivities.filter((activity) => {
+        const isTask = Boolean((activity as Task)?.checklist) === true;
+        if (isTask) {
+          return activity;
+        }
+      });
+    }
+    setActivities(filtered);
+    setFilteredActivities(filtered);
+  };
+
   const handleActivityFilterChange = (activityFilter: ActivityFilter) => {
+    filterActivitiesByActivityFilter(activityFilter);
     setActivityFilter(activityFilter);
     toggleActivityFilterModal();
   };
@@ -101,6 +134,33 @@ const SearchBar = ({ height, habits, singleTasks, recurringTasks }: Props) => {
     });
 
     switch (pathname) {
+      case 'home':
+        setFilteredActivities(filteredActivities as Activity[]);
+        break;
+      case 'habits':
+        setFilteredHabits(filteredActivities as Habit[]);
+        break;
+      case 'tasks':
+        if (filter === 'single') {
+          const dateGroupedTasks = toDateGroupedTasks(filteredActivities as Task[]);
+          setFilteredSingleTasks(toFormattedSections(dateGroupedTasks));
+        } else {
+          setFilteredRecurringTasks(filteredActivities as Task[]);
+        }
+        break;
+    }
+  };
+
+  const filterActivitiesByCategory = (selectedCategories: Category[]) => {
+    const filteredActivities = activities.filter(
+      (activity) =>
+        typeof activity !== 'string' && selectedCategories.includes(activity.category)
+    );
+
+    switch (pathname) {
+      case 'home':
+        setFilteredActivities(filteredActivities as Activity[]);
+        break;
       case 'habits':
         setFilteredHabits(filteredActivities as Habit[]);
         break;
@@ -117,11 +177,15 @@ const SearchBar = ({ height, habits, singleTasks, recurringTasks }: Props) => {
 
   const handleCategorySelect = (category: Category) => {
     const isCategorySelected = selectedCategories.includes(category);
+    let updatedSelectedCategories: Category[] = [];
 
     if (isCategorySelected) {
-      setSelectedCategories(selectedCategories.filter((cat) => cat !== category));
+      updatedSelectedCategories = selectedCategories.filter((cat) => cat !== category);
+      filterActivitiesByCategory(updatedSelectedCategories);
+      setSelectedCategories(updatedSelectedCategories);
     } else {
-      const updatedSelectedCategories = [...selectedCategories, category];
+      updatedSelectedCategories = [...selectedCategories, category];
+      filterActivitiesByCategory(updatedSelectedCategories);
       setSelectedCategories(updatedSelectedCategories);
     }
   };
@@ -147,6 +211,9 @@ const SearchBar = ({ height, habits, singleTasks, recurringTasks }: Props) => {
 
   useEffect(() => {
     switch (pathname) {
+      case 'home':
+        setActivities(initialFilteredActivities);
+        break;
       case 'habits':
         setActivities(habits);
         break;
@@ -157,40 +224,16 @@ const SearchBar = ({ height, habits, singleTasks, recurringTasks }: Props) => {
           setActivities(recurringTasks);
         }
         break;
-      case 'home':
-        // setActivities([...habits, ...tasks]);
-        break;
     }
-  }, [pathname, habits, singleTasks, recurringTasks]);
+  }, [pathname, initialFilteredActivities, habits, singleTasks, recurringTasks]);
 
   useEffect(() => {
     if (!isCategoryOpen) return;
 
     if (!selectedCategories.length) {
       handleActivitiesReset();
-      return;
     }
-
-    const filteredActivities = activities.filter((activity) => {
-      if (typeof activity !== 'string') {
-        return selectedCategories.includes(activity.category);
-      }
-    });
-
-    switch (pathname) {
-      case 'habits':
-        setFilteredHabits(filteredActivities as Habit[]);
-        break;
-      case 'tasks':
-        if (filter === 'single') {
-          const dateGroupedTasks = toDateGroupedTasks(filteredActivities as Task[]);
-          setFilteredSingleTasks(toFormattedSections(dateGroupedTasks));
-        } else {
-          setFilteredRecurringTasks(filteredActivities as Task[]);
-        }
-        break;
-    }
-  }, [activities, selectedCategories, isCategoryOpen, pathname, filter]);
+  }, [selectedCategories, isCategoryOpen]);
 
   useEffect(() => {
     isSearchRowVisible.value = 1;
