@@ -33,6 +33,14 @@ export type Frequency = z.infer<typeof frequencySchema>;
 
 export type Reminder = z.infer<typeof reminderSchema>;
 
+export type IconVariant = 'outline' | 'solid';
+
+export interface IconProps {
+  size?: number;
+  fill?: string;
+  variant?: IconVariant;
+}
+
 export interface Task {
   id: string;
   title: string;

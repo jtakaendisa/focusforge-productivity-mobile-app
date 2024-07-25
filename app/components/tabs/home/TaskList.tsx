@@ -36,29 +36,27 @@ const TaskList = ({ taskListRef, filteredActivities, isCheckable }: Props) => {
   const { isDeleteOpen, isPrioritizeOpen, isChecklistOpen } = modalState;
 
   const handlePress = (selectedActivity: Activity, hasChecklist: boolean) => {
-    const allCompleted = selectedActivity.checklist.every((item) => item.isCompleted);
-
-    if (hasChecklist && !allCompleted) {
-      setSelectedTask(selectedTask);
-      return;
-    }
-
-    const updatedTasks = tasks.map((task) => {
-      if (task.id === selectedActivity.id) {
-        return {
-          ...task,
-          checklist:
-            hasChecklist && task.isCompleted
-              ? task.checklist.map((item) => ({ ...item, isCompleted: false }))
-              : task.checklist,
-          isCompleted: !task.isCompleted,
-        };
-      } else {
-        return task;
-      }
-    });
-    setTasks(updatedTasks);
-    setSelectedTask(null);
+    // const allCompleted = selectedActivity.checklist.every((item) => item.isCompleted);
+    // if (hasChecklist && !allCompleted) {
+    //   setSelectedTask(selectedTask);
+    //   return;
+    // }
+    // const updatedTasks = tasks.map((task) => {
+    //   if (task.id === selectedActivity.id) {
+    //     return {
+    //       ...task,
+    //       checklist:
+    //         hasChecklist && task.isCompleted
+    //           ? task.checklist.map((item) => ({ ...item, isCompleted: false }))
+    //           : task.checklist,
+    //       isCompleted: !task.isCompleted,
+    //     };
+    //   } else {
+    //     return task;
+    //   }
+    // });
+    // setTasks(updatedTasks);
+    // setSelectedTask(null);
   };
 
   const handlePrioritize = (priority: Priority) => {

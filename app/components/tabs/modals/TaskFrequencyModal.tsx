@@ -10,6 +10,7 @@ import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/typ
 import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import TaskFrequencyIcon from './TaskFrequencyIcon';
+import ArrowRightSvg from '../../icons/ArrowRightSvg';
 
 interface Props {
   taskFrequencyRef: MutableRefObject<BottomSheetModalMethods | null>;
@@ -93,7 +94,7 @@ const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
                   <CardDescription>{description}</CardDescription>
                 </CardTextContainer>
                 <IconContainer>
-                  <TaskFrequencyIcon name="proceed" fill={customGray1} />
+                  <ArrowRightSvg fill={customGray1} />
                 </IconContainer>
               </CardContainer>
               {index < options.length - 1 && <Separator />}

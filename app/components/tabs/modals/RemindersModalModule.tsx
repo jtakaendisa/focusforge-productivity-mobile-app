@@ -1,13 +1,13 @@
+import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
-import Svg, { Path } from 'react-native-svg';
-import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { styled, View, Text, Image, getTokenValue } from 'tamagui';
+import { getTokenValue, Image, styled, Text, View } from 'tamagui';
 
-import { Reminder } from '@/app/entities';
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
+import { Reminder } from '@/app/entities';
 import { NewHabitData } from '@/app/newHabit';
+import PlusCircleSvg from '../../icons/PlusCircleSvg';
 import ReminderListItem from '../habits/ReminderListItem';
 import ModalContainer from './ModalContainer';
 import NewReminderModalModule from './NewReminderModalModule';
@@ -86,12 +86,7 @@ const RemindersModalModule = ({ control, reminders, closeModal }: Props) => {
       />
       <Button onPress={toggleNewReminderModal}>
         <ButtonTextRow>
-          <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <Path
-              d="M10 1.875C12.1549 1.875 14.2215 2.73102 15.7452 4.25476C17.269 5.77849 18.125 7.84512 18.125 10C18.125 12.1549 17.269 14.2215 15.7452 15.7452C14.2215 17.269 12.1549 18.125 10 18.125C7.84512 18.125 5.77849 17.269 4.25476 15.7452C2.73102 14.2215 1.875 12.1549 1.875 10C1.875 7.84512 2.73102 5.77849 4.25476 4.25476C5.77849 2.73102 7.84512 1.875 10 1.875ZM10 20C12.6522 20 15.1957 18.9464 17.0711 17.0711C18.9464 15.1957 20 12.6522 20 10C20 7.34784 18.9464 4.8043 17.0711 2.92893C15.1957 1.05357 12.6522 0 10 0C7.34784 0 4.8043 1.05357 2.92893 2.92893C1.05357 4.8043 0 7.34784 0 10C0 12.6522 1.05357 15.1957 2.92893 17.0711C4.8043 18.9464 7.34784 20 10 20ZM9.0625 14.375H10.9375V13.4375V10.9375H13.4375H14.375V9.0625H13.4375H10.9375V6.5625V5.625H9.0625V6.5625V9.0625H6.5625H5.625V10.9375H6.5625H9.0625V13.4375V14.375Z"
-              fill={customRed1}
-            />
-          </Svg>
+          <PlusCircleSvg fill={customRed1} />
           <ButtonText color={customRed1}>NEW REMINDER</ButtonText>
         </ButtonTextRow>
       </Button>

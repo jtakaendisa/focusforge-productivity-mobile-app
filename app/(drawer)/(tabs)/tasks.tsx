@@ -48,7 +48,11 @@ const TasksScreen = () => {
     <Container>
       <SearchBarSpacer isExpanded={pathname === 'tasks' && isSearchBarOpen} />
       <FilterBar filter={filter} onSelect={handleSelectFilter} />
-      <TaskList taskListRef={tasklistRef} filteredTasks={filteredTasks} tasks={tasks} />
+      <TaskList
+        taskListRef={tasklistRef}
+        filteredActivities={filteredTasks}
+        tasks={tasks}
+      />
       <CreateTaskButton onPress={handlePresentModalPress} />
       <TaskFrequencyModal taskFrequencyRef={taskFrequencyRef} />
     </Container>
