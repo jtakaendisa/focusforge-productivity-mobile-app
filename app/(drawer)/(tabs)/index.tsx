@@ -4,8 +4,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, styled } from 'tamagui';
 
 import { TabRoute, Task } from '../../entities';
-import { useActivityStore, useAppStore, useTaskStore } from '../../store';
-import { toFormattedDateString } from '../../utils';
+import { useActivityStore, useAppStore } from '../../store';
 import DateCarousel from '../../components/tabs/home/DateCarousel';
 import ActivityListPlaceholder from '../../components/tabs/home/ActivityListPlaceholder';
 import TaskList from '../../components/tabs/home/TaskList';
@@ -37,7 +36,7 @@ const HomeScreen = () => {
         ) : (
           <TaskList
             taskListRef={taskListRef}
-            filteredTasks={filteredActivities as Task[]}
+            filteredActivities={filteredActivities}
             isCheckable
           />
         )}

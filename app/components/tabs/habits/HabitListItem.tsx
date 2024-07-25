@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { eachDayOfInterval, format } from 'date-fns';
+import { eachDayOfInterval, endOfWeek, format, startOfWeek } from 'date-fns';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { View, Text, styled, getTokenValue } from 'tamagui';
@@ -12,8 +12,8 @@ import HabitDateCard from './HabitDateCard';
 import { Swipeable } from 'react-native-gesture-handler';
 import HabitItemLeftActions from './HabitItemLeftActions';
 import HabitItemRightActions from './HabitItemRightActions';
-import { router } from 'expo-router';
 import { HabitActiveTab } from '@/app/habitDetails';
+import { TODAYS_DATE } from '@/app/constants';
 
 interface Props {
   habit: Habit;
@@ -32,17 +32,14 @@ const HabitListItem = ({
   onSwipe,
   openModal,
 }: Props) => {
-  const { id, title, category, frequency, startDate, endDate } = habit;
+  const { id, title, category, frequency, endDate } = habit;
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const days = useMemo(() => {
-    const defaultEndDate = new Date(startDate);
-    defaultEndDate.setDate(startDate.getDate() + 6);
-
     const daysOfWeek = eachDayOfInterval({
-      start: startDate,
-      end: endDate || defaultEndDate,
+      start: startOfWeek(TODAYS_DATE, { weekStartsOn: 0 }), // Week starts on Sunday
+      end: endOfWeek(TODAYS_DATE, { weekStartsOn: 0 }), // Week ends on Saturday
     });
 
     const dayObjects = daysOfWeek.map((day) => ({
@@ -51,7 +48,7 @@ const HabitListItem = ({
     }));
 
     return dayObjects;
-  }, [startDate, endDate]);
+  }, [TODAYS_DATE, endDate]);
 
   const handleSwipeCompletion = (direction: 'left' | 'right') => {
     onSwipe(habit);
