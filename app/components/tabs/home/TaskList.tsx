@@ -1,7 +1,7 @@
 import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 
-import { Priority, Task } from '@/app/entities';
+import { Activity, Priority, Task } from '@/app/entities';
 import { useTaskStore } from '@/app/store';
 import TaskItem from '../tasks/TaskItem';
 import ModalContainer from '../modals/ModalContainer';
@@ -15,12 +15,12 @@ import ChecklistModalModule from '../modals/ChecklistModalModule';
 
 interface Props {
   taskListRef: MutableRefObject<FlashList<Task | (string | Task)> | null>;
-  tasks: Task[];
-  filteredTasks: Task[] | (string | Task)[];
+  filteredActivities: Activity[];
   isCheckable?: boolean;
 }
 
-const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => {
+const TaskList = ({ taskListRef, filteredActivities, isCheckable }: Props) => {
+  const tasks = useTaskStore((s) => s.tasks);
   const setTasks = useTaskStore((s) => s.setTasks);
 
   const [currentPriority, setCurrentPriority] = useState<Priority | null>(null);
@@ -35,8 +35,8 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
 
   const { isDeleteOpen, isPrioritizeOpen, isChecklistOpen } = modalState;
 
-  const handlePress = (selectedTask: Task, hasChecklist: boolean) => {
-    const allCompleted = selectedTask.checklist.every((item) => item.isCompleted);
+  const handlePress = (selectedActivity: Activity, hasChecklist: boolean) => {
+    const allCompleted = selectedActivity.checklist.every((item) => item.isCompleted);
 
     if (hasChecklist && !allCompleted) {
       setSelectedTask(selectedTask);
@@ -44,7 +44,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
     }
 
     const updatedTasks = tasks.map((task) => {
-      if (task.id === selectedTask.id) {
+      if (task.id === selectedActivity.id) {
         return {
           ...task,
           checklist:
@@ -77,8 +77,8 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
   };
 
   const handleDelete = (id: string) => {
-    const filteredTasks = tasks.filter((task) => task.id !== id);
-    setTasks(filteredTasks);
+    const updatedTasks = tasks.filter((task) => task.id !== id);
+    setTasks(updatedTasks);
     taskListRef.current?.prepareForLayoutAnimationRender();
 
     activityOptionsRef.current?.close();
@@ -117,20 +117,22 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
 
   useEffect(() => {
     if (isPrioritizeOpen) {
-      const priority = tasks.find((task) => task.id === selectedTask?.id)?.priority;
+      const priority = filteredActivities.find(
+        (task) => task.id === selectedTask?.id
+      )?.priority;
       if (priority) {
         setCurrentPriority(priority);
       }
     } else {
       setCurrentPriority(null);
     }
-  }, [tasks, isPrioritizeOpen, selectedTask]);
+  }, [filteredActivities, isPrioritizeOpen, selectedTask]);
 
   return (
     <>
       <AnimatedFlashList
         ref={taskListRef}
-        data={filteredTasks as (string | Task)[]}
+        data={filteredActivities as (string | Activity)[]}
         renderItem={({ item }) => {
           if (typeof item === 'string') {
             return <TaskSectionHeader title={item} />;
@@ -185,7 +187,7 @@ const TaskList = ({ taskListRef, tasks, filteredTasks, isCheckable }: Props) => 
       <ModalContainer isOpen={isChecklistOpen} closeModal={toggleChecklistModal}>
         {selectedTask?.checklist && (
           <ChecklistModalModule
-            tasks={tasks}
+            activities={filteredActivities}
             taskId={selectedTask.id}
             checklist={selectedTask.checklist}
             closeModal={toggleChecklistModal}

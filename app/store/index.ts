@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import uuid from 'react-native-uuid';
 
-import { AuthUser, Habit, Task, Theme } from '../entities';
+import { Theme, AuthUser, Activity, Habit, Task, TaskFilter } from '../entities';
 import { TODAYS_DATE } from '../constants';
 
 interface AppStore {
@@ -18,11 +18,24 @@ interface AuthStore {
   setAuthUser: (authUser: AuthUser | null) => void;
 }
 
+interface ActivityStore {
+  filteredActivities: Activity[];
+  filteredHabits: Habit[];
+  filteredSingleTasks: (Task | string)[];
+  filteredRecurringTasks: Task[];
+  setFilteredActivities: (filteredActivities: Activity[]) => void;
+  setFilteredHabits: (filteredHabits: Habit[]) => void;
+  setFilteredSingleTasks: (filteredSingleTasks: (Task | string)[]) => void;
+  setFilteredRecurringTasks: (filteredRecurringTasks: Task[]) => void;
+}
+
 interface TaskStore {
   tasks: Task[];
   selectedDate: Date;
+  filter: TaskFilter;
   setTasks: (tasks: Task[]) => void;
   setSelectedDate: (selectedDate: Date) => void;
+  setFilter: (filter: TaskFilter) => void;
 }
 
 interface HabitStore {
@@ -36,10 +49,10 @@ const dummyTasks: Task[] = [
     title: 'Complete project report',
     isCompleted: false,
     category: 'Work',
-    dueDate: new Date('2024-07-11'),
+    dueDate: new Date('2024-07-18'),
     priority: 'High',
     note: 'Include all project milestones',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [
       { id: uuid.v4() as string, title: 'Draft introduction', isCompleted: false },
@@ -53,7 +66,7 @@ const dummyTasks: Task[] = [
     title: 'Grocery shopping',
     isCompleted: false,
     category: 'Home',
-    dueDate: new Date('2024-07-11'),
+    startDate: new Date('2024-07-18'),
     priority: 'Normal',
     note: '',
     isCarriedOver: false,
@@ -71,7 +84,8 @@ const dummyTasks: Task[] = [
     title: 'Morning meditation',
     isCompleted: false,
     category: 'Meditation',
-    dueDate: new Date('2024-07-11'),
+    startDate: new Date('2024-07-18'),
+    endDate: new Date('2024-07-28'),
     priority: 'Normal',
     note: '20 minutes session',
     isCarriedOver: false,
@@ -85,10 +99,10 @@ const dummyTasks: Task[] = [
     title: 'Finish reading book',
     isCompleted: false,
     category: 'Recreation',
-    dueDate: new Date('2024-05-24'),
+    dueDate: new Date('2024-07-19'),
     priority: 'Low',
     note: 'Last 3 chapters',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [],
     reminders: [],
@@ -98,7 +112,7 @@ const dummyTasks: Task[] = [
     title: 'Attend yoga class',
     isCompleted: false,
     category: 'Health',
-    dueDate: new Date('2024-05-25'),
+    startDate: new Date('2024-07-19'),
     priority: 'Normal',
     note: '',
     isCarriedOver: false,
@@ -112,10 +126,10 @@ const dummyTasks: Task[] = [
     title: 'Team meeting',
     isCompleted: false,
     category: 'Work',
-    dueDate: new Date('2024-05-26'),
+    dueDate: new Date('2024-07-19'),
     priority: 'High',
     note: 'Discuss project deadlines',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [
       { id: uuid.v4() as string, title: 'Prepare slides', isCompleted: false },
@@ -128,7 +142,8 @@ const dummyTasks: Task[] = [
     title: 'Visit the dentist',
     isCompleted: false,
     category: 'Health',
-    dueDate: new Date('2024-05-27'),
+    startDate: new Date('2024-07-19'),
+    endDate: new Date('2024-08-19'),
     priority: 'High',
     note: 'Annual check-up',
     isCarriedOver: false,
@@ -142,7 +157,7 @@ const dummyTasks: Task[] = [
     title: 'Call mom',
     isCompleted: false,
     category: 'Social',
-    dueDate: new Date('2024-05-28'),
+    startDate: new Date('2024-07-19'),
     priority: 'Normal',
     note: '',
     isCarriedOver: false,
@@ -159,7 +174,7 @@ const dummyTasks: Task[] = [
     dueDate: new Date('2024-05-29'),
     priority: 'Normal',
     note: 'Look for hiking spots',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [
       { id: uuid.v4() as string, title: 'Book hotel', isCompleted: false },
@@ -172,7 +187,7 @@ const dummyTasks: Task[] = [
     title: 'Pay electricity bill',
     isCompleted: false,
     category: 'Finance',
-    dueDate: new Date('2024-05-30'),
+    startDate: new Date('2024-05-30'),
     priority: 'High',
     note: 'Due on the 31st',
     isCarriedOver: false,
@@ -186,12 +201,13 @@ const dummyTasks: Task[] = [
     title: 'Water the plants',
     isCompleted: false,
     category: 'Home',
-    dueDate: new Date('2024-05-31'),
+    startDate: new Date('2024-05-31'),
+    endDate: new Date('2024-09-25'),
     priority: 'Low',
     note: '',
     isCarriedOver: false,
     isRecurring: true,
-    frequency: { isRepeatedOn: ['Monday', 'Wednesday', 'Friday'], type: 'specific' },
+    frequency: { isRepeatedOn: ['Tuesday', 'Thursday'], type: 'specific' },
     checklist: [],
     reminders: [],
   },
@@ -203,7 +219,7 @@ const dummyTasks: Task[] = [
     dueDate: new Date('2024-05-22'),
     priority: 'High',
     note: 'Include all receipts',
-    isCarriedOver: false,
+    isCarriedOver: true,
     isRecurring: false,
     checklist: [
       { id: uuid.v4() as string, title: 'Collect receipts', isCompleted: false },
@@ -217,7 +233,8 @@ const dummyTasks: Task[] = [
     title: 'Jog in the park',
     isCompleted: false,
     category: 'Sports',
-    dueDate: new Date('2024-05-23'),
+    startDate: new Date('2024-05-23'),
+    endDate: new Date('2024-07-23'),
     priority: 'Normal',
     note: '5 km run',
     isCarriedOver: false,
@@ -485,7 +502,7 @@ const dummyTasks: Task[] = [
     title: 'Meditate',
     isCompleted: false,
     category: 'Meditation',
-    dueDate: new Date('2024-05-30'),
+    startDate: new Date('2024-05-30'),
     priority: 'Low',
     note: 'Morning routine',
     isCarriedOver: false,
@@ -519,7 +536,7 @@ const dummyTasks: Task[] = [
     title: 'Weekly review and planning',
     isCompleted: false,
     category: 'Work',
-    dueDate: new Date('2024-06-01'),
+    startDate: new Date('2024-06-01'),
     priority: 'Normal',
     note: '',
     isCarriedOver: false,
@@ -549,7 +566,7 @@ const dummyTasks: Task[] = [
     title: 'Volunteer at local shelter',
     isCompleted: false,
     category: 'Social',
-    dueDate: new Date('2024-05-22'),
+    startDate: new Date('2024-05-22'),
     priority: 'Normal',
     note: 'Morning shift',
     isCarriedOver: false,
@@ -589,7 +606,7 @@ const dummyTasks: Task[] = [
     title: 'Meal prep for the week',
     isCompleted: false,
     category: 'Nutrition',
-    dueDate: new Date('2024-05-25'),
+    startDate: new Date('2024-05-25'),
     priority: 'Normal',
     note: 'Prepare healthy meals',
     isCarriedOver: false,
@@ -619,7 +636,7 @@ const dummyTasks: Task[] = [
     title: 'Read a chapter of a book',
     isCompleted: false,
     category: 'Recreation',
-    dueDate: new Date('2024-05-27'),
+    startDate: new Date('2024-05-27'),
     priority: 'Low',
     note: '',
     isCarriedOver: false,
@@ -734,16 +751,32 @@ const useAuthStore = create<AuthStore>((set) => ({
   setAuthUser: (authUser) => set((state) => ({ ...state, authUser })),
 }));
 
-const useHabitStore = create<HabitStore>((set) => ({
-  habits: dummyHabits,
-  setHabits: (habits) => set((state) => ({ ...state, habits })),
+const useActivityStore = create<ActivityStore>((set) => ({
+  filteredActivities: [],
+  filteredHabits: [],
+  filteredSingleTasks: [],
+  filteredRecurringTasks: [],
+  setFilteredActivities: (filteredActivities) =>
+    set((state) => ({ ...state, filteredActivities })),
+  setFilteredHabits: (filteredHabits) => set((state) => ({ ...state, filteredHabits })),
+  setFilteredSingleTasks: (filteredSingleTasks) =>
+    set((state) => ({ ...state, filteredSingleTasks })),
+  setFilteredRecurringTasks: (filteredRecurringTasks) =>
+    set((state) => ({ ...state, filteredRecurringTasks })),
 }));
 
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: dummyTasks,
   selectedDate: TODAYS_DATE,
+  filter: 'single',
   setTasks: (tasks) => set((state) => ({ ...state, tasks })),
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
+  setFilter: (filter) => set((state) => ({ ...state, filter })),
 }));
 
-export { useAppStore, useAuthStore, useTaskStore, useHabitStore };
+const useHabitStore = create<HabitStore>((set) => ({
+  habits: dummyHabits,
+  setHabits: (habits) => set((state) => ({ ...state, habits })),
+}));
+
+export { useAppStore, useAuthStore, useActivityStore, useTaskStore, useHabitStore };

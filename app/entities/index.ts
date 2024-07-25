@@ -13,7 +13,7 @@ export type AnimatedInterpolation = Animated.AnimatedInterpolation<string | numb
 
 export type Theme = 'dark' | 'light';
 
-export type Filter = 'single' | 'recurring';
+export type TaskFilter = 'single' | 'recurring';
 
 export type Category = (typeof categoryArray)[number];
 
@@ -38,7 +38,9 @@ export interface Task {
   title: string;
   isCompleted: boolean;
   category: Category;
-  dueDate: Date;
+  dueDate?: Date;
+  startDate?: Date;
+  endDate?: Date;
   priority: Priority;
   note: string;
   frequency?: Frequency;

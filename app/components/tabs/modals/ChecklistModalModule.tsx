@@ -4,7 +4,7 @@ import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { ChecklistItem as ChecklistItemType, Task } from '@/app/entities';
+import { Activity, ChecklistItem as ChecklistItemType, Task } from '@/app/entities';
 import { SCREEN_HEIGHT } from '@/app/constants';
 import { NewTaskData } from '@/app/newTask';
 import CreateChecklistItem from '../tasks/CreateChecklistItem';
@@ -16,7 +16,7 @@ import { checklistSchema } from '@/app/validationSchemas';
 interface Props {
   isForm?: boolean;
   control?: Control<NewTaskData>;
-  tasks?: Task[];
+  activities?: Activity[];
   taskId?: string;
   checklist: ChecklistItemType[];
   closeModal: () => void;
@@ -25,7 +25,7 @@ interface Props {
 const ChecklistModalModule = ({
   isForm,
   control,
-  tasks,
+  activities,
   taskId,
   checklist,
   closeModal,
@@ -60,7 +60,7 @@ const ChecklistModalModule = ({
   };
 
   const handleCheck = (id: string) => {
-    if (!tasks) return;
+    if (!activities) return;
 
     const updatedChecklist = watchChecklist.map((item) => {
       if (item.id === id) {
@@ -77,7 +77,7 @@ const ChecklistModalModule = ({
 
     const allCompleted = updatedChecklist.every((item) => item.isCompleted);
 
-    const updatedTasks = tasks.map((task) => {
+    const updatedTasks = activities.map((task) => {
       if (task.id === taskId) {
         const updatedTask = {
           ...task,

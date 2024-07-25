@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, styled, getTokenValue } from 'tamagui';
 
-import { PriorityType, useHabitStore } from './store';
+import { useHabitStore } from './store';
 import { SCREEN_WIDTH, TODAYS_DATE } from './constants';
 import { habitSchema } from './validationSchemas';
 import NewHabitListItem from './components/tabs/habits/NewHabitListItem';
@@ -50,7 +50,7 @@ const NewHabitScreen = () => {
       title: '',
       note: '',
       startDate: TODAYS_DATE,
-      priority: PriorityType.normal,
+      priority: 'Normal',
       frequency: {
         type: 'daily',
       },

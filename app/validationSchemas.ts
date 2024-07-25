@@ -53,7 +53,9 @@ export const frequencySchema = z.object({
 export const taskSchema = z.object({
   title: titleSchema,
   category: z.enum(categoryArray),
-  dueDate: z.date({ message: 'Invalid date string' }),
+  dueDate: z.date({ message: 'Invalid date string' }).optional(),
+  startDate: z.date({ message: 'Invalid date string' }).optional(),
+  endDate: z.date({ message: 'Invalid date string' }).optional(),
   reminders: z.array(reminderSchema),
   checklist: checklistSchema,
   priority: prioritySchema,

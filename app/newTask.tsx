@@ -11,11 +11,16 @@ import {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import uuid from 'react-native-uuid';
-import Svg, { Path } from 'react-native-svg';
-import { useSharedValue, withTiming } from 'react-native-reanimated';
+import Svg, { Path, Rect } from 'react-native-svg';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { getTokenValue, styled, Text, View } from 'tamagui';
 
-import { PriorityType, useTaskStore } from './store';
+import { useTaskStore } from './store';
 import { TODAYS_DATE } from './constants';
 import { toFormattedDateString, toTruncatedText } from './utils';
 import { taskSchema } from './validationSchemas';
@@ -58,6 +63,7 @@ const NewTaskScreen = () => {
   });
 
   const setDueDateRef = useRef<((...event: any[]) => void) | null>(null);
+  const setEndDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setIsCarriedOverRef = useRef<((...event: any[]) => void) | null>(null);
 
   const {
@@ -70,7 +76,7 @@ const NewTaskScreen = () => {
     defaultValues: {
       title: '',
       category: 'Task',
-      dueDate: TODAYS_DATE,
+      [isRecurring ? 'startDate' : 'dueDate']: TODAYS_DATE,
       priority: 'Normal',
       reminders: [],
       frequency: isRecurring
@@ -80,7 +86,7 @@ const NewTaskScreen = () => {
         : undefined,
       checklist: [],
       note: '',
-      isCarriedOver: true,
+      isCarriedOver: isRecurring ? false : true,
     },
     resolver: zodResolver(taskSchema),
   });
@@ -99,6 +105,8 @@ const NewTaskScreen = () => {
   const {
     category,
     dueDate,
+    startDate,
+    endDate,
     checklist,
     priority,
     frequency,
@@ -113,17 +121,30 @@ const NewTaskScreen = () => {
 
   const handleDateSelect = (
     event: DateTimePickerEvent,
-    selectedDate: Date | undefined
+    selectedDate: Date | undefined,
+    mode: 'start' | 'end'
   ) => {
     if (selectedDate) {
-      setDueDateRef.current?.(selectedDate);
+      if (mode === 'start') {
+        setDueDateRef.current?.(selectedDate);
+      } else {
+        if (
+          toFormattedDateString(selectedDate) !== toFormattedDateString(TODAYS_DATE)
+        ) {
+          setEndDateRef.current?.(selectedDate);
+        } else {
+          setEndDateRef.current?.();
+        }
+      }
     }
   };
 
-  const showDatePicker = () => {
+  const handleEndDateClear = () => setEndDateRef.current?.();
+
+  const showDatePicker = (mode: 'start' | 'end') => {
     DateTimePickerAndroid.open({
       value: new Date(),
-      onChange: handleDateSelect,
+      onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
       minimumDate: TODAYS_DATE,
     });
@@ -168,6 +189,8 @@ const NewTaskScreen = () => {
     router.replace(origin);
   }, [isSubmitSuccessful]);
 
+  const customGray1 = getTokenValue('$customGray1');
+
   return (
     <Container>
       <ScreenLabel>
@@ -203,7 +226,7 @@ const NewTaskScreen = () => {
           </CategoryContainer>
         </Row>
       </OptionContainer>
-      <OptionContainer onPress={showDatePicker}>
+      <OptionContainer onPress={() => showDatePicker('start')}>
         <OptionInfo>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 19 20" fill="none">
             <Path
@@ -211,25 +234,82 @@ const NewTaskScreen = () => {
               fill={customRed1}
             />
           </Svg>
-          <OptionTitle>Date</OptionTitle>
+          <OptionTitle>{isRecurring ? 'Start Date' : 'Due Date'}</OptionTitle>
         </OptionInfo>
         <Controller
           control={control}
-          name="dueDate"
+          name={isRecurring ? 'startDate' : 'dueDate'}
           render={({ field: { onChange } }) => {
             setDueDateRef.current = onChange;
             return (
               <CategoryLabel>
                 <LabelText>
-                  {toFormattedDateString(dueDate) === toFormattedDateString(TODAYS_DATE)
+                  {toFormattedDateString(isRecurring ? startDate! : dueDate!) ===
+                  toFormattedDateString(TODAYS_DATE)
                     ? 'Today'
-                    : toFormattedDateString(dueDate)}
+                    : toFormattedDateString(isRecurring ? startDate! : dueDate!)}
                 </LabelText>
               </CategoryLabel>
             );
           }}
         />
       </OptionContainer>
+
+      {isRecurring && (
+        <OptionContainer onPress={() => showDatePicker('end')}>
+          <OptionInfo>
+            <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 21 22" fill="none">
+              <Path
+                d="M19.1102 1.55977H17.5504V3.93164C17.5504 4.37422 17.2109 4.70938 16.7727 4.70938H13.6188C13.1762 4.70938 12.841 4.36992 12.841 3.93164V1.55977H8.09297V3.93164C8.09297 4.37422 7.75352 4.70938 7.31524 4.70938H4.16133C3.71875 4.70938 3.38359 4.36992 3.38359 3.93164V1.55977H1.81953C0.938672 1.55977 0.259766 2.27305 0.259766 3.11953V20.4402C0.259766 21.3211 0.973047 22 1.81953 22H19.1402C20.0211 22 20.7 21.2867 20.7 20.4402V3.15391C20.7043 2.27305 19.991 1.55977 19.1102 1.55977ZM19.1102 20.4746H1.81953V6.30352H19.1402V20.4746H19.1102ZM6.5332 3.15391H4.97344V1.03301e-07H6.5332V3.15391ZM15.9906 3.15391H14.4309V1.03301e-07H15.9906V3.15391Z"
+                fill={customRed1}
+              />
+              <Rect x="12" y="13" width="5.60938" height="5.60938" fill={customRed1} />
+            </Svg>
+            <OptionTitle>End date</OptionTitle>
+          </OptionInfo>
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field: { onChange } }) => {
+              setEndDateRef.current = onChange;
+              return (
+                <Row>
+                  {endDate && (
+                    <AnimatedIconContainer
+                      onPress={handleEndDateClear}
+                      entering={FadeIn}
+                      exiting={FadeOut}
+                    >
+                      <Svg
+                        width={SVG_SIZE / 1.2}
+                        height={SVG_SIZE / 1.2}
+                        viewBox="0 0 21 24"
+                        fill="none"
+                      >
+                        <Path
+                          d="M7.67813 0H13.3219C13.8891 0 14.4094 0.31875 14.6625 0.829688L15 1.5H19.5C20.3297 1.5 21 2.17031 21 3C21 3.82969 20.3297 4.5 19.5 4.5H1.5C0.670312 4.5 0 3.82969 0 3C0 2.17031 0.670312 1.5 1.5 1.5H6L6.3375 0.829688C6.59062 0.31875 7.11094 0 7.67813 0ZM1.5 6H19.5L18.5062 21.8906C18.4312 23.0766 17.4469 24 16.2609 24H4.73906C3.55312 24 2.56875 23.0766 2.49375 21.8906L1.5 6ZM6.70312 11.2031C6.2625 11.6437 6.2625 12.3562 6.70312 12.7922L8.90625 14.9953L6.70312 17.1984C6.2625 17.6391 6.2625 18.3516 6.70312 18.7875C7.14375 19.2234 7.85625 19.2281 8.29219 18.7875L10.4953 16.5844L12.6984 18.7875C13.1391 19.2281 13.8516 19.2281 14.2875 18.7875C14.7234 18.3469 14.7281 17.6344 14.2875 17.1984L12.0844 14.9953L14.2875 12.7922C14.7281 12.3516 14.7281 11.6391 14.2875 11.2031C13.8469 10.7672 13.1344 10.7625 12.6984 11.2031L10.4953 13.4062L8.29219 11.2031C7.85156 10.7625 7.13906 10.7625 6.70312 11.2031Z"
+                          fill={customGray1}
+                        />
+                      </Svg>
+                    </AnimatedIconContainer>
+                  )}
+                  <OptionLabel>
+                    <LabelText>
+                      {endDate
+                        ? toFormattedDateString(endDate) ===
+                          toFormattedDateString(TODAYS_DATE)
+                          ? 'Today'
+                          : toFormattedDateString(endDate)
+                        : '---'}
+                    </LabelText>
+                  </OptionLabel>
+                </Row>
+              );
+            }}
+          />
+        </OptionContainer>
+      )}
+
       <OptionContainer onPress={toggleRemindersModal}>
         <OptionInfo>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 20 22" fill="none">
@@ -304,28 +384,32 @@ const NewTaskScreen = () => {
         </OptionInfo>
         <Text color={customRed1}>{toTruncatedText(note, 16)}</Text>
       </OptionContainer>
-      <OptionContainer onPress={() => setIsCarriedOverRef.current?.(!isCarriedOver)}>
-        <OptionInfo>
-          <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 20 21" fill="none">
-            <Path
-              d="M10.9316 18.9131C11.4919 18.8388 11.9346 19.3867 11.7447 19.9193C11.6455 20.1893 11.4149 20.3788 11.1289 20.4167C10.4706 20.5014 9.80563 20.5216 9.14343 20.4769C6.70039 20.3124 4.50235 19.2538 2.87405 17.6255C1.09843 15.8499 0 13.3967 0 10.6876C0 7.97801 1.09843 5.52521 2.87405 3.74959C4.64967 1.97397 7.10248 0.875536 9.81202 0.875536C10.7514 0.875536 11.667 1.01074 12.5395 1.26278C13.2554 1.46933 13.9452 1.75739 14.5953 2.12128L14.4019 1.61486C14.2405 1.19049 14.4535 0.715715 14.8775 0.553939C15.3018 0.392555 15.7766 0.60552 15.9384 1.02989L16.7558 3.16891C16.7867 3.2503 16.8046 3.33599 16.809 3.42291C16.8731 3.82149 16.6343 4.21655 16.2373 4.3369L14.0479 5.00667C13.6145 5.13796 13.1569 4.89334 13.0256 4.46038C12.8943 4.02742 13.139 3.56945 13.5719 3.43815L13.7521 3.38305C13.2331 3.10217 12.6855 2.87789 12.1187 2.71407C11.393 2.50462 10.6193 2.39208 9.81202 2.39208C7.52138 2.39208 5.44721 3.32053 3.9463 4.82184C2.44499 6.32275 1.51654 8.39652 1.51654 10.6876C1.51654 12.9782 2.44499 15.052 3.9463 16.5533C5.30654 17.9135 7.13726 18.8037 9.17351 18.9584C9.75575 19.0026 10.3548 18.9881 10.9316 18.9131ZM8.30993 6.69671C8.30993 6.2782 8.6495 5.93863 9.0684 5.93863C9.48691 5.93863 9.82648 6.2782 9.82648 6.69671V11.3124L12.9858 12.7011C13.3687 12.8696 13.5422 13.3166 13.3738 13.6995C13.2054 14.0821 12.7584 14.256 12.3754 14.0876L8.80151 12.5167C8.5143 12.4085 8.30993 12.1314 8.30993 11.8067V6.69671ZM13.5735 18.1026C12.9631 18.4149 13.0444 19.3101 13.702 19.5066C13.8923 19.5606 14.0819 19.5442 14.2593 19.4555C14.7485 19.2097 15.2182 18.9201 15.6586 18.595C15.8735 18.4348 15.9853 18.1824 15.9622 17.9155C15.9036 17.3258 15.2323 17.0269 14.7551 17.377C14.3826 17.6521 13.9873 17.8948 13.5735 18.1026ZM16.6668 15.3849C16.3213 15.8999 16.7093 16.5924 17.3299 16.565C17.5725 16.5521 17.7898 16.4333 17.9258 16.2301C18.2329 15.7745 18.4983 15.2974 18.7257 14.7972C18.9449 14.3033 18.6034 13.75 18.0629 13.7269C17.7531 13.7167 17.4725 13.8898 17.3436 14.1724C17.1509 14.5963 16.927 14.9988 16.6668 15.3849ZM18.0602 11.496C18.0329 11.7938 18.1774 12.0728 18.4349 12.224C18.9179 12.4983 19.5135 12.1912 19.5701 11.6391C19.6221 11.0912 19.6303 10.5488 19.5928 9.99981C19.574 9.73605 19.4216 9.50355 19.1872 9.38046C18.6612 9.10771 18.0379 9.51566 18.0797 10.1061C18.1118 10.5719 18.1044 11.031 18.0602 11.496ZM17.4319 7.41727C17.6018 7.80921 18.0579 7.98544 18.4459 7.80647C18.8198 7.63454 18.9875 7.19649 18.8253 6.81824C18.6104 6.31454 18.3517 5.83039 18.0559 5.36929C17.6843 4.798 16.8098 4.96446 16.6746 5.63306C16.6374 5.82961 16.6726 6.02147 16.7809 6.19067C17.0317 6.58222 17.2498 6.98939 17.4319 7.41727Z"
-              fill={customRed1}
-            />
-          </Svg>
-          <OptionTextContainer>
-            <OptionTitle>Pending Task</OptionTitle>
-            <OptionSubtitle>It will be shown each day until completed.</OptionSubtitle>
-          </OptionTextContainer>
-        </OptionInfo>
-        <Controller
-          control={control}
-          name="isCarriedOver"
-          render={({ field: { onChange } }) => {
-            setIsCarriedOverRef.current = onChange;
-            return <CircularCheckbox isChecked={isChecked} />;
-          }}
-        />
-      </OptionContainer>
+      {!isRecurring && (
+        <OptionContainer onPress={() => setIsCarriedOverRef.current?.(!isCarriedOver)}>
+          <OptionInfo>
+            <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 20 21" fill="none">
+              <Path
+                d="M10.9316 18.9131C11.4919 18.8388 11.9346 19.3867 11.7447 19.9193C11.6455 20.1893 11.4149 20.3788 11.1289 20.4167C10.4706 20.5014 9.80563 20.5216 9.14343 20.4769C6.70039 20.3124 4.50235 19.2538 2.87405 17.6255C1.09843 15.8499 0 13.3967 0 10.6876C0 7.97801 1.09843 5.52521 2.87405 3.74959C4.64967 1.97397 7.10248 0.875536 9.81202 0.875536C10.7514 0.875536 11.667 1.01074 12.5395 1.26278C13.2554 1.46933 13.9452 1.75739 14.5953 2.12128L14.4019 1.61486C14.2405 1.19049 14.4535 0.715715 14.8775 0.553939C15.3018 0.392555 15.7766 0.60552 15.9384 1.02989L16.7558 3.16891C16.7867 3.2503 16.8046 3.33599 16.809 3.42291C16.8731 3.82149 16.6343 4.21655 16.2373 4.3369L14.0479 5.00667C13.6145 5.13796 13.1569 4.89334 13.0256 4.46038C12.8943 4.02742 13.139 3.56945 13.5719 3.43815L13.7521 3.38305C13.2331 3.10217 12.6855 2.87789 12.1187 2.71407C11.393 2.50462 10.6193 2.39208 9.81202 2.39208C7.52138 2.39208 5.44721 3.32053 3.9463 4.82184C2.44499 6.32275 1.51654 8.39652 1.51654 10.6876C1.51654 12.9782 2.44499 15.052 3.9463 16.5533C5.30654 17.9135 7.13726 18.8037 9.17351 18.9584C9.75575 19.0026 10.3548 18.9881 10.9316 18.9131ZM8.30993 6.69671C8.30993 6.2782 8.6495 5.93863 9.0684 5.93863C9.48691 5.93863 9.82648 6.2782 9.82648 6.69671V11.3124L12.9858 12.7011C13.3687 12.8696 13.5422 13.3166 13.3738 13.6995C13.2054 14.0821 12.7584 14.256 12.3754 14.0876L8.80151 12.5167C8.5143 12.4085 8.30993 12.1314 8.30993 11.8067V6.69671ZM13.5735 18.1026C12.9631 18.4149 13.0444 19.3101 13.702 19.5066C13.8923 19.5606 14.0819 19.5442 14.2593 19.4555C14.7485 19.2097 15.2182 18.9201 15.6586 18.595C15.8735 18.4348 15.9853 18.1824 15.9622 17.9155C15.9036 17.3258 15.2323 17.0269 14.7551 17.377C14.3826 17.6521 13.9873 17.8948 13.5735 18.1026ZM16.6668 15.3849C16.3213 15.8999 16.7093 16.5924 17.3299 16.565C17.5725 16.5521 17.7898 16.4333 17.9258 16.2301C18.2329 15.7745 18.4983 15.2974 18.7257 14.7972C18.9449 14.3033 18.6034 13.75 18.0629 13.7269C17.7531 13.7167 17.4725 13.8898 17.3436 14.1724C17.1509 14.5963 16.927 14.9988 16.6668 15.3849ZM18.0602 11.496C18.0329 11.7938 18.1774 12.0728 18.4349 12.224C18.9179 12.4983 19.5135 12.1912 19.5701 11.6391C19.6221 11.0912 19.6303 10.5488 19.5928 9.99981C19.574 9.73605 19.4216 9.50355 19.1872 9.38046C18.6612 9.10771 18.0379 9.51566 18.0797 10.1061C18.1118 10.5719 18.1044 11.031 18.0602 11.496ZM17.4319 7.41727C17.6018 7.80921 18.0579 7.98544 18.4459 7.80647C18.8198 7.63454 18.9875 7.19649 18.8253 6.81824C18.6104 6.31454 18.3517 5.83039 18.0559 5.36929C17.6843 4.798 16.8098 4.96446 16.6746 5.63306C16.6374 5.82961 16.6726 6.02147 16.7809 6.19067C17.0317 6.58222 17.2498 6.98939 17.4319 7.41727Z"
+                fill={customRed1}
+              />
+            </Svg>
+            <OptionTextContainer>
+              <OptionTitle>Pending Task</OptionTitle>
+              <OptionSubtitle>
+                It will be shown each day until completed.
+              </OptionSubtitle>
+            </OptionTextContainer>
+          </OptionInfo>
+          <Controller
+            control={control}
+            name="isCarriedOver"
+            render={({ field: { onChange } }) => {
+              setIsCarriedOverRef.current = onChange;
+              return <CircularCheckbox isChecked={isChecked} />;
+            }}
+          />
+        </OptionContainer>
+      )}
       <ButtonsContainer>
         <Button onPress={() => router.replace(origin)}>
           <ButtonText>CANCEL</ButtonText>
@@ -425,6 +509,13 @@ const OptionContainer = styled(View, {
   borderColor: '$customGray2',
 });
 
+const IconContainer = styled(View, {
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 36,
+  height: 36,
+});
+
 const OptionInfo = styled(View, {
   flexDirection: 'row',
   alignItems: 'center',
@@ -466,6 +557,13 @@ const CategoryLabel = styled(View, {
   backgroundColor: '$customRed5',
 });
 
+const OptionLabel = styled(View, {
+  paddingHorizontal: 26,
+  paddingVertical: 10,
+  borderRadius: 8,
+  backgroundColor: '$customRed5',
+});
+
 const LabelText = styled(Text, {
   fontSize: 14,
   fontWeight: 'bold',
@@ -494,5 +592,7 @@ const ButtonText = styled(Text, {
   fontSize: 15,
   fontWeight: 'bold',
 });
+
+const AnimatedIconContainer = Animated.createAnimatedComponent(IconContainer);
 
 export default NewTaskScreen;

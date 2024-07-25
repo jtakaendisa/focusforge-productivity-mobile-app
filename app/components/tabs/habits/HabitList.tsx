@@ -14,10 +14,9 @@ import ModalContainer from '../modals/ModalContainer';
 
 interface Props {
   habits: Habit[];
-  filteredHabits: Habit[];
 }
 
-const HabitList = ({ habits, filteredHabits }: Props) => {
+const HabitList = ({ habits }: Props) => {
   const setHabits = useHabitStore((s) => s.setHabits);
 
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
@@ -56,7 +55,7 @@ const HabitList = ({ habits, filteredHabits }: Props) => {
     <Container>
       <AnimatedFlashList
         ref={habitListRef}
-        data={filteredHabits}
+        data={habits}
         renderItem={({ item }) => (
           <HabitListItem
             habit={item}

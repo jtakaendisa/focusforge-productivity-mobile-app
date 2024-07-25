@@ -44,7 +44,7 @@ export const toFormattedSectionTitle = (date: string) => {
 
 export const toDateGroupedTasks = (tasks: Task[]) => {
   const groups: DateGroupedTasks = tasks.reduce((acc: DateGroupedTasks, task) => {
-    const dueDate = toFormattedDateString(task.dueDate);
+    const dueDate = toFormattedDateString(task.dueDate!);
     if (!acc[dueDate]) {
       acc[dueDate] = [];
     }

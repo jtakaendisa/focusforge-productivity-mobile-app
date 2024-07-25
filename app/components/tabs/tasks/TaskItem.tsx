@@ -44,8 +44,8 @@ const TaskItem = ({
 
   const isChecked = useSharedValue(isCompleted ? 1 : 0);
 
-  const hasChecklist = !!checklist.length;
-  const allCompleted = checklist.every((item) => item.isCompleted);
+  const hasChecklist = !!checklist?.length;
+  const allCompleted = checklist?.every((item) => item.isCompleted);
 
   const customGray1 = getTokenValue('$customGray1');
 
@@ -89,8 +89,8 @@ const TaskItem = ({
     swipeableRef.current?.close();
   };
 
-  const generateProgressText = (checklist: ChecklistItem[]) => {
-    if (!checklist.length) return '';
+  const generateProgressText = (checklist?: ChecklistItem[]) => {
+    if (!checklist?.length) return '';
 
     const totalItems = checklist.length;
     const completedItems = checklist.filter((item) => item.isCompleted).length;

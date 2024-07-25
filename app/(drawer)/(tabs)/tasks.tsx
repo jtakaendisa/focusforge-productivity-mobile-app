@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FlashList } from '@shopify/flash-list';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { View, styled } from 'tamagui';
 
-import { Filter, TabRoute, Task } from '../../entities';
-import { useAppStore, useTaskStore } from '../../store';
-import { toDateGroupedTasks, toFormattedSections } from '../../utils';
+import { TaskFilter, TabRoute, Task } from '../../entities';
+import { useActivityStore, useAppStore, useTaskStore } from '../../store';
 import CreateTaskButton from '../../components/tabs/CreateTaskButton';
 import TaskFrequencyModal from '../../components/tabs/modals/TaskFrequencyModal';
 import FilterBar from '../../components/tabs/tasks/FilterBar';
@@ -18,44 +17,32 @@ const TasksScreen = () => {
 
   const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
   const tasks = useTaskStore((s) => s.tasks);
+  const filter = useTaskStore((s) => s.filter);
+  const setFilter = useTaskStore((s) => s.setFilter);
+  const filteredSingleTasks = useActivityStore((s) => s.filteredSingleTasks);
+  const filteredRecurringTasks = useActivityStore((s) => s.filteredRecurringTasks);
 
-  const [filter, setFilter] = useState<Filter>('single');
   const [filteredTasks, setFilteredTasks] = useState<(string | Task)[]>([]);
 
   const tasklistRef = useRef<FlashList<Task | (string | Task)> | null>(null);
   const taskFrequencyRef = useRef<BottomSheetModal | null>(null);
 
-  const singleSectionedTasks = useMemo(() => {
-    const singleTasks = tasks.filter((task) => task.isRecurring === false);
-    const dateGroupedTasks = toDateGroupedTasks(singleTasks);
-    return toFormattedSections(dateGroupedTasks);
-  }, [tasks]);
-
-  const recurringTasks = useMemo(
-    () => tasks.filter((task) => task.isRecurring === true),
-    [tasks]
-  );
-
-  const handleSelectFilter = (filter: Filter) => setFilter(filter);
+  const handleSelectFilter = (filter: TaskFilter) => setFilter(filter);
 
   const handlePresentModalPress = () => taskFrequencyRef.current?.present();
 
   useEffect(() => {
     let filteredTasks: (string | Task)[] = [];
 
-    switch (filter) {
-      case 'single':
-        filteredTasks = singleSectionedTasks;
-        break;
-      case 'recurring':
-        filteredTasks = recurringTasks;
-        break;
+    if (filter === 'single') {
+      filteredTasks = filteredSingleTasks;
+    } else {
+      filteredTasks = filteredRecurringTasks;
     }
 
     setFilteredTasks(filteredTasks);
-
     tasklistRef.current?.prepareForLayoutAnimationRender();
-  }, [filter, singleSectionedTasks, recurringTasks, tasklistRef]);
+  }, [filter, filteredSingleTasks, filteredRecurringTasks, tasklistRef]);
 
   return (
     <Container>

@@ -49,6 +49,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
   });
 
   const setDueDateRef = useRef<((...event: any[]) => void) | null>(null);
+  const setEndDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setIsCarriedOverRef = useRef<((...event: any[]) => void) | null>(null);
 
   const {
@@ -80,6 +81,8 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
     title,
     category,
     dueDate,
+    startDate,
+    endDate,
     checklist,
     priority,
     note,
@@ -94,17 +97,28 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
 
   const handleDateSelect = (
     event: DateTimePickerEvent,
-    selectedDate: Date | undefined
+    selectedDate: Date | undefined,
+    mode: 'start' | 'end'
   ) => {
     if (selectedDate) {
-      setDueDateRef.current?.(selectedDate);
+      if (mode === 'start') {
+        setDueDateRef.current?.(selectedDate);
+      } else {
+        if (
+          toFormattedDateString(selectedDate) !== toFormattedDateString(TODAYS_DATE)
+        ) {
+          setEndDateRef.current?.(selectedDate);
+        } else {
+          setEndDateRef.current?.();
+        }
+      }
     }
   };
 
-  const showDatePicker = () => {
+  const showDatePicker = (mode: 'start' | 'end') => {
     DateTimePickerAndroid.open({
       value: new Date(),
-      onChange: handleDateSelect,
+      onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
       minimumDate: TODAYS_DATE,
     });
@@ -185,7 +199,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
           </CategoryContainer>
         </Row>
       </OptionContainer>
-      <OptionContainer onPress={showDatePicker}>
+      <OptionContainer onPress={() => showDatePicker('start')}>
         <OptionInfo>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 19 20" fill="none">
             <Path
@@ -193,25 +207,58 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
               fill={customRed1}
             />
           </Svg>
-          <OptionTitle>Date</OptionTitle>
+          <OptionTitle>{isRecurring ? 'Start Date' : 'Due Date'}</OptionTitle>
         </OptionInfo>
         <Controller
           control={control}
-          name="dueDate"
+          name={isRecurring ? 'startDate' : 'dueDate'}
           render={({ field: { onChange } }) => {
             setDueDateRef.current = onChange;
             return (
               <CategoryLabel>
                 <LabelText>
-                  {toFormattedDateString(dueDate) === toFormattedDateString(TODAYS_DATE)
+                  {toFormattedDateString(isRecurring ? startDate! : dueDate!) ===
+                  toFormattedDateString(TODAYS_DATE)
                     ? 'Today'
-                    : toFormattedDateString(dueDate)}
+                    : toFormattedDateString(isRecurring ? startDate! : dueDate!)}
                 </LabelText>
               </CategoryLabel>
             );
           }}
         />
       </OptionContainer>
+      {isRecurring && (
+        <OptionContainer onPress={() => showDatePicker('end')}>
+          <OptionInfo>
+            <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 19 20" fill="none">
+              <Path
+                d="M17.1367 1.41797H15.7188V3.57422C15.7188 3.97656 15.4102 4.28125 15.0117 4.28125H12.1445C11.7422 4.28125 11.4375 3.97266 11.4375 3.57422V1.41797H7.12109V3.57422C7.12109 3.97656 6.8125 4.28125 6.41406 4.28125H3.54688C3.14453 4.28125 2.83984 3.97266 2.83984 3.57422V1.41797H1.41797C0.617188 1.41797 0 2.06641 0 2.83594V18.582C0 19.3828 0.648438 20 1.41797 20H17.1641C17.9648 20 18.582 19.3516 18.582 18.582V2.86719C18.5859 2.06641 17.9375 1.41797 17.1367 1.41797ZM17.1367 18.6133H1.41797V5.73047H17.1641V18.6133H17.1367ZM5.70312 2.86719H4.28516V0H5.70312V2.86719ZM14.3008 2.86719H12.8828V0H14.3008V2.86719ZM7.12109 8.59766H5.70312V7.17969H7.12109V8.59766ZM9.98828 8.59766H8.57031V7.17969H9.98828V8.59766ZM12.8516 8.59766H11.4336V7.17969H12.8516V8.59766ZM15.7188 8.59766H14.3008V7.17969H15.7188V8.59766ZM4.28516 11.4336H2.86719V10.0156H4.28516V11.4336ZM7.12109 11.4336H5.70312V10.0156H7.12109V11.4336ZM9.98828 11.4336H8.57031V10.0156H9.98828V11.4336ZM12.8516 11.4336H11.4336V10.0156H12.8516V11.4336ZM15.7188 11.4336H14.3008V10.0156H15.7188V11.4336ZM4.28516 14.3008H2.86719V12.8828H4.28516V14.3008ZM7.12109 14.3008H5.70312V12.8828H7.12109V14.3008ZM9.98828 14.3008H8.57031V12.8828H9.98828V14.3008ZM12.8516 14.3008H11.4336V12.8828H12.8516V14.3008ZM15.7188 14.3008H14.3008V12.8828H15.7188V14.3008ZM4.28516 17.1641H2.86719V15.7461H4.28516V17.1641ZM7.12109 17.1641H5.70312V15.7461H7.12109V17.1641ZM9.98828 17.1641H8.57031V15.7461H9.98828V17.1641ZM12.8516 17.1641H11.4336V15.7461H12.8516V17.1641Z"
+                fill={customRed1}
+              />
+            </Svg>
+            <OptionTitle>End Date</OptionTitle>
+          </OptionInfo>
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field: { onChange } }) => {
+              setEndDateRef.current = onChange;
+              return (
+                <CategoryLabel>
+                  <LabelText>
+                    {endDate
+                      ? toFormattedDateString(endDate) ===
+                        toFormattedDateString(TODAYS_DATE)
+                        ? 'Today'
+                        : toFormattedDateString(endDate)
+                      : '---'}
+                  </LabelText>
+                </CategoryLabel>
+              );
+            }}
+          />
+        </OptionContainer>
+      )}
       <OptionContainer onPress={toggleRemindersModal}>
         <OptionInfo>
           <Svg width={SVG_SIZE} height={SVG_SIZE} viewBox="0 0 20 22" fill="none">
