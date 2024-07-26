@@ -1,5 +1,5 @@
 import { Category } from '@/app/entities';
-import { styled, View, Text } from 'tamagui';
+import { styled, View, Text, getTokenValue } from 'tamagui';
 import CategoryIcon from './CategoryIcon';
 import RippleButton from './RippleButton';
 import CircularCheckbox from './CircularCheckbox';
@@ -15,6 +15,8 @@ interface Props {
 const SearchBarCategoryCard = ({ category, isSelected, onSelect }: Props) => {
   const isChecked = useSharedValue(isSelected ? 1 : 0);
 
+  const customBlack1 = getTokenValue('$customBlack1');
+
   const handleSelect = () => onSelect(category);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ const SearchBarCategoryCard = ({ category, isSelected, onSelect }: Props) => {
       <Container>
         <InnerRow>
           <CategoryContainer>
-            <CategoryIcon category={category} />
+            <CategoryIcon category={category} fill={customBlack1} />
           </CategoryContainer>
           <TitleText>{category}</TitleText>
         </InnerRow>

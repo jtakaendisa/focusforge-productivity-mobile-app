@@ -4,11 +4,11 @@ import {
   DrawerItem,
 } from '@react-navigation/drawer';
 import { router, usePathname } from 'expo-router';
-import { StyleSheet, View, Image, Text } from 'react-native';
-import { TabRoute } from '../entities';
-import DrawerItemIcon from './tabs/DrawerItemIcon';
-import { useAuthStore } from '../store';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { getTokenValue } from 'tamagui';
+import { TabRoute } from '../entities';
+import { useAuthStore } from '../store';
+import DrawerItemIcon from './tabs/DrawerItemIcon';
 
 const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
@@ -74,6 +74,9 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
       {routes.map((route) => {
         const { icon, label, isSelected, onNavigate } = route;
 
+        const color = isSelected ? customRed1 : customGray1;
+        const backgroundColor = isSelected ? customRed4 : 'transparent';
+
         return (
           <DrawerItem
             key={label}
@@ -83,19 +86,17 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                 <DrawerItemIcon
                   icon={icon}
                   size={size}
-                  fill={isSelected ? customRed1 : customGray1}
+                  fill={color}
+                  variant={isSelected ? 'solid' : 'outline'}
                 />
               </View>
             )}
             label={label}
-            labelStyle={[
-              styles.label,
-              { color: isSelected ? customRed1 : customGray1 },
-            ]}
+            labelStyle={[styles.label, { color }]}
             style={[
               styles.drawerItem,
               {
-                backgroundColor: isSelected ? customRed4 : 'transparent',
+                backgroundColor,
               },
             ]}
             onPress={onNavigate}

@@ -47,6 +47,7 @@ const TaskItem = ({
   const hasChecklist = !!checklist?.length;
   const allCompleted = checklist?.every((item) => item.isCompleted);
 
+  const customBlack1 = getTokenValue('$customBlack1');
   const customGray1 = getTokenValue('$customGray1');
 
   const textColorAnimation = useAnimatedStyle(() => ({
@@ -151,7 +152,7 @@ const TaskItem = ({
               <ProgressText>{generateProgressText(checklist)}</ProgressText>
             </MetricsContainer>
             <CategoryContainer>
-              <CategoryIcon category={category} />
+              <CategoryIcon category={category} fill={customBlack1} />
             </CategoryContainer>
           </InfoContainer>
         </TaskContainer>

@@ -4,7 +4,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import { styled, View, Text, getTokenValue } from 'tamagui';
+import { getTokenValue, styled, Text, View } from 'tamagui';
 
 import { TabRoute } from '@/app/entities';
 import TabBarIcon from './TabBarIcon';
@@ -48,7 +48,11 @@ const TabBarButton = ({ accessibilityState, to, onPress }: Props) => {
   return (
     <Container onPress={onPress}>
       <IconContainer>
-        <TabBarIcon color={color} currentPath={currentPath} isSelected={isSelected} />
+        <TabBarIcon
+          currentPath={currentPath}
+          fill={color}
+          variant={isSelected ? 'solid' : 'outline'}
+        />
       </IconContainer>
       <AnimatedIconBackground isSelected={isSelected} style={widthAnimation} />
       <AnimatedLabel color={color} style={fontAnimation}>

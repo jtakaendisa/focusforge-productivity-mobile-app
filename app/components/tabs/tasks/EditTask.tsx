@@ -1,24 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { router } from 'expo-router';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { router } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import Svg, { Path } from 'react-native-svg';
 
+import { TODAYS_DATE } from '@/app/constants';
 import { Task } from '@/app/entities';
 import { NewTaskData } from '@/app/newTask';
 import { useTaskStore } from '@/app/store';
 import { toFormattedDateString, toTruncatedText } from '@/app/utils';
 import { taskSchema } from '@/app/validationSchemas';
-import { View, Text, styled, getTokenValue } from 'tamagui';
-import CategoryIcon from '../CategoryIcon';
-import { TODAYS_DATE } from '@/app/constants';
 import {
   DateTimePickerAndroid,
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import FrequencyBadge from '../habits/FrequencyBadge';
-import CircularCheckbox from '../CircularCheckbox';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
+import { Text, View, getTokenValue, styled } from 'tamagui';
+import BellSvg from '../../icons/BellSvg';
+import CalendarEndSvg from '../../icons/CalendarEndSvg';
+import CalendarStartSvg from '../../icons/CalendarStartSvg';
+import CalendarSvg from '../../icons/CalendarSvg';
+import ChecklistSvg from '../../icons/ChecklistSvg';
+import FlagSvg from '../../icons/FlagSvg';
+import LoopSvg from '../../icons/LoopSvg';
+import PenSvg from '../../icons/PenSvg';
+import PenToSquareSvg from '../../icons/PenToSquareSvg';
+import PendingSvg from '../../icons/PendingSvg';
+import SquareGridSvg from '../../icons/SquareGridSvg';
+import CategoryIcon from '../CategoryIcon';
+import CircularCheckbox from '../CircularCheckbox';
+import FrequencyBadge from '../habits/FrequencyBadge';
 import FrequencyListModule from '../habits/FrequencyListModule';
 import CategoryModalModule from '../modals/CategoryModalModule';
 import ChecklistModalModule from '../modals/ChecklistModalModule';
@@ -26,15 +36,6 @@ import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import RemindersModalModule from '../modals/RemindersModalModule';
 import TextModalModule from '../modals/TextModalModule';
-import PenSvg from '../../icons/PenSvg';
-import SquareGridSvg from '../../icons/SquareGridSvg';
-import CalendarSvg from '../../icons/CalendarSvg';
-import BellSvg from '../../icons/BellSvg';
-import ChecklistSvg from '../../icons/ChecklistSvg';
-import FlagSvg from '../../icons/FlagSvg';
-import PenToSquareSvg from '../../icons/PenToSquareSvg';
-import PendingSvg from '../../icons/PendingSvg';
-import LoopSvg from '../../icons/LoopSvg';
 
 interface Props {
   tasks: Task[];
@@ -42,6 +43,7 @@ interface Props {
 }
 
 const SVG_SIZE = 22;
+
 const EditTask = ({ tasks, selectedTask }: Props) => {
   const { isRecurring } = selectedTask;
 
@@ -102,6 +104,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
 
   const isChecked = useSharedValue(isCarriedOver ? 1 : 0);
 
+  const customBlack1 = getTokenValue('$customBlack1');
   const customRed1 = getTokenValue('$customRed1');
 
   const handleDateSelect = (
@@ -181,26 +184,30 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
     <Container>
       <OptionContainer onPress={toggleTitleModal}>
         <OptionInfo>
-          <PenSvg size={22} fill={customRed1} />
+          <PenSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Title</OptionTitle>
         </OptionInfo>
-        <Text color="#8C8C8C">{toTruncatedText(title, 24)}</Text>
+        <Text color="$customGray1">{toTruncatedText(title, 24)}</Text>
       </OptionContainer>
       <OptionContainer onPress={toggleCategoryModal}>
         <OptionInfo>
-          <SquareGridSvg size={22} fill={customRed1} />
+          <SquareGridSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Category</OptionTitle>
         </OptionInfo>
         <Row>
           <Text color={customRed1}>{category}</Text>
           <CategoryContainer>
-            <CategoryIcon category={category} />
+            <CategoryIcon category={category} fill={customBlack1} />
           </CategoryContainer>
         </Row>
       </OptionContainer>
       <OptionContainer onPress={() => showDatePicker('start')}>
         <OptionInfo>
-          <CalendarSvg size={22} fill={customRed1} />
+          {isRecurring ? (
+            <CalendarStartSvg size={SVG_SIZE} fill={customRed1} />
+          ) : (
+            <CalendarSvg size={SVG_SIZE} fill={customRed1} />
+          )}
           <OptionTitle>{isRecurring ? 'Start Date' : 'Due Date'}</OptionTitle>
         </OptionInfo>
         <Controller
@@ -224,7 +231,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
       {isRecurring && (
         <OptionContainer onPress={() => showDatePicker('end')}>
           <OptionInfo>
-            <CalendarSvg size={22} fill={customRed1} />
+            <CalendarEndSvg size={SVG_SIZE} fill={customRed1} />
             <OptionTitle>End Date</OptionTitle>
           </OptionInfo>
           <Controller
@@ -250,7 +257,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
       )}
       <OptionContainer onPress={toggleRemindersModal}>
         <OptionInfo>
-          <BellSvg size={22} fill={customRed1} />
+          <BellSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Time and reminders</OptionTitle>
         </OptionInfo>
         <CategoryLabel>
@@ -263,7 +270,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
       </OptionContainer>
       <OptionContainer onPress={toggleChecklistModal}>
         <OptionInfo>
-          <ChecklistSvg size={22} fill={customRed1} />
+          <ChecklistSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Checklist</OptionTitle>
         </OptionInfo>
         <CategoryLabel>
@@ -274,7 +281,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
       </OptionContainer>
       <OptionContainer onPress={togglePriorityModal}>
         <OptionInfo>
-          <FlagSvg size={22} fill={customRed1} variant="outline" />
+          <FlagSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
           <OptionTitle>Priority</OptionTitle>
         </OptionInfo>
         <CategoryLabel>
@@ -284,7 +291,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
       {isRecurring && (
         <OptionContainer onPress={toggleFrequencyModal}>
           <OptionInfo>
-            <LoopSvg size={22} fill={customRed1} />
+            <LoopSvg size={SVG_SIZE} fill={customRed1} />
             <OptionTitle>Frequency</OptionTitle>
           </OptionInfo>
           <FrequencyBadge frequency={frequency!} isForm />
@@ -292,14 +299,14 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
       )}
       <OptionContainer onPress={toggleNoteModal}>
         <OptionInfo>
-          <PenToSquareSvg size={22} fill={customRed1} variant="outline" />
+          <PenToSquareSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
           <OptionTitle>Note</OptionTitle>
         </OptionInfo>
         <Text color={customRed1}>{toTruncatedText(note, 16)}</Text>
       </OptionContainer>
       <OptionContainer onPress={() => setIsCarriedOverRef.current?.(!isCarriedOver)}>
         <OptionInfo>
-          <PendingSvg size={22} fill={customRed1} />
+          <PendingSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTextContainer>
             <OptionTitle>Pending Task</OptionTitle>
             <OptionSubtitle>It will be shown each day until completed.</OptionSubtitle>

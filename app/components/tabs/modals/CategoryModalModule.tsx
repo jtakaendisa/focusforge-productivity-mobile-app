@@ -14,6 +14,7 @@ interface Props {
 const CARD_SIZE = (0.8 * SCREEN_WIDTH - 56) / 3;
 
 const CategoryModalModule = ({ control, closeModal }: Props) => {
+  const customBlack1 = getTokenValue('$customBlack1');
   const customRed1 = getTokenValue('$customRed1');
 
   return (
@@ -37,7 +38,7 @@ const CategoryModalModule = ({ control, closeModal }: Props) => {
                     }}
                   >
                     <CategoryContainer>
-                      <CategoryIcon category={category} />
+                      <CategoryIcon category={category} fill={customBlack1} />
                     </CategoryContainer>
                     <CategoryTitle>{category}</CategoryTitle>
                   </CategoryCard>

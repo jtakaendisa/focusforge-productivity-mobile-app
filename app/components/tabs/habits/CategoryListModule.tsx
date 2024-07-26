@@ -1,5 +1,5 @@
 import { Control, Controller } from 'react-hook-form';
-import { View, Text, styled } from 'tamagui';
+import { View, Text, styled, getTokenValue } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { categoryArray } from '@/app/store';
@@ -12,6 +12,8 @@ interface Props {
 }
 
 const CategoryListModule = ({ control, navigateForward }: Props) => {
+  const customBlack1 = getTokenValue('$customBlack1');
+
   return (
     <Container>
       <HeadingContainer>
@@ -35,7 +37,7 @@ const CategoryListModule = ({ control, navigateForward }: Props) => {
                     <CategoryCardInnerRow>
                       <Text>{category}</Text>
                       <CategoryIconContainer>
-                        <CategoryIcon category={category} />
+                        <CategoryIcon category={category} fill={customBlack1} />
                       </CategoryIconContainer>
                     </CategoryCardInnerRow>
                   </CategoryCard>

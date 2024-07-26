@@ -36,6 +36,7 @@ const ActivityOptionsModal = ({
       ? (['calendar', 'statistics', 'edit', 'delete'] as const)
       : (['calendar', 'edit', 'delete'] as const);
 
+  const customBlack1 = getTokenValue('$customBlack1');
   const customGray1 = getTokenValue('$customGray1');
   const customGray3 = getTokenValue('$customGray3');
   const customRed1 = getTokenValue('$customRed1');
@@ -62,7 +63,7 @@ const ActivityOptionsModal = ({
           </DetailsContainer>
           <CategoryContainer>
             {selectedActivity?.category && (
-              <CategoryIcon category={selectedActivity.category} />
+              <CategoryIcon category={selectedActivity.category} fill={customBlack1} />
             )}
           </CategoryContainer>
         </TopRow>
