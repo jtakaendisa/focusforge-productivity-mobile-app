@@ -1,7 +1,7 @@
 import { format, parse } from 'date-fns';
 
 import { Task } from '../entities';
-import { TODAYS_DATE } from '../constants';
+import { CURRENT_DATE } from '../constants';
 
 interface DateGroupedTasks {
   [key: string]: Task[];
@@ -26,14 +26,14 @@ export const toFormattedTimeString = (date: Date) => {
 };
 
 export const toFormattedSectionTitle = (date: string) => {
-  const yesterday = new Date(TODAYS_DATE);
-  yesterday.setDate(TODAYS_DATE.getDate() - 1);
-  const tomorrow = new Date(TODAYS_DATE);
-  tomorrow.setDate(TODAYS_DATE.getDate() + 1);
+  const yesterday = new Date(CURRENT_DATE);
+  yesterday.setDate(CURRENT_DATE.getDate() - 1);
+  const tomorrow = new Date(CURRENT_DATE);
+  tomorrow.setDate(CURRENT_DATE.getDate() + 1);
 
   if (date === toFormattedDateString(yesterday)) {
     return 'Yesterday';
-  } else if (date === toFormattedDateString(TODAYS_DATE)) {
+  } else if (date === toFormattedDateString(CURRENT_DATE)) {
     return 'Today';
   } else if (date === toFormattedDateString(tomorrow)) {
     return 'Tomorrow';

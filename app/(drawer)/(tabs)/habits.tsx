@@ -1,40 +1,31 @@
-import { useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { useRef } from 'react';
 import { styled, View } from 'tamagui';
 
-import { useActivityStore, useAppStore, useHabitStore } from '../../store';
-import HabitList from '../../components/tabs/habits/HabitList';
-import CreateTaskButton from '../../components/tabs/CreateTaskButton';
-import TaskFrequencyModal from '../../components/tabs/modals/TaskFrequencyModal';
-import ActivityListPlaceholder from '../../components/tabs/home/ActivityListPlaceholder';
 import SearchBarSpacer from '@/app/components/tabs/SearchBarSpacer';
-import { usePathname } from 'expo-router';
 import { TabRoute } from '@/app/entities';
+import { usePathname } from 'expo-router';
+import NewActivityButton from '../../components/tabs/NewActivityButton';
+import HabitList from '../../components/tabs/habits/HabitList';
+import NewActivityModal from '../../components/tabs/modals/NewActivityModal';
+import { useActivityStore, useAppStore } from '../../store';
 
 const HabitsScreen = () => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
   const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
-  const filteredHabits = useActivityStore((s) => s.filteredHabits);
+  const activities = useActivityStore((s) => s.activities);
 
-  const taskFrequencyRef = useRef<BottomSheetModal | null>(null);
+  const newActivityModalRef = useRef<BottomSheetModal | null>(null);
 
-  const isHabitsEmpty = !filteredHabits.length;
-
-  const handlePresentTaskFrequencyModal = () => taskFrequencyRef.current?.present();
+  const toggleNewActivityModal = () => newActivityModalRef.current?.present();
 
   return (
     <Container>
       <SearchBarSpacer isExpanded={pathname === 'habits' && isSearchBarOpen} />
-      <HabitListContainer isCentered={isHabitsEmpty}>
-        {isHabitsEmpty ? (
-          <ActivityListPlaceholder />
-        ) : (
-          <HabitList habits={filteredHabits} />
-        )}
-      </HabitListContainer>
-      <CreateTaskButton onPress={handlePresentTaskFrequencyModal} />
-      <TaskFrequencyModal taskFrequencyRef={taskFrequencyRef} />
+      <HabitList activities={activities} />
+      <NewActivityButton onPress={toggleNewActivityModal} />
+      <NewActivityModal newActivityModalRef={newActivityModalRef} />
     </Container>
   );
 };
@@ -43,19 +34,6 @@ const Container = styled(View, {
   flex: 1,
   position: 'relative',
   backgroundColor: '$customBlack1',
-});
-
-const HabitListContainer = styled(View, {
-  flex: 1,
-  marginTop: 16,
-  variants: {
-    isCentered: {
-      true: {
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-    },
-  } as const,
 });
 
 export default HabitsScreen;

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { getTokenValue, styled, Text, View } from 'tamagui';
 
-import { TODAYS_DATE } from '@/app/constants';
+import { CURRENT_DATE } from '@/app/constants';
 import { Habit } from '@/app/entities';
 import { NewHabitData } from '@/app/newHabit';
 import { useHabitStore } from '@/app/store';
@@ -100,7 +100,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
         setStartDateRef.current?.(selectedDate);
       } else {
         if (
-          toFormattedDateString(selectedDate) !== toFormattedDateString(TODAYS_DATE)
+          toFormattedDateString(selectedDate) !== toFormattedDateString(CURRENT_DATE)
         ) {
           setEndDateRef.current?.(selectedDate);
         } else {
@@ -115,7 +115,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
       value: new Date(),
       onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
-      minimumDate: TODAYS_DATE,
+      minimumDate: CURRENT_DATE,
     });
   };
 
@@ -228,7 +228,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
               <OptionLabel>
                 <LabelText>
                   {toFormattedDateString(startDate) ===
-                  toFormattedDateString(TODAYS_DATE)
+                  toFormattedDateString(CURRENT_DATE)
                     ? 'Today'
                     : toFormattedDateString(startDate)}
                 </LabelText>
@@ -262,7 +262,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
                   <LabelText>
                     {endDate
                       ? toFormattedDateString(endDate) ===
-                        toFormattedDateString(TODAYS_DATE)
+                        toFormattedDateString(CURRENT_DATE)
                         ? 'Today'
                         : toFormattedDateString(endDate)
                       : '---'}

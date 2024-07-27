@@ -19,7 +19,7 @@ import {
 } from '@/app/utils';
 import { usePathname } from 'expo-router';
 import { Activity, TabRoute, Task } from '@/app/entities';
-import { TODAYS_DATE } from '@/app/constants';
+import { CURRENT_DATE } from '@/app/constants';
 
 interface Props {
   title?: string;
@@ -45,6 +45,8 @@ const CustomHeader = ({ title }: Props) => {
   const defaultHeaderHeight = getDefaultHeaderHeight(frame, false, insets.top);
   const statusBarHeight = StatusBar.currentHeight || 0;
   const headerHeight = defaultHeaderHeight - statusBarHeight;
+
+  return <DefaultHeader height={headerHeight} title={title} />;
 
   const recurringTasks = useMemo(
     () => tasks.filter((task) => task.isRecurring === true),
@@ -81,8 +83,8 @@ const CustomHeader = ({ title }: Props) => {
       return tasks.map((task) => {
         if (!task.isRecurring && task.isCarriedOver && !task.isCompleted) {
           const dueDate = new Date(task.dueDate!);
-          if (dueDate < TODAYS_DATE) {
-            return { ...task, dueDate: TODAYS_DATE };
+          if (dueDate < CURRENT_DATE) {
+            return { ...task, dueDate: CURRENT_DATE };
           }
         }
         return task;

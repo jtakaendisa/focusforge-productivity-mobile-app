@@ -8,7 +8,7 @@ import {
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { styled, View, Text, getTokenValue } from 'tamagui';
 
-import { Habit, Task } from '@/app/entities';
+import { Activity, Habit, Task } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
 import HabitOptionIcon from './HabitOptionIcon';
 import CategoryIcon from '../CategoryIcon';
@@ -19,7 +19,7 @@ import { HabitActiveTab } from '@/app/habitDetails';
 interface Props {
   mode: 'habit' | 'task';
   activityOptionsRef: MutableRefObject<BottomSheetModalMethods | null>;
-  selectedActivity: Habit | Task | null;
+  selectedActivity: Activity | null;
   onDelete: (id: string) => void;
   onNavigate: (activeTab: TaskActiveTab | HabitActiveTab, habitId: string) => void;
 }

@@ -8,12 +8,14 @@ import { useActivityStore, useAppStore } from '../../store';
 import DateCarousel from '../../components/tabs/home/DateCarousel';
 import ActivityListPlaceholder from '../../components/tabs/home/ActivityListPlaceholder';
 import TaskList from '../../components/tabs/home/TaskList';
-import CreateTaskButton from '../../components/tabs/CreateTaskButton';
-import TaskFrequencyModal from '../../components/tabs/modals/TaskFrequencyModal';
+import CreateTaskButton from '../../components/tabs/NewActivityButton';
+import TaskFrequencyModal from '../../components/tabs/modals/NewActivityModal';
 import SearchBarSpacer from '@/app/components/tabs/SearchBarSpacer';
 import { usePathname } from 'expo-router';
 
 const HomeScreen = () => {
+  return null;
+
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
   const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);

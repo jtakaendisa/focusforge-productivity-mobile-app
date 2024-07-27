@@ -9,11 +9,11 @@ import {
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { styled, View, Text, getTokenValue } from 'tamagui';
 
-import TaskFrequencyIcon from './TaskFrequencyIcon';
+import ActivityTypeIcon from './ActivityTypeIcon';
 import ArrowRightSvg from '../../icons/ArrowRightSvg';
 
 interface Props {
-  taskFrequencyRef: MutableRefObject<BottomSheetModalMethods | null>;
+  newActivityModalRef: MutableRefObject<BottomSheetModalMethods | null>;
 }
 
 type Pathname = '/newTask' | '/newHabit';
@@ -47,11 +47,11 @@ const options = [
   },
 ] as const;
 
-const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
+const NewActivityModal = ({ newActivityModalRef }: Props) => {
   const currentPath = usePathname();
 
   const handleCreateTask = (pathname: Pathname, isRecurring: boolean) => {
-    taskFrequencyRef.current?.dismiss();
+    newActivityModalRef.current?.dismiss();
 
     if (pathname === '/newTask') {
       router.push({
@@ -69,7 +69,7 @@ const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
 
   return (
     <BottomSheetModal
-      ref={taskFrequencyRef}
+      ref={newActivityModalRef}
       backgroundStyle={{ backgroundColor: customGray3 }}
       handleIndicatorStyle={{ backgroundColor: 'gray' }}
       backdropComponent={renderBackdrop}
@@ -87,7 +87,7 @@ const TaskFrequencyModal = ({ taskFrequencyRef }: Props) => {
                 onPress={() => handleCreateTask(pathname, isRecurring)}
               >
                 <IconContainer isTransparent={false}>
-                  <TaskFrequencyIcon name={icon} fill={customRed1} />
+                  <ActivityTypeIcon name={icon} fill={customRed1} />
                 </IconContainer>
                 <CardTextContainer>
                   <CardHeading>{heading}</CardHeading>
@@ -152,4 +152,4 @@ const Separator = styled(View, {
   borderColor: '$customGray2',
 });
 
-export default TaskFrequencyModal;
+export default NewActivityModal;

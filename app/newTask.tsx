@@ -40,7 +40,7 @@ import ModalContainer from './components/tabs/modals/ModalContainer';
 import PriorityModalModule from './components/tabs/modals/PriorityModalModule';
 import RemindersModalModule from './components/tabs/modals/RemindersModalModule';
 import TextModalModule from './components/tabs/modals/TextModalModule';
-import { TODAYS_DATE } from './constants';
+import { CURRENT_DATE } from './constants';
 import { useTaskStore } from './store';
 import { toFormattedDateString, toTruncatedText } from './utils';
 import { taskSchema } from './validationSchemas';
@@ -86,7 +86,7 @@ const NewTaskScreen = () => {
     defaultValues: {
       title: '',
       category: 'Task',
-      [isRecurring ? 'startDate' : 'dueDate']: TODAYS_DATE,
+      [isRecurring ? 'startDate' : 'dueDate']: CURRENT_DATE,
       priority: 'Normal',
       reminders: [],
       frequency: isRecurring
@@ -140,7 +140,7 @@ const NewTaskScreen = () => {
         setDueDateRef.current?.(selectedDate);
       } else {
         if (
-          toFormattedDateString(selectedDate) !== toFormattedDateString(TODAYS_DATE)
+          toFormattedDateString(selectedDate) !== toFormattedDateString(CURRENT_DATE)
         ) {
           setEndDateRef.current?.(selectedDate);
         } else {
@@ -157,7 +157,7 @@ const NewTaskScreen = () => {
       value: new Date(),
       onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
-      minimumDate: TODAYS_DATE,
+      minimumDate: CURRENT_DATE,
     });
   };
 
@@ -250,7 +250,7 @@ const NewTaskScreen = () => {
               <CategoryLabel>
                 <LabelText>
                   {toFormattedDateString(isRecurring ? startDate! : dueDate!) ===
-                  toFormattedDateString(TODAYS_DATE)
+                  toFormattedDateString(CURRENT_DATE)
                     ? 'Today'
                     : toFormattedDateString(isRecurring ? startDate! : dueDate!)}
                 </LabelText>
@@ -286,7 +286,7 @@ const NewTaskScreen = () => {
                     <LabelText>
                       {endDate
                         ? toFormattedDateString(endDate) ===
-                          toFormattedDateString(TODAYS_DATE)
+                          toFormattedDateString(CURRENT_DATE)
                           ? 'Today'
                           : toFormattedDateString(endDate)
                         : '---'}

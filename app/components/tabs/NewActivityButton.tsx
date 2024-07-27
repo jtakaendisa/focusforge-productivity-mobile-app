@@ -6,7 +6,7 @@ interface Props {
   onPress: () => void;
 }
 
-const CreateTaskButton = ({ onPress }: Props) => {
+const NewActivityButton = ({ onPress }: Props) => {
   const customRed2 = getTokenValue('$customRed2');
   const customRed3 = getTokenValue('$customRed3');
 
@@ -35,4 +35,4 @@ const Gradient = styled(LinearGradient, {
   alignItems: 'center',
 });
 
-export default CreateTaskButton;
+export default NewActivityButton;

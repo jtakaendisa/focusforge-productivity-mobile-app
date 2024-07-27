@@ -7,7 +7,7 @@ interface Props {
   fill: string;
 }
 
-const TaskFrequencyIcon = ({ name, fill }: Props) => {
+const ActivityTypeIcon = ({ name, fill }: Props) => {
   switch (name) {
     case 'habit':
       return <TrophySvg size={22} fill={fill} />;
@@ -18,4 +18,4 @@ const TaskFrequencyIcon = ({ name, fill }: Props) => {
   }
 };
 
-export default TaskFrequencyIcon;
+export default ActivityTypeIcon;

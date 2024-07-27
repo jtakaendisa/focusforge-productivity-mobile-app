@@ -9,7 +9,7 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { View, Text, styled, getTokenValue } from 'tamagui';
 
 import { Priority, Reminder } from '@/app/entities';
-import { SCREEN_WIDTH, SCREEN_HEIGHT, TODAYS_DATE } from '@/app/constants';
+import { SCREEN_WIDTH, SCREEN_HEIGHT, CURRENT_DATE } from '@/app/constants';
 import { toFormattedDateString } from '@/app/utils';
 import { NewHabitData } from '@/app/newHabit';
 import Switch from '../settings/Switch';
@@ -68,7 +68,7 @@ const DurationListModule = ({
       value: new Date(),
       onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
-      minimumDate: TODAYS_DATE,
+      minimumDate: CURRENT_DATE,
     });
   };
 
@@ -109,7 +109,7 @@ const DurationListModule = ({
               <OptionLabel>
                 <LabelText>
                   {toFormattedDateString(startDate) ===
-                  toFormattedDateString(TODAYS_DATE)
+                  toFormattedDateString(CURRENT_DATE)
                     ? 'Today'
                     : toFormattedDateString(startDate)}
                 </LabelText>
@@ -135,7 +135,7 @@ const DurationListModule = ({
                     <AnimatedOptionLabel entering={FadeIn} exiting={FadeOut}>
                       <LabelText>
                         {toFormattedDateString(endDate) ===
-                        toFormattedDateString(TODAYS_DATE)
+                        toFormattedDateString(CURRENT_DATE)
                           ? 'Today'
                           : toFormattedDateString(endDate)}
                       </LabelText>

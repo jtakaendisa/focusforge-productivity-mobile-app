@@ -13,7 +13,7 @@ export type AnimatedInterpolation = Animated.AnimatedInterpolation<string | numb
 
 export type Theme = 'dark' | 'light';
 
-export type TaskFilter = 'single' | 'recurring';
+export type TaskFilter = 'single task' | 'recurring task';
 
 export type Category = (typeof categoryArray)[number];
 
@@ -24,10 +24,6 @@ export interface ChecklistItem {
   title: string;
   isCompleted: boolean;
 }
-
-export type ActivityFilter = 'all' | 'habits' | 'tasks';
-
-export type Activity = Habit | Task;
 
 export type Frequency = z.infer<typeof frequencySchema>;
 
@@ -40,6 +36,27 @@ export interface IconProps {
   fill?: string;
   variant?: IconVariant;
 }
+
+export type ActivityFilter = 'all' | 'habits' | 'tasks';
+
+export type ActivityType = 'habit' | 'single task' | 'recurring task';
+
+export type Activity = {
+  id: string;
+  type: ActivityType;
+  title: string;
+  category: Category;
+  priority: Priority;
+  note: string;
+  dueDate?: Date;
+  startDate?: Date;
+  endDate?: Date;
+  frequency?: Frequency;
+  reminders: Reminder[];
+  checklist?: ChecklistItem[];
+  isCompleted: boolean;
+  isCarriedOver: boolean;
+};
 
 export interface Task {
   id: string;

@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
-import { TODAYS_DATE } from '@/app/constants';
+import { CURRENT_DATE } from '@/app/constants';
 import { Task } from '@/app/entities';
 import { NewTaskData } from '@/app/newTask';
 import { useTaskStore } from '@/app/store';
@@ -117,7 +117,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
         setDueDateRef.current?.(selectedDate);
       } else {
         if (
-          toFormattedDateString(selectedDate) !== toFormattedDateString(TODAYS_DATE)
+          toFormattedDateString(selectedDate) !== toFormattedDateString(CURRENT_DATE)
         ) {
           setEndDateRef.current?.(selectedDate);
         } else {
@@ -132,7 +132,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
       value: new Date(),
       onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
-      minimumDate: TODAYS_DATE,
+      minimumDate: CURRENT_DATE,
     });
   };
 
@@ -219,7 +219,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
               <CategoryLabel>
                 <LabelText>
                   {toFormattedDateString(isRecurring ? startDate! : dueDate!) ===
-                  toFormattedDateString(TODAYS_DATE)
+                  toFormattedDateString(CURRENT_DATE)
                     ? 'Today'
                     : toFormattedDateString(isRecurring ? startDate! : dueDate!)}
                 </LabelText>
@@ -244,7 +244,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
                   <LabelText>
                     {endDate
                       ? toFormattedDateString(endDate) ===
-                        toFormattedDateString(TODAYS_DATE)
+                        toFormattedDateString(CURRENT_DATE)
                         ? 'Today'
                         : toFormattedDateString(endDate)
                       : '---'}

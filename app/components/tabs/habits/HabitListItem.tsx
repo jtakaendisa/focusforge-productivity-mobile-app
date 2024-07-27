@@ -1,10 +1,10 @@
 import { eachDayOfInterval, endOfWeek, format, startOfWeek } from 'date-fns';
-import { useMemo, useRef } from 'react';
+import { MutableRefObject, useMemo, useRef } from 'react';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 
-import { TODAYS_DATE } from '@/app/constants';
-import { Habit } from '@/app/entities';
+import { CURRENT_DATE } from '@/app/constants';
+import { Activity } from '@/app/entities';
 import { HabitActiveTab } from '@/app/habitDetails';
 import { toTruncatedText } from '@/app/utils';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -20,30 +20,28 @@ import HabitItemLeftActions from './HabitItemLeftActions';
 import HabitItemRightActions from './HabitItemRightActions';
 
 interface Props {
-  habit: Habit;
-  showOptions: (habit: Habit) => void;
+  habit: Activity;
+  showOptions: (habit: Activity) => void;
   onNavigate: (activeTab: HabitActiveTab, habitId: string) => void;
-  onSwipe: (selectedHabit: Habit) => void;
+  onSwipe: (
+    direction: 'left' | 'right',
+    habit: Activity,
+    swipeableRef: MutableRefObject<Swipeable | null>
+  ) => void;
   openModal: () => void;
 }
 
 const SVG_SIZE = 18;
 
-const HabitListItem = ({
-  habit,
-  showOptions,
-  onNavigate,
-  onSwipe,
-  openModal,
-}: Props) => {
+const HabitListItem = ({ habit, showOptions, onNavigate, onSwipe }: Props) => {
   const { id, title, category, frequency, endDate } = habit;
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const days = useMemo(() => {
     const daysOfWeek = eachDayOfInterval({
-      start: startOfWeek(TODAYS_DATE, { weekStartsOn: 0 }), // Week starts on Sunday
-      end: endOfWeek(TODAYS_DATE, { weekStartsOn: 0 }), // Week ends on Saturday
+      start: startOfWeek(CURRENT_DATE, { weekStartsOn: 0 }), // Week starts on Sunday
+      end: endOfWeek(CURRENT_DATE, { weekStartsOn: 0 }), // Week ends on Saturday
     });
 
     const dayObjects = daysOfWeek.map((day) => ({
@@ -52,21 +50,10 @@ const HabitListItem = ({
     }));
 
     return dayObjects;
-  }, [TODAYS_DATE, endDate]);
+  }, [CURRENT_DATE, endDate]);
 
-  const handleSwipeCompletion = (direction: 'left' | 'right') => {
-    onSwipe(habit);
-
-    if (direction === 'left') {
-      onNavigate('edit', id);
-    }
-
-    if (direction === 'right') {
-      openModal();
-    }
-
-    swipeableRef.current?.close();
-  };
+  const handleSwipe = (direction: 'left' | 'right') =>
+    onSwipe(direction, habit, swipeableRef);
 
   const customBlack1 = getTokenValue('$customBlack1');
   const customGray1 = getTokenValue('$customGray1');
@@ -82,13 +69,13 @@ const HabitListItem = ({
         renderRightActions={(_, dragAnimatedValue) => (
           <HabitItemRightActions dragAnimatedValue={dragAnimatedValue} />
         )}
-        onSwipeableOpen={(direction) => handleSwipeCompletion(direction)}
+        onSwipeableOpen={handleSwipe}
       >
         <HabitContainer>
           <DetailsRow>
             <TitleContainer>
               <Title>{toTruncatedText(title, 38)}</Title>
-              <FrequencyBadge frequency={frequency} />
+              <FrequencyBadge frequency={frequency!} />
             </TitleContainer>
             <CategoryContainer>
               <CategoryIcon category={category} fill={customBlack1} />

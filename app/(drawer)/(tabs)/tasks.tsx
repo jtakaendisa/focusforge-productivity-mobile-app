@@ -5,14 +5,16 @@ import { View, styled } from 'tamagui';
 
 import { TaskFilter, TabRoute, Task } from '../../entities';
 import { useActivityStore, useAppStore, useTaskStore } from '../../store';
-import CreateTaskButton from '../../components/tabs/CreateTaskButton';
-import TaskFrequencyModal from '../../components/tabs/modals/TaskFrequencyModal';
+import CreateTaskButton from '../../components/tabs/NewActivityButton';
+import TaskFrequencyModal from '../../components/tabs/modals/NewActivityModal';
 import FilterBar from '../../components/tabs/tasks/FilterBar';
 import TaskList from '../../components/tabs/home/TaskList';
 import SearchBarSpacer from '@/app/components/tabs/SearchBarSpacer';
 import { usePathname } from 'expo-router';
 
 const TasksScreen = () => {
+  return null;
+
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
   const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);

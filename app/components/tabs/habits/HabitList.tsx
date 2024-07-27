@@ -1,43 +1,34 @@
-import { useRef, useState } from 'react';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { router } from 'expo-router';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { View, styled } from 'tamagui';
 
-import { Habit } from '@/app/entities';
-import { useHabitStore } from '@/app/store';
-import HabitListItem from './HabitListItem';
-import ActivityOptionsModal from './ActivityOptionsModal';
+import { Activity, Habit } from '@/app/entities';
 import { HabitActiveTab } from '@/app/habitDetails';
+import { useActivityStore } from '@/app/store';
+import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
 import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
+import ActivityOptionsModal from './ActivityOptionsModal';
+import HabitListItem from './HabitListItem';
+import { Swipeable } from 'react-native-gesture-handler';
 
 interface Props {
-  habits: Habit[];
+  activities: Activity[];
 }
 
-const HabitList = ({ habits }: Props) => {
-  const setHabits = useHabitStore((s) => s.setHabits);
+const HabitList = ({ activities }: Props) => {
+  const setActivities = useActivityStore((s) => s.setActivities);
 
-  const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [habits, setHabits] = useState<Activity[]>([]);
+  const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const habitListRef = useRef<FlashList<Habit> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
-  const handleDelete = () => {
-    const filteredHabits = habits.filter((habit) => habit.id !== selectedHabit?.id);
-    setHabits(filteredHabits);
-    habitListRef.current?.prepareForLayoutAnimationRender();
-
-    activityOptionsRef.current?.close();
-    setSelectedHabit(null);
-  };
-
-  const handlePresentActivityOptionsModal = (habit: Habit) => {
-    setSelectedHabit(habit);
-    activityOptionsRef.current?.present();
-  };
+  const isHabitsEmpty = !habits.length;
 
   const navigateToHabitDetailsScreen = (activeTab: HabitActiveTab, habitId: string) => {
     if (!habitId.length) return;
@@ -49,26 +40,68 @@ const HabitList = ({ habits }: Props) => {
     });
   };
 
-  const closeDeleteModal = () => setIsDeleteOpen(false);
+  const toggleActivityOptionsModal = (habit: Activity) => {
+    setSelectedHabit(habit);
+    activityOptionsRef.current?.present();
+  };
+
+  const toggleDeleteModal = () => setIsDeleteModalOpen((prev) => !prev);
+
+  const handleDelete = () => {
+    if (!selectedHabit) return;
+
+    const filteredActivities = activities.filter(
+      (activity) => activity.id !== selectedHabit.id
+    );
+    setActivities(filteredActivities);
+    habitListRef.current?.prepareForLayoutAnimationRender();
+
+    activityOptionsRef.current?.close();
+    setSelectedHabit(null);
+  };
+
+  const handleSwipe = (
+    direction: 'left' | 'right',
+    selectedHabit: Activity,
+    swipeableRef: MutableRefObject<Swipeable | null>
+  ) => {
+    setSelectedHabit(selectedHabit);
+
+    if (direction === 'left') {
+      navigateToHabitDetailsScreen('edit', selectedHabit.id);
+    } else {
+      toggleDeleteModal();
+    }
+    swipeableRef.current?.close();
+  };
+
+  useEffect(() => {
+    const habits = activities.filter((activity) => activity.type === 'habit');
+    setHabits(habits);
+  }, [activities]);
 
   return (
-    <Container>
-      <AnimatedFlashList
-        ref={habitListRef}
-        data={habits}
-        renderItem={({ item }) => (
-          <HabitListItem
-            habit={item}
-            showOptions={handlePresentActivityOptionsModal}
-            onNavigate={navigateToHabitDetailsScreen}
-            onSwipe={(habit) => setSelectedHabit(habit)}
-            openModal={() => setIsDeleteOpen(true)}
-          />
-        )}
-        ItemSeparatorComponent={ItemSeparator}
-        keyExtractor={(item) => item.id}
-        estimatedItemSize={180}
-      />
+    <Container isContentCentered={isHabitsEmpty}>
+      {isHabitsEmpty ? (
+        <ActivityListPlaceholder />
+      ) : (
+        <AnimatedFlashList
+          ref={habitListRef}
+          data={habits}
+          renderItem={({ item }) => (
+            <HabitListItem
+              habit={item}
+              showOptions={toggleActivityOptionsModal}
+              onNavigate={navigateToHabitDetailsScreen}
+              onSwipe={handleSwipe}
+              openModal={toggleDeleteModal}
+            />
+          )}
+          ItemSeparatorComponent={ItemSeparator}
+          keyExtractor={(item) => item.id}
+          estimatedItemSize={180}
+        />
+      )}
       <ActivityOptionsModal
         mode="habit"
         activityOptionsRef={activityOptionsRef}
@@ -76,12 +109,12 @@ const HabitList = ({ habits }: Props) => {
         onDelete={handleDelete}
         onNavigate={navigateToHabitDetailsScreen}
       />
-      <ModalContainer isOpen={isDeleteOpen} closeModal={closeDeleteModal}>
+      <ModalContainer isOpen={isDeleteModalOpen} closeModal={toggleDeleteModal}>
         {selectedHabit && (
           <DeleteModalModule
             taskId={selectedHabit.id}
             deleteTask={handleDelete}
-            closeModal={closeDeleteModal}
+            closeModal={toggleDeleteModal}
           />
         )}
       </ModalContainer>
@@ -93,6 +126,14 @@ const Container = styled(View, {
   flex: 1,
   paddingTop: 12,
   paddingHorizontal: 8,
+  variants: {
+    isContentCentered: {
+      true: {
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    },
+  } as const,
 });
 
 const ItemSeparator = styled(View, {
