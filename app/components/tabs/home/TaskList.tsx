@@ -180,7 +180,8 @@ const TaskList = () => {
       <ModalContainer isOpen={isDeleteModalOpen} closeModal={toggleDeleteModal}>
         {selectedTask && (
           <DeleteModalModule
-            taskId={selectedTask.id}
+            activityId={selectedTask.id}
+            variant="task"
             onDelete={handleDelete}
             closeModal={toggleDeleteModal}
           />

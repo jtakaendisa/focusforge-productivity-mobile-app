@@ -108,7 +108,8 @@ const HabitList = () => {
       <ModalContainer isOpen={isDeleteModalOpen} closeModal={toggleDeleteModal}>
         {selectedHabit && (
           <DeleteModalModule
-            taskId={selectedHabit.id}
+            activityId={selectedHabit.id}
+            variant="habit"
             onDelete={handleDelete}
             closeModal={toggleDeleteModal}
           />

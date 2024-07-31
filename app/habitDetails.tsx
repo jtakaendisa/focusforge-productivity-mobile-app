@@ -1,15 +1,15 @@
+import { useLocalSearchParams } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { useLocalSearchParams } from 'expo-router';
 import { styled, Text, View } from 'tamagui';
 
-import { useHabitStore } from './store';
-import { Habit } from './entities';
-import TabBar from './components/tabs/habits/TabBar';
+import EditHabit from './components/tabs/habits/EditHabit';
 import HabitCalendar from './components/tabs/habits/HabitCalendar';
 import HabitStatistics from './components/tabs/habits/HabitStatistics';
-import EditHabit from './components/tabs/habits/EditHabit';
+import TabBar from './components/tabs/habits/TabBar';
+import { Activity } from './entities';
+import { useActivityStore } from './store';
 
 export type HabitActiveTab = 'calendar' | 'statistics' | 'edit';
 
@@ -21,19 +21,19 @@ type SearchParams = {
 const HabitDetailsScreen = () => {
   const { activeTab: activeTabParam, habitId } = useLocalSearchParams<SearchParams>();
 
-  const habits = useHabitStore((s) => s.habits);
+  const activities = useActivityStore((s) => s.activities);
 
   const [activeTab, setActiveTab] = useState(activeTabParam);
-  const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
+  const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
 
   const handleSelectTab = (activeTab: HabitActiveTab) => setActiveTab(activeTab);
 
   useEffect(() => {
-    const selectedHabit = habits.find((habit) => habit.id === habitId);
+    const selectedHabit = activities.find((activity) => activity.id === habitId);
     if (selectedHabit) {
       setSelectedHabit(selectedHabit);
     }
-  }, [habits, habitId]);
+  }, [activities, habitId]);
 
   if (!selectedHabit) return null;
 
@@ -46,7 +46,7 @@ const HabitDetailsScreen = () => {
       {activeTab === 'calendar' && <HabitCalendar selectedHabit={selectedHabit} />}
       {activeTab === 'statistics' && <HabitStatistics selectedHabit={selectedHabit} />}
       {activeTab === 'edit' && (
-        <EditHabit habits={habits} selectedHabit={selectedHabit} />
+        <EditHabit activities={activities} selectedHabit={selectedHabit} />
       )}
       <StatusBar style="light" />
     </Container>

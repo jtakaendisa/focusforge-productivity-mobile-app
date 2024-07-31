@@ -8,24 +8,23 @@ interface Props {
   isForm?: boolean;
 }
 
+const generateBadgeText = (frequency: Frequency) => {
+  const { type, isRepeatedEvery, isRepeatedOn } = frequency;
+
+  switch (type) {
+    case 'daily':
+      return 'Every day';
+    case 'specific':
+      return isRepeatedOn?.map(
+        (day, index) =>
+          toTruncatedText(day, 3, true) + (index < isRepeatedOn.length - 1 ? ' - ' : '')
+      );
+    case 'repeats':
+      return `Every ${isRepeatedEvery} days`;
+  }
+};
+
 const FrequencyBadge = ({ frequency, isForm }: Props) => {
-  const generateBadgeText = (frequency: Frequency) => {
-    const { type, isRepeatedEvery, isRepeatedOn } = frequency;
-
-    switch (type) {
-      case 'daily':
-        return 'Every day';
-      case 'specific':
-        return isRepeatedOn?.map(
-          (day, index) =>
-            toTruncatedText(day, 3, true) +
-            (index < isRepeatedOn.length - 1 ? ' - ' : '')
-        );
-      case 'repeats':
-        return `Every ${isRepeatedEvery} days`;
-    }
-  };
-
   return (
     <Container isForm={isForm}>
       <BadgeText isForm={isForm}>{generateBadgeText(frequency)}</BadgeText>

@@ -1,21 +1,33 @@
 import { Text, View, styled } from 'tamagui';
 
 interface Props {
-  taskId: string;
+  activityId: string;
+  variant: 'activity' | 'habit' | 'task';
   onDelete: (id: string) => void;
   closeModal: () => void;
 }
 
-const DeleteModalModule = ({ taskId, onDelete, closeModal }: Props) => {
+const generateMessageText = (variant: 'activity' | 'habit' | 'task') => {
+  switch (variant) {
+    case 'activity':
+      return 'Delete Activity?';
+    case 'habit':
+      return 'Delete Habit?';
+    case 'task':
+      return 'Delete Task?';
+  }
+};
+
+const DeleteModalModule = ({ activityId, variant, onDelete, closeModal }: Props) => {
   const handleDelete = () => {
-    onDelete(taskId);
+    onDelete(activityId);
     closeModal();
   };
 
   return (
     <Container>
       <MainContent>
-        <Message>Delete Task?</Message>
+        <Message>{generateMessageText(variant)}</Message>
       </MainContent>
       <ButtonsContainer>
         <Button onPress={closeModal}>

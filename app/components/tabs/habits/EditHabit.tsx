@@ -5,10 +5,10 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { getTokenValue, styled, Text, View } from 'tamagui';
 
 import { CURRENT_DATE } from '@/app/constants';
-import { Habit, NewActivityData } from '@/app/entities';
-import { useHabitStore } from '@/app/store';
-import { toFormattedDateString, toTruncatedText } from '@/app/utils';
-import { habitSchema } from '@/app/validationSchemas';
+import { Activity, NewActivityData } from '@/app/entities';
+import { useActivityStore } from '@/app/store';
+import { toCleanedObject, toFormattedDateString, toTruncatedText } from '@/app/utils';
+import { activitySchema } from '@/app/validationSchemas';
 import {
   DateTimePickerAndroid,
   DateTimePickerEvent,
@@ -33,23 +33,21 @@ import FrequencyBadge from './FrequencyBadge';
 import FrequencyListModule from './FrequencyListModule';
 
 interface Props {
-  habits: Habit[];
-  selectedHabit: Habit;
+  activities: Activity[];
+  selectedHabit: Activity;
 }
 
 const SVG_SIZE = 22;
 
-const EditHabit = ({ habits, selectedHabit }: Props) => {
-  const setHabits = useHabitStore((s) => s.setHabits);
+const EditHabit = ({ activities, selectedHabit }: Props) => {
+  const setActivities = useActivityStore((s) => s.setActivities);
 
-  const [modalState, setModalState] = useState({
-    isTitleOpen: false,
-    isCategoryOpen: false,
-    isNoteOpen: false,
-    isRemindersOpen: false,
-    isPriorityOpen: false,
-    isFrequencyOpen: false,
-  });
+  const [isTitleModalOpen, setIsTitleModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+  const [isRemindersModalOpen, setIsRemindersModalOpen] = useState(false);
+  const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
+  const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
 
   const setStartDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setEndDateRef = useRef<((...event: any[]) => void) | null>(null);
@@ -64,26 +62,19 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
     defaultValues: {
       ...selectedHabit,
     },
-    resolver: zodResolver(habitSchema),
+    resolver: zodResolver(activitySchema),
   });
 
   const watchAllFields = watch();
-
-  const {
-    isTitleOpen,
-    isCategoryOpen,
-    isRemindersOpen,
-    isPriorityOpen,
-    isNoteOpen,
-    isFrequencyOpen,
-  } = modalState;
 
   const { title, category, note, priority, frequency, startDate, endDate, reminders } =
     watchAllFields;
 
   const handleDelete = () => {
-    const filteredHabits = habits.filter((habit) => habit.id !== selectedHabit.id);
-    setHabits(filteredHabits);
+    const filteredActivities = activities.filter(
+      (activity) => activity.id !== selectedHabit.id
+    );
+    setActivities(filteredActivities);
     router.replace('/habits');
   };
 
@@ -119,34 +110,27 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
   };
 
   const onSubmit: SubmitHandler<NewActivityData> = (data) => {
-    const updatedHabits = habits.map((habit) =>
-      habit.id === selectedHabit.id
-        ? {
-            ...selectedHabit,
-            ...data,
-          }
-        : habit
+    const updatedHabit: Activity = {
+      ...selectedHabit,
+      ...data,
+    };
+    const updatedActivities = activities.map((activity) =>
+      activity.id === selectedHabit.id ? toCleanedObject(updatedHabit) : activity
     );
-    setHabits(updatedHabits);
+    setActivities(updatedActivities);
   };
 
-  const toggleTitleModal = () =>
-    setModalState({ ...modalState, isTitleOpen: !isTitleOpen });
+  const toggleTitleModal = () => setIsTitleModalOpen((prev) => !prev);
 
-  const toggleCategoryModal = () =>
-    setModalState({ ...modalState, isCategoryOpen: !isCategoryOpen });
+  const toggleCategoryModal = () => setIsCategoryModalOpen((prev) => !prev);
 
-  const toggleNoteModal = () =>
-    setModalState({ ...modalState, isNoteOpen: !isNoteOpen });
+  const toggleNoteModal = () => setIsNoteModalOpen((prev) => !prev);
 
-  const toggleRemindersModal = () =>
-    setModalState({ ...modalState, isRemindersOpen: !isRemindersOpen });
+  const toggleRemindersModal = () => setIsRemindersModalOpen((prev) => !prev);
 
-  const togglePriorityModal = () =>
-    setModalState({ ...modalState, isPriorityOpen: !isPriorityOpen });
+  const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
 
-  const toggleFrequencyModal = () =>
-    setModalState({ ...modalState, isFrequencyOpen: !isFrequencyOpen });
+  const toggleFrequencyModal = () => setIsFrequencyModalOpen((prev) => !prev);
 
   useEffect(() => {
     if (!isSubmitSuccessful) return;
@@ -166,7 +150,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
           <PenSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Title</OptionTitle>
         </OptionInfo>
-        <Text color={customGray1}>{toTruncatedText(title, 24)}</Text>
+        <Text color="$customGray1">{toTruncatedText(title, 24)}</Text>
       </OptionContainer>
       <OptionContainer onPress={toggleCategoryModal}>
         <OptionInfo>
@@ -182,7 +166,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
           <PenToSquareSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
           <OptionTitle>Notes</OptionTitle>
         </OptionInfo>
-        <Text color={customGray1}>{toTruncatedText(note, 16)}</Text>
+        {note && <Text color="$customGray1">{toTruncatedText(note, 16)}</Text>}
       </OptionContainer>
       <OptionContainer onPress={toggleRemindersModal}>
         <OptionInfo>
@@ -191,7 +175,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
         </OptionInfo>
         <OptionLabel>
           <LabelText>
-            {!!reminders.length
+            {!!reminders?.length
               ? reminders.length + (reminders.length === 1 ? ' reminder' : ' reminders')
               : '---'}
           </LabelText>
@@ -226,10 +210,11 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
             return (
               <OptionLabel>
                 <LabelText>
-                  {toFormattedDateString(startDate) ===
-                  toFormattedDateString(CURRENT_DATE)
-                    ? 'Today'
-                    : toFormattedDateString(startDate)}
+                  {startDate &&
+                    (toFormattedDateString(startDate) ===
+                    toFormattedDateString(CURRENT_DATE)
+                      ? 'Today'
+                      : toFormattedDateString(startDate))}
                 </LabelText>
               </OptionLabel>
             );
@@ -284,51 +269,47 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
           <ButtonText>CANCEL</ButtonText>
         </Button>
         <Button onPress={handleSubmit(onSubmit)}>
-          <ButtonText color={customRed1}>CONFIRM</ButtonText>
+          <ButtonText color="$customRed1">CONFIRM</ButtonText>
         </Button>
       </ButtonsContainer>
 
-      <ModalContainer isOpen={isTitleOpen} closeModal={toggleTitleModal}>
+      <ModalContainer isOpen={isTitleModalOpen} closeModal={toggleTitleModal}>
         <TextModalModule
-          control={control as any}
+          control={control}
           name="title"
-          previousText={title}
+          initialText={title}
           closeModal={toggleTitleModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isCategoryOpen} closeModal={toggleCategoryModal}>
-        <CategoryModalModule
-          control={control as any}
-          closeModal={toggleCategoryModal}
-        />
+      <ModalContainer isOpen={isCategoryModalOpen} closeModal={toggleCategoryModal}>
+        <CategoryModalModule control={control} closeModal={toggleCategoryModal} />
       </ModalContainer>
-      <ModalContainer isOpen={isNoteOpen} closeModal={toggleNoteModal}>
+      <ModalContainer isOpen={isNoteModalOpen} closeModal={toggleNoteModal}>
         <TextModalModule
-          control={control as any}
+          control={control}
           name="note"
-          previousText={note}
+          initialText={note}
           closeModal={toggleNoteModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isRemindersOpen} closeModal={toggleRemindersModal}>
+      <ModalContainer isOpen={isRemindersModalOpen} closeModal={toggleRemindersModal}>
         <RemindersModalModule
           control={control}
           reminders={reminders}
           closeModal={toggleRemindersModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isPriorityOpen} closeModal={togglePriorityModal}>
+      <ModalContainer isOpen={isPriorityModalOpen} closeModal={togglePriorityModal}>
         <PriorityModalModule
-          isForm
-          control={control as any}
-          currentPriority={priority}
+          control={control}
+          initialPriority={priority}
           closeModal={togglePriorityModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isFrequencyOpen} closeModal={toggleFrequencyModal}>
+      <ModalContainer isOpen={isFrequencyModalOpen} closeModal={toggleFrequencyModal}>
         <FrequencyListModule
           isModal
-          control={control as any}
+          control={control}
           closeModal={toggleFrequencyModal}
         />
       </ModalContainer>

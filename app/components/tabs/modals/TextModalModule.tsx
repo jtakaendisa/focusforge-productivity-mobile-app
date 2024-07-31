@@ -23,7 +23,11 @@ const TextModalModule = ({ control, name, initialText, closeModal }: Props) => {
   };
 
   const handleConfirm = () => {
-    setInputRef.current?.(control._getWatch('note').trim());
+    setInputRef.current?.(
+      name === 'title'
+        ? control._getWatch('title').trim()
+        : control._getWatch('note').trim()
+    );
     closeModal();
   };
 

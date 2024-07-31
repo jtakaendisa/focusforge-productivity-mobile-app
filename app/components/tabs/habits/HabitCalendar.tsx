@@ -1,15 +1,15 @@
-import { styled, View, Text } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
-import { Habit } from '@/app/entities';
+import { Activity } from '@/app/entities';
 
 interface Props {
-  selectedHabit: Habit;
+  selectedHabit: Activity;
 }
 
 const HabitCalendar = ({ selectedHabit }: Props) => {
   return (
     <Container>
-      <Text>Cal</Text>
+      <Text>Calendar</Text>
     </Container>
   );
 };
