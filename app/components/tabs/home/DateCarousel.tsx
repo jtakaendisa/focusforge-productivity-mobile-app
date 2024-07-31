@@ -1,12 +1,12 @@
-import { useMemo, useRef } from 'react';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { addDays, addWeeks, format, startOfWeek } from 'date-fns';
+import { useMemo, useRef } from 'react';
 import { styled, View } from 'tamagui';
 
-import { useTaskStore } from '@/app/store';
 import { DATE_CARD_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
-import DateCard from './DateCard';
+import { useTaskStore } from '@/app/store';
 import { toFormattedDateString } from '@/app/utils';
+import DateCard from './DateCard';
 
 const DateCarousel = () => {
   const selectedDate = useTaskStore((s) => s.selectedDate);
@@ -36,7 +36,7 @@ const DateCarousel = () => {
     listRef.current?.scrollToIndex({
       index: selectedIndex,
       animated: true,
-      viewPosition: 0.5,
+      viewPosition: 0.25,
     });
   };
 
