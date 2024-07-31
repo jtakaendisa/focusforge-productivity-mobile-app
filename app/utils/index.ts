@@ -1,10 +1,10 @@
 import { format, parse } from 'date-fns';
 
-import { Task } from '../entities';
+import { Activity } from '../entities';
 import { CURRENT_DATE } from '../constants';
 
 interface DateGroupedTasks {
-  [key: string]: Task[];
+  [key: string]: Activity[];
 }
 
 export const toTruncatedText = (text: string, maxLength: number, altMode?: boolean) => {
@@ -42,9 +42,9 @@ export const toFormattedSectionTitle = (date: string) => {
   }
 };
 
-export const toDateGroupedTasks = (tasks: Task[]) => {
+export const toDateGroupedTasks = (tasks: Activity[]) => {
   const groups: DateGroupedTasks = tasks.reduce((acc: DateGroupedTasks, task) => {
-    const dueDate = toFormattedDateString(task.dueDate!);
+    const dueDate = toFormattedDateString(task.endDate!);
     if (!acc[dueDate]) {
       acc[dueDate] = [];
     }
@@ -68,8 +68,8 @@ export const toDateGroupedTasks = (tasks: Task[]) => {
   return sortedGroups;
 };
 
-export const toFormattedSections = (tasksByDueDate: { [key: string]: Task[] }) => {
-  const sections: (string | Task)[] = [];
+export const toFormattedSections = (tasksByDueDate: DateGroupedTasks) => {
+  const sections: (string | Activity)[] = [];
   Object.keys(tasksByDueDate).forEach((dueDate) => {
     sections.push(dueDate);
     sections.push(...tasksByDueDate[dueDate]);

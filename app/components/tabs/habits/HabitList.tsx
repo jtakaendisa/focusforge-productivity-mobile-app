@@ -21,7 +21,7 @@ const HabitList = () => {
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const habitListRef = useRef<FlashList<Habit> | null>(null);
+  const listRef = useRef<FlashList<Habit> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
   const allHabits = useMemo(
@@ -51,10 +51,8 @@ const HabitList = () => {
   const handleDelete = (id: string) => {
     const filteredActivities = activities.filter((activity) => activity.id !== id);
     setActivities(filteredActivities);
-    habitListRef.current?.prepareForLayoutAnimationRender();
-
+    listRef.current?.prepareForLayoutAnimationRender();
     activityOptionsRef.current?.close();
-    setSelectedHabit(null);
   };
 
   const handleSwipe = (
@@ -82,7 +80,7 @@ const HabitList = () => {
         <ActivityListPlaceholder />
       ) : (
         <AnimatedFlashList
-          ref={habitListRef}
+          ref={listRef}
           data={habits}
           renderItem={({ item }) => (
             <HabitListItem

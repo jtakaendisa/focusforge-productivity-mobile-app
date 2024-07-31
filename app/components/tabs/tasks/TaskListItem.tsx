@@ -21,7 +21,7 @@ import TaskItemRightActions from './TaskItemRightActions';
 interface Props {
   task: Activity;
   isCheckable?: boolean;
-  onTaskComplete: (task: Activity) => void;
+  onTaskComplete?: (task: Activity) => void;
   onSwipe: (
     direction: 'left' | 'right',
     task: Activity,
@@ -58,7 +58,7 @@ const TaskListItem = ({
 
   const handlePress = () => {
     if (isCheckable) {
-      onTaskComplete(task);
+      onTaskComplete?.(task);
     } else {
       if (type === 'recurring task') {
         showOptions?.(task);
@@ -118,7 +118,9 @@ const TaskListItem = ({
               <CategoryBadge>
                 <BadgeText>{category}</BadgeText>
               </CategoryBadge>
-              <ProgressText>{generateProgressText(checklist)}</ProgressText>
+              {isCheckable && (
+                <ProgressText>{generateProgressText(checklist)}</ProgressText>
+              )}
             </MetricsContainer>
             <CategoryContainer>
               <CategoryIcon category={category} fill={customBlack1} />

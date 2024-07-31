@@ -5,7 +5,7 @@ import { View, styled } from 'tamagui';
 import SearchBarSpacer from '@/app/components/tabs/SearchBarSpacer';
 import { usePathname } from 'expo-router';
 import NewActivityButton from '../../components/tabs/NewActivityButton';
-import TaskList from '../../components/tabs/home/TaskList';
+import TaskList from '../../components/tabs/tasks/TaskList';
 import NewActivityModal from '../../components/tabs/modals/NewActivityModal';
 import TaskFilterBar from '../../components/tabs/tasks/TaskFilterBar';
 import { TabRoute } from '../../entities';
