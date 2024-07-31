@@ -4,8 +4,7 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 
 import { CURRENT_DATE } from '@/app/constants';
-import { Activity } from '@/app/entities';
-import { HabitActiveTab } from '@/app/habitDetails';
+import { Activity, HabitActiveTab } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
 import { Swipeable } from 'react-native-gesture-handler';
 import BarChartSvg from '../../icons/BarChartSvg';

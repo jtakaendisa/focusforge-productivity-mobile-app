@@ -39,6 +39,10 @@ export interface IconProps {
   variant?: IconVariant;
 }
 
+export type HabitActiveTab = 'calendar' | 'statistics' | 'edit';
+
+export type TaskActiveTab = 'calendar' | 'edit';
+
 export type NewActivityData = z.infer<typeof activitySchema>;
 
 export type ActivityFilter = 'all' | 'habits' | 'tasks';

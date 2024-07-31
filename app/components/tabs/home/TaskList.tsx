@@ -1,8 +1,7 @@
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Activity, Priority, Task } from '@/app/entities';
-import { HabitActiveTab } from '@/app/habitDetails';
+import { Activity, Priority, Task, TaskActiveTab } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
@@ -83,7 +82,7 @@ const TaskList = () => {
     setSelectedTask(null);
   };
 
-  const navigateToTaskDetailsScreen = (activeTab: HabitActiveTab, taskId: string) => {
+  const navigateToTaskDetailsScreen = (activeTab: TaskActiveTab, taskId: string) => {
     if (!taskId.length) return;
 
     activityOptionsRef.current?.dismiss();

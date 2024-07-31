@@ -10,16 +10,25 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { HabitActiveTab } from '@/app/habitDetails';
-import { TaskActiveTab } from '@/app/taskDetails';
+import { HabitActiveTab, TaskActiveTab } from '@/app/entities';
 
-interface Props {
-  mode: 'habit' | 'task';
-  activeTab: HabitActiveTab | TaskActiveTab;
-  onSelect: (activeTab: HabitActiveTab | TaskActiveTab) => void;
+interface HabitProps {
+  mode: 'habit';
+  activeTab: HabitActiveTab;
+  onSelect: (activeTab: HabitActiveTab) => void;
 }
 
+interface TaskProps {
+  mode: 'task';
+  activeTab: TaskActiveTab;
+  onSelect: (activeTab: TaskActiveTab) => void;
+}
+
+type Props = HabitProps | TaskProps;
+
 const TabBar = ({ mode, activeTab, onSelect }: Props) => {
+  const isTaskMode = mode === 'task';
+
   const isCalendarSelected = useSharedValue(0);
   const isStatisticsSelected = useSharedValue(0);
   const isEditSelected = useSharedValue(0);
@@ -38,29 +47,37 @@ const TabBar = ({ mode, activeTab, onSelect }: Props) => {
     }));
   };
 
+  const selectCalendarTab = () => onSelect('calendar');
+
+  const selectStatisticsTab = () => !isTaskMode && onSelect('statistics');
+
+  const selectEditTab = () => onSelect('edit');
+
   useEffect(() => {
+    const resetTabSelectionIndicators = () => {
+      isCalendarSelected.value = withTiming(0);
+      isStatisticsSelected.value = withTiming(0);
+      isEditSelected.value = withTiming(0);
+    };
+
+    resetTabSelectionIndicators();
+
     switch (activeTab) {
       case 'calendar':
         isCalendarSelected.value = withTiming(1);
-        isStatisticsSelected.value = withTiming(0);
-        isEditSelected.value = withTiming(0);
         break;
       case 'statistics':
         isStatisticsSelected.value = withTiming(1);
-        isCalendarSelected.value = withTiming(0);
-        isEditSelected.value = withTiming(0);
         break;
       case 'edit':
         isEditSelected.value = withTiming(1);
-        isCalendarSelected.value = withTiming(0);
-        isStatisticsSelected.value = withTiming(0);
         break;
     }
   }, [activeTab]);
 
   return (
     <Container>
-      <Button isHabit={mode === 'habit'} onPress={() => onSelect('calendar')}>
+      <Button isHalfWidth={isTaskMode} onPress={selectCalendarTab}>
         <TextContainer>
           <AnimatedButtonText style={textColorAnimation(isCalendarSelected)}>
             Calendar
@@ -71,7 +88,7 @@ const TabBar = ({ mode, activeTab, onSelect }: Props) => {
         </TextContainer>
       </Button>
       {mode === 'habit' && (
-        <Button isHabit={mode === 'habit'} onPress={() => onSelect('statistics')}>
+        <Button isHalfWidth={isTaskMode} onPress={selectStatisticsTab}>
           <TextContainer>
             <AnimatedButtonText style={textColorAnimation(isStatisticsSelected)}>
               Statistics
@@ -82,7 +99,7 @@ const TabBar = ({ mode, activeTab, onSelect }: Props) => {
           </TextContainer>
         </Button>
       )}
-      <Button isHabit={mode === 'habit'} onPress={() => onSelect('edit')}>
+      <Button isHalfWidth={isTaskMode} onPress={selectEditTab}>
         <TextContainer>
           <AnimatedButtonText style={textColorAnimation(isEditSelected)}>
             Edit
@@ -106,12 +123,12 @@ const Container = styled(View, {
 const Button = styled(View, {
   alignItems: 'center',
   variants: {
-    isHabit: {
+    isHalfWidth: {
       true: {
-        width: '33.333%',
+        width: '50%',
       },
       false: {
-        width: '50%',
+        width: '33.333%',
       },
     },
   } as const,

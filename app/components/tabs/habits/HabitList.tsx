@@ -4,8 +4,7 @@ import { router } from 'expo-router';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { View, styled } from 'tamagui';
 
-import { Activity, Habit } from '@/app/entities';
-import { HabitActiveTab } from '@/app/habitDetails';
+import { Activity, Habit, HabitActiveTab } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
 import DeleteModalModule from '../modals/DeleteModalModule';

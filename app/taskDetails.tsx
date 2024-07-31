@@ -1,14 +1,12 @@
 import { useLocalSearchParams } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styled, Text, View } from 'tamagui';
-import { useTaskStore } from './store';
-import { useEffect, useState } from 'react';
-import { Task } from './entities';
 import TabBar from './components/tabs/habits/TabBar';
 import EditTask from './components/tabs/tasks/EditTask';
-import { StatusBar } from 'expo-status-bar';
-
-export type TaskActiveTab = 'calendar' | 'edit';
+import { Activity, TaskActiveTab } from './entities';
+import { useActivityStore } from './store';
 
 type SearchParams = {
   activeTab: TaskActiveTab;
@@ -18,19 +16,21 @@ type SearchParams = {
 const TaskDetailsScreen = () => {
   const { activeTab: activeTabParam, taskId } = useLocalSearchParams<SearchParams>();
 
-  const tasks = useTaskStore((s) => s.tasks);
+  const activities = useActivityStore((s) => s.activities);
 
   const [activeTab, setActiveTab] = useState(activeTabParam);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
+
+  const isRecurring = selectedTask?.type === 'recurring task';
 
   const handleSelectTab = (activeTab: TaskActiveTab) => setActiveTab(activeTab);
 
   useEffect(() => {
-    const selectedTask = tasks.find((task) => task.id === taskId);
+    const selectedTask = activities.find((activity) => activity.id === taskId);
     if (selectedTask) {
       setSelectedTask(selectedTask);
     }
-  }, [tasks, taskId]);
+  }, [activities, taskId]);
 
   if (!selectedTask) return null;
 
@@ -39,9 +39,17 @@ const TaskDetailsScreen = () => {
       <ScreenLabel>
         <LabelTextLarge>Task Details</LabelTextLarge>
       </ScreenLabel>
-      <TabBar mode="task" activeTab={activeTab} onSelect={handleSelectTab} />
+      {isRecurring && (
+        <TabBar mode="task" activeTab={activeTab} onSelect={handleSelectTab} />
+      )}
       {activeTab === 'calendar' && <Text>Calendar</Text>}
-      {activeTab === 'edit' && <EditTask tasks={tasks} selectedTask={selectedTask} />}
+      {activeTab === 'edit' && (
+        <EditTask
+          activities={activities}
+          selectedTask={selectedTask}
+          isRecurring={isRecurring}
+        />
+      )}
       <StatusBar style="light" />
     </Container>
   );

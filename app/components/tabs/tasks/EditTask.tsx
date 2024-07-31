@@ -4,16 +4,20 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 import { CURRENT_DATE } from '@/app/constants';
-import { Task } from '@/app/entities';
-import { NewTaskData } from '@/app/newTask';
-import { useTaskStore } from '@/app/store';
-import { toFormattedDateString, toTruncatedText } from '@/app/utils';
-import { taskSchema } from '@/app/validationSchemas';
+import { Activity, NewActivityData } from '@/app/entities';
+import { useActivityStore } from '@/app/store';
+import { toCleanedObject, toFormattedDateString, toTruncatedText } from '@/app/utils';
+import { activitySchema } from '@/app/validationSchemas';
 import {
   DateTimePickerAndroid,
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import { useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 import BellSvg from '../../icons/BellSvg';
 import CalendarEndSvg from '../../icons/CalendarEndSvg';
@@ -36,42 +40,30 @@ import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import RemindersModalModule from '../modals/RemindersModalModule';
 import TextModalModule from '../modals/TextModalModule';
+import BinSvg from '../../icons/BinSvg';
 
 interface Props {
-  tasks: Task[];
-  selectedTask: Task;
+  activities: Activity[];
+  selectedTask: Activity;
+  isRecurring: boolean;
 }
 
 const SVG_SIZE = 22;
 
-const EditTask = ({ tasks, selectedTask }: Props) => {
-  const { isRecurring } = selectedTask;
+const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
+  const setActivities = useActivityStore((s) => s.setActivities);
 
-  const setTasks = useTaskStore((s) => s.setTasks);
+  const [isTitleModalOpen, setIsTitleModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+  const [isRemindersModalOpen, setIsRemindersModalOpen] = useState(false);
+  const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
+  const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
+  const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
 
-  const [modalState, setModalState] = useState({
-    isTitleOpen: false,
-    isCategoryOpen: false,
-    isRemindersOpen: false,
-    isChecklistOpen: false,
-    isPriorityOpen: false,
-    isFrequencyOpen: false,
-    isNoteOpen: false,
-  });
-
-  const setDueDateRef = useRef<((...event: any[]) => void) | null>(null);
+  const setStartDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setEndDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setIsCarriedOverRef = useRef<((...event: any[]) => void) | null>(null);
-
-  const {
-    isTitleOpen,
-    isCategoryOpen,
-    isRemindersOpen,
-    isChecklistOpen,
-    isPriorityOpen,
-    isFrequencyOpen,
-    isNoteOpen,
-  } = modalState;
 
   const {
     control,
@@ -79,11 +71,11 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
     reset,
     watch,
     formState: { isSubmitSuccessful },
-  } = useForm<NewTaskData>({
+  } = useForm<NewActivityData>({
     defaultValues: {
       ...selectedTask,
     },
-    resolver: zodResolver(taskSchema),
+    resolver: zodResolver(activitySchema),
   });
 
   const watchAllFields = watch();
@@ -91,7 +83,6 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
   const {
     title,
     category,
-    dueDate,
     startDate,
     endDate,
     checklist,
@@ -105,6 +96,7 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
   const isChecked = useSharedValue(isCarriedOver ? 1 : 0);
 
   const customBlack1 = getTokenValue('$customBlack1');
+  const customGray1 = getTokenValue('$customGray1');
   const customRed1 = getTokenValue('$customRed1');
 
   const handleDateSelect = (
@@ -114,14 +106,18 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
   ) => {
     if (selectedDate) {
       if (mode === 'start') {
-        setDueDateRef.current?.(selectedDate);
+        setStartDateRef.current?.(selectedDate);
       } else {
-        if (
-          toFormattedDateString(selectedDate) !== toFormattedDateString(CURRENT_DATE)
-        ) {
-          setEndDateRef.current?.(selectedDate);
+        if (isRecurring) {
+          if (
+            toFormattedDateString(selectedDate) !== toFormattedDateString(CURRENT_DATE)
+          ) {
+            setEndDateRef.current?.(selectedDate);
+          } else {
+            setEndDateRef.current?.();
+          }
         } else {
-          setEndDateRef.current?.();
+          setEndDateRef.current?.(selectedDate);
         }
       }
     }
@@ -136,38 +132,36 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
     });
   };
 
-  const onSubmit: SubmitHandler<NewTaskData> = (data) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === selectedTask.id
-        ? {
-            ...selectedTask,
-            ...data,
-          }
-        : task
+  const handleStartDateSelect = () => showDatePicker('start');
+
+  const handleEndDateSelect = () => showDatePicker('end');
+
+  const handleEndDateClear = () => setEndDateRef.current?.();
+
+  const onSubmit: SubmitHandler<NewActivityData> = (data) => {
+    const updatedTask: Activity = {
+      ...selectedTask,
+      ...data,
+    };
+    const updatedActivities = activities.map((activity) =>
+      activity.id === selectedTask.id ? toCleanedObject(updatedTask) : activity
     );
-    setTasks(updatedTasks);
+    setActivities(updatedActivities);
   };
 
-  const toggleTitleModal = () =>
-    setModalState({ ...modalState, isTitleOpen: !isTitleOpen });
+  const toggleTitleModal = () => setIsTitleModalOpen((prev) => !prev);
 
-  const toggleCategoryModal = () =>
-    setModalState({ ...modalState, isCategoryOpen: !isCategoryOpen });
+  const toggleCategoryModal = () => setIsCategoryModalOpen((prev) => !prev);
 
-  const toggleRemindersModal = () =>
-    setModalState({ ...modalState, isRemindersOpen: !isRemindersOpen });
+  const toggleNoteModal = () => setIsNoteModalOpen((prev) => !prev);
 
-  const toggleChecklistModal = () =>
-    setModalState({ ...modalState, isChecklistOpen: !isChecklistOpen });
+  const toggleRemindersModal = () => setIsRemindersModalOpen((prev) => !prev);
 
-  const togglePriorityModal = () =>
-    setModalState({ ...modalState, isPriorityOpen: !isPriorityOpen });
+  const toggleChecklistModal = () => setIsChecklistModalOpen((prev) => !prev);
 
-  const toggleFrequencyModal = () =>
-    setModalState({ ...modalState, isFrequencyOpen: !isFrequencyOpen });
+  const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
 
-  const toggleNoteModal = () =>
-    setModalState({ ...modalState, isNoteOpen: !isNoteOpen });
+  const toggleFrequencyModal = () => setIsFrequencyModalOpen((prev) => !prev);
 
   useEffect(() => {
     isChecked.value = isCarriedOver ? withTiming(1) : withTiming(0);
@@ -195,52 +189,66 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
           <OptionTitle>Category</OptionTitle>
         </OptionInfo>
         <Row>
-          <Text color={customRed1}>{category}</Text>
+          <Text color="$customRed1">{category}</Text>
           <CategoryContainer>
             <CategoryIcon category={category} fill={customBlack1} />
           </CategoryContainer>
         </Row>
       </OptionContainer>
-      <OptionContainer onPress={() => showDatePicker('start')}>
-        <OptionInfo>
-          {isRecurring ? (
-            <CalendarStartSvg size={SVG_SIZE} fill={customRed1} />
-          ) : (
-            <CalendarSvg size={SVG_SIZE} fill={customRed1} />
-          )}
-          <OptionTitle>{isRecurring ? 'Start Date' : 'Due Date'}</OptionTitle>
-        </OptionInfo>
-        <Controller
-          control={control}
-          name={isRecurring ? 'startDate' : 'dueDate'}
-          render={({ field: { onChange } }) => {
-            setDueDateRef.current = onChange;
-            return (
-              <CategoryLabel>
-                <LabelText>
-                  {toFormattedDateString(isRecurring ? startDate! : dueDate!) ===
-                  toFormattedDateString(CURRENT_DATE)
-                    ? 'Today'
-                    : toFormattedDateString(isRecurring ? startDate! : dueDate!)}
-                </LabelText>
-              </CategoryLabel>
-            );
-          }}
-        />
-      </OptionContainer>
+
       {isRecurring && (
-        <OptionContainer onPress={() => showDatePicker('end')}>
+        <OptionContainer onPress={handleStartDateSelect}>
           <OptionInfo>
-            <CalendarEndSvg size={SVG_SIZE} fill={customRed1} />
-            <OptionTitle>End Date</OptionTitle>
+            <CalendarStartSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>Start Date</OptionTitle>
           </OptionInfo>
           <Controller
             control={control}
-            name="endDate"
+            name="startDate"
             render={({ field: { onChange } }) => {
-              setEndDateRef.current = onChange;
+              setStartDateRef.current = onChange;
               return (
-                <CategoryLabel>
+                <OptionLabel>
+                  <LabelText>
+                    {startDate &&
+                      (toFormattedDateString(startDate) ===
+                      toFormattedDateString(CURRENT_DATE)
+                        ? 'Today'
+                        : toFormattedDateString(startDate))}
+                  </LabelText>
+                </OptionLabel>
+              );
+            }}
+          />
+        </OptionContainer>
+      )}
+
+      <OptionContainer onPress={handleEndDateSelect}>
+        <OptionInfo>
+          {isRecurring ? (
+            <CalendarEndSvg size={SVG_SIZE} fill={customRed1} />
+          ) : (
+            <CalendarSvg size={SVG_SIZE} fill={customRed1} />
+          )}
+          <OptionTitle>{isRecurring ? 'End date' : 'Due Date'}</OptionTitle>
+        </OptionInfo>
+        <Controller
+          control={control}
+          name="endDate"
+          render={({ field: { onChange } }) => {
+            setEndDateRef.current = onChange;
+            return (
+              <Row>
+                {endDate && isRecurring && (
+                  <AnimatedIconContainer
+                    onPress={handleEndDateClear}
+                    entering={FadeIn}
+                    exiting={FadeOut}
+                  >
+                    <BinSvg size={SVG_SIZE / 1.2} fill={customGray1} />
+                  </AnimatedIconContainer>
+                )}
+                <OptionLabel>
                   <LabelText>
                     {endDate
                       ? toFormattedDateString(endDate) ===
@@ -249,44 +257,47 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
                         : toFormattedDateString(endDate)
                       : '---'}
                   </LabelText>
-                </CategoryLabel>
-              );
-            }}
-          />
-        </OptionContainer>
-      )}
+                </OptionLabel>
+              </Row>
+            );
+          }}
+        />
+      </OptionContainer>
+
       <OptionContainer onPress={toggleRemindersModal}>
         <OptionInfo>
           <BellSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Time and reminders</OptionTitle>
         </OptionInfo>
-        <CategoryLabel>
+        <OptionLabel>
           <LabelText>
-            {!!reminders.length
+            {!!reminders?.length
               ? reminders.length + (reminders.length === 1 ? ' reminder' : ' reminders')
               : '---'}
           </LabelText>
-        </CategoryLabel>
+        </OptionLabel>
       </OptionContainer>
       <OptionContainer onPress={toggleChecklistModal}>
         <OptionInfo>
           <ChecklistSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Checklist</OptionTitle>
         </OptionInfo>
-        <CategoryLabel>
+        <OptionLabel>
           <LabelText>
-            {checklist.length} sub {checklist.length === 1 ? 'task' : 'tasks'}
+            {!!checklist?.length
+              ? checklist.length + (checklist.length === 1 ? ' sub task' : ' sub tasks')
+              : '---'}
           </LabelText>
-        </CategoryLabel>
+        </OptionLabel>
       </OptionContainer>
       <OptionContainer onPress={togglePriorityModal}>
         <OptionInfo>
           <FlagSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
           <OptionTitle>Priority</OptionTitle>
         </OptionInfo>
-        <CategoryLabel>
+        <OptionLabel>
           <LabelText>{priority}</LabelText>
-        </CategoryLabel>
+        </OptionLabel>
       </OptionContainer>
       {isRecurring && (
         <OptionContainer onPress={toggleFrequencyModal}>
@@ -302,54 +313,59 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
           <PenToSquareSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
           <OptionTitle>Note</OptionTitle>
         </OptionInfo>
-        <Text color={customRed1}>{toTruncatedText(note, 16)}</Text>
+        {note && <Text color="$customRed1">{toTruncatedText(note, 16)}</Text>}
       </OptionContainer>
-      <OptionContainer onPress={() => setIsCarriedOverRef.current?.(!isCarriedOver)}>
-        <OptionInfo>
-          <PendingSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTextContainer>
-            <OptionTitle>Pending Task</OptionTitle>
-            <OptionSubtitle>It will be shown each day until completed.</OptionSubtitle>
-          </OptionTextContainer>
-        </OptionInfo>
-        <Controller
-          control={control}
-          name="isCarriedOver"
-          render={({ field: { onChange } }) => {
-            setIsCarriedOverRef.current = onChange;
-            return <CircularCheckbox isChecked={isChecked} />;
-          }}
-        />
-      </OptionContainer>
+
+      {!isRecurring && (
+        <OptionContainer onPress={() => setIsCarriedOverRef.current?.(!isCarriedOver)}>
+          <OptionInfo>
+            <PendingSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTextContainer>
+              <OptionTitle>Pending Task</OptionTitle>
+              <OptionSubtitle>
+                It will be shown each day until completed.
+              </OptionSubtitle>
+            </OptionTextContainer>
+          </OptionInfo>
+          <Controller
+            control={control}
+            name="isCarriedOver"
+            render={({ field: { onChange } }) => {
+              setIsCarriedOverRef.current = onChange;
+              return <CircularCheckbox isChecked={isChecked} />;
+            }}
+          />
+        </OptionContainer>
+      )}
 
       <ButtonsContainer>
         <Button onPress={() => router.replace('/tasks')}>
           <ButtonText>CANCEL</ButtonText>
         </Button>
         <Button onPress={handleSubmit(onSubmit)}>
-          <ButtonText color={customRed1}>CONFIRM</ButtonText>
+          <ButtonText color="$customRed1">CONFIRM</ButtonText>
         </Button>
       </ButtonsContainer>
 
-      <ModalContainer isOpen={isTitleOpen} closeModal={toggleTitleModal}>
+      <ModalContainer isOpen={isTitleModalOpen} closeModal={toggleTitleModal}>
         <TextModalModule
           control={control}
           name="title"
-          previousText={title}
+          initialText={title}
           closeModal={toggleTitleModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isCategoryOpen} closeModal={toggleCategoryModal}>
+      <ModalContainer isOpen={isCategoryModalOpen} closeModal={toggleCategoryModal}>
         <CategoryModalModule control={control} closeModal={toggleCategoryModal} />
       </ModalContainer>
-      <ModalContainer isOpen={isRemindersOpen} closeModal={toggleRemindersModal}>
+      <ModalContainer isOpen={isRemindersModalOpen} closeModal={toggleRemindersModal}>
         <RemindersModalModule
-          control={control as any}
+          control={control}
           reminders={reminders}
           closeModal={toggleRemindersModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isChecklistOpen} closeModal={toggleChecklistModal}>
+      <ModalContainer isOpen={isChecklistModalOpen} closeModal={toggleChecklistModal}>
         <ChecklistModalModule
           isForm
           control={control}
@@ -357,26 +373,25 @@ const EditTask = ({ tasks, selectedTask }: Props) => {
           closeModal={toggleChecklistModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isPriorityOpen} closeModal={togglePriorityModal}>
+      <ModalContainer isOpen={isPriorityModalOpen} closeModal={togglePriorityModal}>
         <PriorityModalModule
-          isForm
           control={control}
-          currentPriority={priority}
+          initialPriority={priority}
           closeModal={togglePriorityModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isFrequencyOpen} closeModal={toggleFrequencyModal}>
+      <ModalContainer isOpen={isFrequencyModalOpen} closeModal={toggleFrequencyModal}>
         <FrequencyListModule
           isModal
-          control={control as any}
+          control={control}
           closeModal={toggleFrequencyModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isNoteOpen} closeModal={toggleNoteModal}>
+      <ModalContainer isOpen={isNoteModalOpen} closeModal={toggleNoteModal}>
         <TextModalModule
           control={control}
           name="note"
-          previousText={note}
+          initialText={note}
           closeModal={toggleNoteModal}
         />
       </ModalContainer>
@@ -404,6 +419,20 @@ const OptionInfo = styled(View, {
   gap: 10,
 });
 
+const OptionLabel = styled(View, {
+  paddingHorizontal: 26,
+  paddingVertical: 10,
+  borderRadius: 8,
+  backgroundColor: '$customRed5',
+});
+
+const IconContainer = styled(View, {
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 36,
+  height: 36,
+});
+
 const Row = styled(View, {
   flexDirection: 'row',
   alignItems: 'center',
@@ -417,13 +446,6 @@ const CategoryContainer = styled(View, {
   height: 36,
   backgroundColor: '$customRed1',
   borderRadius: 8,
-});
-
-const CategoryLabel = styled(View, {
-  paddingHorizontal: 26,
-  paddingVertical: 10,
-  borderRadius: 8,
-  backgroundColor: '$customRed5',
 });
 
 const LabelText = styled(Text, {
@@ -467,5 +489,7 @@ const ButtonText = styled(Text, {
   fontSize: 15,
   fontWeight: 'bold',
 });
+
+const AnimatedIconContainer = Animated.createAnimatedComponent(IconContainer);
 
 export default EditTask;

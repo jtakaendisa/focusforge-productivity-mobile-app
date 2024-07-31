@@ -8,10 +8,8 @@ import EditHabit from './components/tabs/habits/EditHabit';
 import HabitCalendar from './components/tabs/habits/HabitCalendar';
 import HabitStatistics from './components/tabs/habits/HabitStatistics';
 import TabBar from './components/tabs/habits/TabBar';
-import { Activity } from './entities';
+import { Activity, HabitActiveTab } from './entities';
 import { useActivityStore } from './store';
-
-export type HabitActiveTab = 'calendar' | 'statistics' | 'edit';
 
 type SearchParams = {
   activeTab: HabitActiveTab;

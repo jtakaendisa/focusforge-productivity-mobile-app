@@ -1,28 +1,36 @@
-import { MutableRefObject } from 'react';
 import {
-  BottomSheetModal,
   BottomSheetBackdrop,
-  BottomSheetView,
   BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { styled, View, Text, getTokenValue } from 'tamagui';
+import { MutableRefObject } from 'react';
+import { getTokenValue, styled, Text, View } from 'tamagui';
 
-import { Activity } from '@/app/entities';
+import { Activity, HabitActiveTab, TaskActiveTab } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
-import HabitOptionIcon from './HabitOptionIcon';
 import CategoryIcon from '../CategoryIcon';
 import FrequencyBadge from './FrequencyBadge';
-import { TaskActiveTab } from '@/app/taskDetails';
-import { HabitActiveTab } from '@/app/habitDetails';
+import HabitOptionIcon from './HabitOptionIcon';
 
-interface Props {
-  mode: 'habit' | 'recurring task';
+interface HabitProps {
+  mode: 'habit';
   activityOptionsRef: MutableRefObject<BottomSheetModalMethods | null>;
   selectedActivity: Activity | null;
   onDelete: (id: string) => void;
-  onNavigate: (activeTab: TaskActiveTab | HabitActiveTab, activityId: string) => void;
+  onNavigate: (activeTab: HabitActiveTab, activityId: string) => void;
 }
+
+interface TaskProps {
+  mode: 'recurring task';
+  activityOptionsRef: MutableRefObject<BottomSheetModalMethods | null>;
+  selectedActivity: Activity | null;
+  onDelete: (id: string) => void;
+  onNavigate: (activeTab: TaskActiveTab, activityId: string) => void;
+}
+
+type Props = HabitProps | TaskProps;
 
 const renderBackdrop = (props: BottomSheetBackdropProps) => (
   <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />
@@ -83,10 +91,7 @@ const ActivityOptionsModal = ({
                   onPress={() =>
                     isLastIndex
                       ? onDelete(selectedActivity.id)
-                      : onNavigate(
-                          option as TaskActiveTab | HabitActiveTab,
-                          selectedActivity.id
-                        )
+                      : onNavigate(option as any, selectedActivity.id)
                   }
                   isBordered={isLastIndex}
                 >

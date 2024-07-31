@@ -227,7 +227,7 @@ const NewTaskScreen = () => {
             render={({ field: { onChange } }) => {
               setStartDateRef.current = onChange;
               return (
-                <CategoryLabel>
+                <OptionLabel>
                   <LabelText>
                     {startDate &&
                       (toFormattedDateString(startDate) ===
@@ -235,7 +235,7 @@ const NewTaskScreen = () => {
                         ? 'Today'
                         : toFormattedDateString(startDate))}
                   </LabelText>
-                </CategoryLabel>
+                </OptionLabel>
               );
             }}
           />
@@ -288,35 +288,35 @@ const NewTaskScreen = () => {
           <BellSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Time and reminders</OptionTitle>
         </OptionInfo>
-        <CategoryLabel>
+        <OptionLabel>
           <LabelText>
             {!!reminders?.length
               ? reminders.length + (reminders.length === 1 ? ' reminder' : ' reminders')
               : '---'}
           </LabelText>
-        </CategoryLabel>
+        </OptionLabel>
       </OptionContainer>
       <OptionContainer onPress={toggleChecklistModal}>
         <OptionInfo>
           <ChecklistSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Checklist</OptionTitle>
         </OptionInfo>
-        <CategoryLabel>
+        <OptionLabel>
           <LabelText>
             {!!checklist?.length
               ? checklist.length + (checklist.length === 1 ? ' sub task' : ' sub tasks')
               : '---'}
           </LabelText>
-        </CategoryLabel>
+        </OptionLabel>
       </OptionContainer>
       <OptionContainer onPress={togglePriorityModal}>
         <OptionInfo>
           <FlagSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
           <OptionTitle>Priority</OptionTitle>
         </OptionInfo>
-        <CategoryLabel>
+        <OptionLabel>
           <LabelText>{priority}</LabelText>
-        </CategoryLabel>
+        </OptionLabel>
       </OptionContainer>
       {isRecurring && (
         <OptionContainer onPress={toggleFrequencyModal}>
@@ -479,6 +479,13 @@ const OptionSubtitle = styled(Text, {
   color: '$customGray1',
 });
 
+const OptionLabel = styled(View, {
+  paddingHorizontal: 26,
+  paddingVertical: 10,
+  borderRadius: 8,
+  backgroundColor: '$customRed5',
+});
+
 const Row = styled(View, {
   flexDirection: 'row',
   alignItems: 'center',
@@ -492,20 +499,6 @@ const CategoryContainer = styled(View, {
   height: 36,
   backgroundColor: '$customRed1',
   borderRadius: 8,
-});
-
-const CategoryLabel = styled(View, {
-  paddingHorizontal: 26,
-  paddingVertical: 10,
-  borderRadius: 8,
-  backgroundColor: '$customRed5',
-});
-
-const OptionLabel = styled(View, {
-  paddingHorizontal: 26,
-  paddingVertical: 10,
-  borderRadius: 8,
-  backgroundColor: '$customRed5',
 });
 
 const LabelText = styled(Text, {
