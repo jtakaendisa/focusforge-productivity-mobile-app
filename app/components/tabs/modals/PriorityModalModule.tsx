@@ -1,62 +1,48 @@
-import { useMemo, useRef } from 'react';
-import { Control, Controller, useForm } from 'react-hook-form';
+import { useMemo, useRef, useState } from 'react';
+import { Control, Controller } from 'react-hook-form';
 import { Text, View, styled } from 'tamagui';
 
-import { Priority } from '@/app/entities';
-import { NewTaskData } from '@/app/newTask';
+import { NewActivityData, Priority } from '@/app/entities';
 import PriorityButton from './PriorityButton';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { prioritySchema } from '@/app/validationSchemas';
-import { getTokenValue } from 'tamagui';
 
 interface Props {
-  currentPriority: Priority;
-  isForm?: boolean;
-  control?: Control<NewTaskData>;
+  initialPriority: Priority;
+  control?: Control<NewActivityData>;
   closeModal: () => void;
-  setPriority?: (...event: any[]) => void;
+  onPrioritize?: (...event: any[]) => void;
 }
 
 const priorities = ['Low', 'Normal', 'High'] as const;
 
 const PriorityModalModule = ({
-  isForm,
+  initialPriority,
   control,
-  currentPriority,
-  setPriority,
+  onPrioritize,
   closeModal,
 }: Props) => {
-  const initialPriority = useMemo(() => currentPriority, []);
+  const [localPriority, setLocalPriority] = useState(initialPriority);
+
+  const memoizedInitialPriority = useMemo(() => initialPriority, []);
   const setPriorityRef = useRef<((...event: any[]) => void) | null>(null);
 
-  const { control: priorityControl, watch } = useForm<{
-    priority: Priority;
-  }>({
-    defaultValues: { priority: currentPriority },
-    resolver: zodResolver(prioritySchema),
-  });
-
-  const { priority: watchPriority } = watch();
-
-  const handleSelect = (priority: Priority) => {
-    setPriorityRef.current?.(priority);
-  };
-
-  const handleConfirm = () => {
-    setPriority?.(watchPriority);
-    closeModal();
-  };
-
-  const handleCancel = () => {
-    setPriorityRef.current?.(initialPriority);
-    if (!isForm) {
-      setPriority?.(initialPriority);
+  const handlePrioritySelect = (priority: Priority) => {
+    if (control) {
+      setPriorityRef.current?.(priority);
+    } else {
+      setLocalPriority(priority);
     }
+  };
+
+  const handleSelectionConfirm = () => {
+    onPrioritize?.(localPriority);
     closeModal();
   };
 
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
+  const handleSelectionCancel = () => {
+    setPriorityRef.current?.(memoizedInitialPriority);
+    onPrioritize?.(memoizedInitialPriority);
+    closeModal();
+  };
 
   return (
     <Container>
@@ -65,38 +51,52 @@ const PriorityModalModule = ({
       </HeadingContainer>
       <MainContent>
         <PrioritiesRow>
-          <Controller
-            control={control || (priorityControl as any)}
-            name="priority"
-            render={({ field: { onChange } }) => {
-              setPriorityRef.current = onChange;
-              return (
-                <>
-                  {priorities.map((priority) => (
-                    <PriorityButton
-                      key={priority}
-                      priority={priority}
-                      currentPriority={control?._getWatch('priority') || watchPriority}
-                      onChange={handleSelect}
-                    />
-                  ))}
-                </>
-              );
-            }}
-          />
+          {control && (
+            <Controller
+              control={control}
+              name="priority"
+              render={({ field: { onChange } }) => {
+                setPriorityRef.current = onChange;
+                return (
+                  <>
+                    {priorities.map((priority) => (
+                      <PriorityButton
+                        key={priority}
+                        priority={priority}
+                        currentPriority={control._getWatch('priority')}
+                        onChange={handlePrioritySelect}
+                      />
+                    ))}
+                  </>
+                );
+              }}
+            />
+          )}
+          {!control && (
+            <>
+              {priorities.map((priority) => (
+                <PriorityButton
+                  key={priority}
+                  priority={priority}
+                  currentPriority={localPriority}
+                  onChange={handlePrioritySelect}
+                />
+              ))}
+            </>
+          )}
         </PrioritiesRow>
         <PriorityInfo>
-          <Text color={customGray1}>
+          <Text color="$customGray1">
             Higher priority activities will be displayed higher in the list.
           </Text>
         </PriorityInfo>
       </MainContent>
       <ButtonsContainer>
-        <Button onPress={handleCancel}>
+        <Button onPress={handleSelectionCancel}>
           <Text>CANCEL</Text>
         </Button>
-        <Button onPress={handleConfirm}>
-          <ButtonText color={customRed1}>OK</ButtonText>
+        <Button onPress={handleSelectionConfirm}>
+          <ButtonText color="$customRed1">OK</ButtonText>
         </Button>
       </ButtonsContainer>
     </Container>

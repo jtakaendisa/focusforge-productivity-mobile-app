@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { router } from 'expo-router';
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { View, styled } from 'tamagui';
 
 import { Activity, Habit } from '@/app/entities';
@@ -14,11 +14,8 @@ import ActivityOptionsModal from './ActivityOptionsModal';
 import HabitListItem from './HabitListItem';
 import { Swipeable } from 'react-native-gesture-handler';
 
-interface Props {
-  activities: Activity[];
-}
-
-const HabitList = ({ activities }: Props) => {
+const HabitList = () => {
+  const activities = useActivityStore((s) => s.activities);
   const setActivities = useActivityStore((s) => s.setActivities);
 
   const [habits, setHabits] = useState<Activity[]>([]);
@@ -27,6 +24,11 @@ const HabitList = ({ activities }: Props) => {
 
   const habitListRef = useRef<FlashList<Habit> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
+
+  const allHabits = useMemo(
+    () => activities.filter((activity) => activity.type === 'habit'),
+    [activities]
+  );
 
   const isHabitsEmpty = !habits.length;
 
@@ -47,12 +49,8 @@ const HabitList = ({ activities }: Props) => {
 
   const toggleDeleteModal = () => setIsDeleteModalOpen((prev) => !prev);
 
-  const handleDelete = () => {
-    if (!selectedHabit) return;
-
-    const filteredActivities = activities.filter(
-      (activity) => activity.id !== selectedHabit.id
-    );
+  const handleDelete = (id: string) => {
+    const filteredActivities = activities.filter((activity) => activity.id !== id);
     setActivities(filteredActivities);
     habitListRef.current?.prepareForLayoutAnimationRender();
 
@@ -76,9 +74,8 @@ const HabitList = ({ activities }: Props) => {
   };
 
   useEffect(() => {
-    const habits = activities.filter((activity) => activity.type === 'habit');
-    setHabits(habits);
-  }, [activities]);
+    setHabits(allHabits);
+  }, [allHabits]);
 
   return (
     <Container isContentCentered={isHabitsEmpty}>
@@ -94,7 +91,6 @@ const HabitList = ({ activities }: Props) => {
               showOptions={toggleActivityOptionsModal}
               onNavigate={navigateToHabitDetailsScreen}
               onSwipe={handleSwipe}
-              openModal={toggleDeleteModal}
             />
           )}
           ItemSeparatorComponent={ItemSeparator}
@@ -113,7 +109,7 @@ const HabitList = ({ activities }: Props) => {
         {selectedHabit && (
           <DeleteModalModule
             taskId={selectedHabit.id}
-            deleteTask={handleDelete}
+            onDelete={handleDelete}
             closeModal={toggleDeleteModal}
           />
         )}

@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 import { Swipeable } from 'react-native-gesture-handler';
-import { router } from 'expo-router';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -10,42 +9,40 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { View, Text, styled, getTokenValue } from 'tamagui';
+import { Text, View, getTokenValue, styled } from 'tamagui';
 
-import { ChecklistItem, Task } from '@/app/entities';
+import { Activity, ChecklistItem } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
-import TaskItemLeftActions from './TaskItemLeftActions';
-import TaskItemRightActions from './TaskItemRightActions';
 import CategoryIcon from '../CategoryIcon';
 import CircularCheckbox from '../CircularCheckbox';
+import TaskItemLeftActions from './TaskItemLeftActions';
+import TaskItemRightActions from './TaskItemRightActions';
 
 interface Props {
-  task: Task;
+  task: Activity;
   isCheckable?: boolean;
-  onPress: (selectedTask: Task, hasChecklist: boolean) => void;
-  onSwipe: (selectedTask: Task) => void;
-  openModal: (
-    modalName: 'isPrioritizeOpen' | 'isDeleteOpen' | 'isChecklistOpen'
+  onTaskComplete: (task: Activity) => void;
+  onSwipe: (
+    direction: 'left' | 'right',
+    task: Activity,
+    swipeableRef: MutableRefObject<Swipeable | null>,
+    isCheckable?: boolean
   ) => void;
-  showOptions?: (task: Task) => void;
+  showOptions?: (task: Activity) => void;
 }
 
-const TaskItem = ({
+const TaskListItem = ({
   task,
   isCheckable,
-  onPress,
+  onTaskComplete,
   onSwipe,
-  openModal,
   showOptions,
 }: Props) => {
-  const { id, title, isCompleted, isRecurring, note, category, checklist } = task;
+  const { type, title, isCompleted, note, category, checklist } = task;
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const isChecked = useSharedValue(isCompleted ? 1 : 0);
-
-  const hasChecklist = !!checklist?.length;
-  const allCompleted = checklist?.every((item) => item.isCompleted);
 
   const customBlack1 = getTokenValue('$customBlack1');
   const customGray1 = getTokenValue('$customGray1');
@@ -59,36 +56,18 @@ const TaskItem = ({
     opacity: interpolate(isChecked.value, [0, 1], [1, 0.6]),
   }));
 
-  const handleTaskCompletion = () => {
-    if (hasChecklist && !allCompleted) {
-      onPress(task, hasChecklist);
-      openModal('isChecklistOpen');
-      return;
-    }
-    isChecked.value = isChecked.value === 1 ? withTiming(0) : withTiming(1);
-    onPress(task, hasChecklist);
-  };
-
-  const handleSwipeCompletion = (direction: 'left' | 'right') => {
-    onSwipe(task);
-
-    if (direction === 'left') {
-      if (isCheckable) {
-        openModal('isPrioritizeOpen');
-      } else {
-        router.push({
-          pathname: '/taskDetails',
-          params: { taskId: id, activeTab: 'edit' },
-        });
+  const handlePress = () => {
+    if (isCheckable) {
+      onTaskComplete(task);
+    } else {
+      if (type === 'recurring task') {
+        showOptions?.(task);
       }
     }
-
-    if (direction === 'right') {
-      openModal('isDeleteOpen');
-    }
-
-    swipeableRef.current?.close();
   };
+
+  const handleSwipe = (direction: 'left' | 'right') =>
+    onSwipe(direction, task, swipeableRef, isCheckable);
 
   const generateProgressText = (checklist?: ChecklistItem[]) => {
     if (!checklist?.length) return '';
@@ -104,17 +83,7 @@ const TaskItem = ({
   }, [isCompleted]);
 
   return (
-    <AnimatedContainer
-      entering={FadeIn}
-      exiting={FadeOut}
-      onPress={
-        isCheckable
-          ? handleTaskCompletion
-          : isRecurring
-          ? () => showOptions?.(task)
-          : null
-      }
-    >
+    <AnimatedContainer entering={FadeIn} exiting={FadeOut} onPress={handlePress}>
       <Swipeable
         ref={swipeableRef}
         renderLeftActions={(_, dragAnimatedValue) => (
@@ -126,7 +95,7 @@ const TaskItem = ({
         renderRightActions={(_, dragAnimatedValue) => (
           <TaskItemRightActions dragAnimatedValue={dragAnimatedValue} />
         )}
-        onSwipeableOpen={(direction) => handleSwipeCompletion(direction)}
+        onSwipeableOpen={handleSwipe}
       >
         <TaskContainer>
           {isCheckable && (
@@ -232,4 +201,4 @@ const AnimatedContainer = Animated.createAnimatedComponent(View);
 const AnimatedTitle = Animated.createAnimatedComponent(Title);
 const AnimatedNote = Animated.createAnimatedComponent(Note);
 
-export default TaskItem;
+export default TaskListItem;

@@ -5,8 +5,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { getTokenValue, styled, Text, View } from 'tamagui';
 
 import { CURRENT_DATE } from '@/app/constants';
-import { Habit } from '@/app/entities';
-import { NewHabitData } from '@/app/newHabit';
+import { Habit, NewActivityData } from '@/app/entities';
 import { useHabitStore } from '@/app/store';
 import { toFormattedDateString, toTruncatedText } from '@/app/utils';
 import { habitSchema } from '@/app/validationSchemas';
@@ -61,7 +60,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
     reset,
     watch,
     formState: { isSubmitSuccessful },
-  } = useForm<NewHabitData>({
+  } = useForm<NewActivityData>({
     defaultValues: {
       ...selectedHabit,
     },
@@ -119,7 +118,7 @@ const EditHabit = ({ habits, selectedHabit }: Props) => {
     });
   };
 
-  const onSubmit: SubmitHandler<NewHabitData> = (data) => {
+  const onSubmit: SubmitHandler<NewActivityData> = (data) => {
     const updatedHabits = habits.map((habit) =>
       habit.id === selectedHabit.id
         ? {

@@ -1,53 +1,41 @@
-import { useRef, useState } from 'react';
-import Svg, { Path, Rect } from 'react-native-svg';
-import { Control, Controller } from 'react-hook-form';
 import {
   DateTimePickerAndroid,
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { View, Text, styled, getTokenValue } from 'tamagui';
+import { useRef, useState } from 'react';
+import { Control, Controller } from 'react-hook-form';
+import { Text, View, getTokenValue, styled } from 'tamagui';
 
-import { Priority, Reminder } from '@/app/entities';
-import { SCREEN_WIDTH, SCREEN_HEIGHT, CURRENT_DATE } from '@/app/constants';
+import { CURRENT_DATE, SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { toFormattedDateString } from '@/app/utils';
-import { NewHabitData } from '@/app/newHabit';
-import Switch from '../settings/Switch';
+import BellSvg from '../../icons/BellSvg';
+import CalendarEndSvg from '../../icons/CalendarEndSvg';
+import CalendarStartSvg from '../../icons/CalendarStartSvg';
+import FlagSvg from '../../icons/FlagSvg';
 import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import RemindersModalModule from '../modals/RemindersModalModule';
-import CalendarStartSvg from '../../icons/CalendarStartSvg';
-import CalendarEndSvg from '../../icons/CalendarEndSvg';
-import BellSvg from '../../icons/BellSvg';
-import FlagSvg from '../../icons/FlagSvg';
+import { NewActivityData } from '@/app/entities';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import BinSvg from '../../icons/BinSvg';
 
 interface Props {
-  control: Control<NewHabitData>;
-  currentPriority: Priority;
-  startDate: Date;
-  endDate?: Date;
-  reminders: Reminder[];
+  control: Control<NewActivityData>;
 }
 
 const SVG_SIZE = 22;
 
-const DurationListModule = ({
-  control,
-  currentPriority,
-  startDate,
-  endDate,
-  reminders,
-}: Props) => {
-  const [modalState, setModalState] = useState({
-    isRemindersOpen: false,
-    isPriorityOpen: false,
-  });
-  const [isEndDateEnabled, setIsEndDateEnabled] = useState(false);
-
-  const { isRemindersOpen, isPriorityOpen } = modalState;
+const DurationListModule = ({ control }: Props) => {
+  const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
+  const [isRemindersModalOpen, setIsRemindersModalOpen] = useState(false);
 
   const setStartDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setEndDateRef = useRef<((...event: any[]) => void) | null>(null);
+
+  const currentPriority = control?._getWatch('priority');
+  const startDate = control?._getWatch('startDate');
+  const endDate = control?._getWatch('endDate');
+  const reminders = control?._getWatch('reminders');
 
   const handleDateSelect = (
     event: DateTimePickerEvent,
@@ -58,7 +46,13 @@ const DurationListModule = ({
       if (mode === 'start') {
         setStartDateRef.current?.(selectedDate);
       } else {
-        setEndDateRef.current?.(selectedDate);
+        if (
+          toFormattedDateString(selectedDate) !== toFormattedDateString(CURRENT_DATE)
+        ) {
+          setEndDateRef.current?.(selectedDate);
+        } else {
+          setEndDateRef.current?.();
+        }
       }
     }
   };
@@ -72,22 +66,18 @@ const DurationListModule = ({
     });
   };
 
-  const handleEndDateSelect = () => {
-    if (isEndDateEnabled) {
-      setEndDateRef.current?.();
-    } else {
-      showDatePicker('end');
-    }
-    setIsEndDateEnabled((prev) => !prev);
-  };
+  const handleStartDateSelect = () => showDatePicker('start');
 
-  const toggleRemindersModal = () =>
-    setModalState({ ...modalState, isRemindersOpen: !isRemindersOpen });
+  const handleEndDateSelect = () => showDatePicker('end');
 
-  const togglePriorityModal = () =>
-    setModalState({ ...modalState, isPriorityOpen: !isPriorityOpen });
+  const handleEndDateClear = () => setEndDateRef.current?.();
+
+  const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
+
+  const toggleRemindersModal = () => setIsRemindersModalOpen((prev) => !prev);
 
   const customRed1 = getTokenValue('$customRed1');
+  const customGray1 = getTokenValue('$customGray1');
 
   return (
     <Container>
@@ -95,7 +85,7 @@ const DurationListModule = ({
         <Heading>When do you want to do it?</Heading>
       </HeadingContainer>
 
-      <OptionContainer onPress={() => showDatePicker('start')}>
+      <OptionContainer onPress={handleStartDateSelect}>
         <OptionInfo>
           <CalendarStartSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>Start date</OptionTitle>
@@ -108,10 +98,11 @@ const DurationListModule = ({
             return (
               <OptionLabel>
                 <LabelText>
-                  {toFormattedDateString(startDate) ===
-                  toFormattedDateString(CURRENT_DATE)
-                    ? 'Today'
-                    : toFormattedDateString(startDate)}
+                  {startDate &&
+                    (toFormattedDateString(startDate) ===
+                    toFormattedDateString(CURRENT_DATE)
+                      ? 'Today'
+                      : toFormattedDateString(startDate))}
                 </LabelText>
               </OptionLabel>
             );
@@ -123,30 +114,36 @@ const DurationListModule = ({
           <CalendarEndSvg size={SVG_SIZE} fill={customRed1} />
           <OptionTitle>End date</OptionTitle>
         </OptionInfo>
-        <Row>
-          <Controller
-            control={control}
-            name="endDate"
-            render={({ field: { onChange } }) => {
-              setEndDateRef.current = onChange;
-              return (
-                <>
-                  {isEndDateEnabled && endDate && (
-                    <AnimatedOptionLabel entering={FadeIn} exiting={FadeOut}>
-                      <LabelText>
-                        {toFormattedDateString(endDate) ===
+        <Controller
+          control={control}
+          name="endDate"
+          render={({ field: { onChange } }) => {
+            setEndDateRef.current = onChange;
+            return (
+              <Row>
+                {endDate && (
+                  <AnimatedIconContainer
+                    onPress={handleEndDateClear}
+                    entering={FadeIn}
+                    exiting={FadeOut}
+                  >
+                    <BinSvg size={SVG_SIZE / 1.2} fill={customGray1} />
+                  </AnimatedIconContainer>
+                )}
+                <OptionLabel>
+                  <LabelText>
+                    {endDate
+                      ? toFormattedDateString(endDate) ===
                         toFormattedDateString(CURRENT_DATE)
-                          ? 'Today'
-                          : toFormattedDateString(endDate)}
-                      </LabelText>
-                    </AnimatedOptionLabel>
-                  )}
-                </>
-              );
-            }}
-          />
-          <Switch value={isEndDateEnabled ? 1 : 0} onToggle={() => {}} />
-        </Row>
+                        ? 'Today'
+                        : toFormattedDateString(endDate)
+                      : '---'}
+                  </LabelText>
+                </OptionLabel>
+              </Row>
+            );
+          }}
+        />
       </OptionContainer>
       <OptionContainer onPress={toggleRemindersModal}>
         <OptionInfo>
@@ -155,7 +152,7 @@ const DurationListModule = ({
         </OptionInfo>
         <OptionLabel>
           <LabelText>
-            {!!reminders.length
+            {!!reminders?.length
               ? reminders.length === 1
                 ? `${reminders.length} reminder`
                 : `${reminders.length} reminders`
@@ -173,18 +170,17 @@ const DurationListModule = ({
         </OptionLabel>
       </OptionContainer>
 
-      <ModalContainer isOpen={isRemindersOpen} closeModal={toggleRemindersModal}>
+      <ModalContainer isOpen={isRemindersModalOpen} closeModal={toggleRemindersModal}>
         <RemindersModalModule
           control={control}
           reminders={reminders}
           closeModal={toggleRemindersModal}
         />
       </ModalContainer>
-      <ModalContainer isOpen={isPriorityOpen} closeModal={togglePriorityModal}>
+      <ModalContainer isOpen={isPriorityModalOpen} closeModal={togglePriorityModal}>
         <PriorityModalModule
-          isForm
-          control={control as any}
-          currentPriority={currentPriority}
+          control={control}
+          initialPriority={currentPriority}
           closeModal={togglePriorityModal}
         />
       </ModalContainer>
@@ -225,14 +221,15 @@ const OptionInfo = styled(View, {
   gap: 10,
 });
 
-const OptionTitle = styled(Text, {
-  fontSize: 16,
+const IconContainer = styled(View, {
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 36,
+  height: 36,
 });
 
-const Row = styled(View, {
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: 8,
+const OptionTitle = styled(Text, {
+  fontSize: 16,
 });
 
 const OptionLabel = styled(View, {
@@ -248,6 +245,12 @@ const LabelText = styled(Text, {
   color: '$customRed1',
 });
 
-const AnimatedOptionLabel = Animated.createAnimatedComponent(OptionLabel);
+const Row = styled(View, {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+});
+
+const AnimatedIconContainer = Animated.createAnimatedComponent(IconContainer);
 
 export default DurationListModule;

@@ -28,13 +28,15 @@ const titleSchema = z
   .min(2, { message: 'Task description must be at least 2 characters long' })
   .max(80, { message: 'Task description must not exceed 80 characters' });
 
-const subTaskSchema = z.object({
+export const categorySchema = z.enum(categoryArray);
+
+export const checklistItemSchema = z.object({
   id: z.string().min(1, { message: 'ID must be at least 1 characters long' }),
   title: titleSchema,
   isCompleted: z.boolean({ message: 'isCompleted must be a boolean (true / false)' }),
 });
 
-export const checklistSchema = z.array(subTaskSchema);
+export const checklistSchema = z.array(checklistItemSchema);
 
 export const reminderSchema = z.object({
   id: z.string().min(1, { message: 'ID must be at least 1 characters long' }),
@@ -45,7 +47,7 @@ export const reminderSchema = z.object({
 export const prioritySchema = z.enum(['Low', 'Normal', 'High']);
 
 export const frequencySchema = z.object({
-  type: z.enum(['daily', 'specific', 'repeats']),
+  type: z.enum(['once', 'daily', 'specific', 'repeats']),
   isRepeatedOn: z.array(z.string()).optional(),
   isRepeatedEvery: z.number().optional(),
 });
@@ -53,14 +55,14 @@ export const frequencySchema = z.object({
 export const taskSchema = z.object({
   title: titleSchema,
   category: z.enum(categoryArray),
+  note: z.string(),
   dueDate: z.date({ message: 'Invalid date string' }).optional(),
   startDate: z.date({ message: 'Invalid date string' }).optional(),
   endDate: z.date({ message: 'Invalid date string' }).optional(),
-  reminders: z.array(reminderSchema),
-  checklist: checklistSchema,
   priority: prioritySchema,
   frequency: frequencySchema.optional(),
-  note: z.string(),
+  checklist: checklistSchema,
+  reminders: z.array(reminderSchema),
   isCarriedOver: z.boolean({
     message: 'isCarriedOver must be a boolean (true / false)',
   }),
@@ -68,11 +70,31 @@ export const taskSchema = z.object({
 
 export const habitSchema = z.object({
   title: titleSchema,
-  note: z.string(),
   category: z.enum(categoryArray),
-  startDate: z.date({ message: 'Invalid date string' }),
-  endDate: z.date({ message: 'Invalid date string' }).optional(),
+  note: z.string(),
+  startDate: z.date({ message: 'Invalid date entered' }),
+  endDate: z.date({ message: 'Invalid date entered' }).optional(),
   priority: prioritySchema,
   frequency: frequencySchema,
   reminders: z.array(reminderSchema),
+});
+
+export const activitySchema = z.object({
+  title: z
+    .string()
+    .min(2, { message: 'Task description must be at least 2 characters long' })
+    .max(80, { message: 'Task description must not exceed 80 characters' }),
+  category: categorySchema,
+  note: z.string().optional(),
+  startDate: z.date({ message: 'Invalid date entered' }).optional(),
+  endDate: z.date({ message: 'Invalid date entered' }).optional(),
+  priority: prioritySchema,
+  frequency: frequencySchema,
+  checklist: checklistSchema.optional(),
+  reminders: z.array(reminderSchema).optional(),
+  isCarriedOver: z
+    .boolean({
+      message: 'Pending Task must either be true or false',
+    })
+    .optional(),
 });

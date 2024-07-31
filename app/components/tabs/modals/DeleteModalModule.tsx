@@ -1,18 +1,16 @@
-import { Text, View, getTokenValue, styled } from 'tamagui';
+import { Text, View, styled } from 'tamagui';
 
 interface Props {
   taskId: string;
-  deleteTask: (id: string) => void;
+  onDelete: (id: string) => void;
   closeModal: () => void;
 }
 
-const DeleteModalModule = ({ taskId, deleteTask, closeModal }: Props) => {
-  const onDelete = () => {
-    deleteTask(taskId);
+const DeleteModalModule = ({ taskId, onDelete, closeModal }: Props) => {
+  const handleDelete = () => {
+    onDelete(taskId);
     closeModal();
   };
-
-  const customRed1 = getTokenValue('$customRed1');
 
   return (
     <Container>
@@ -23,8 +21,8 @@ const DeleteModalModule = ({ taskId, deleteTask, closeModal }: Props) => {
         <Button onPress={closeModal}>
           <ButtonText>Cancel</ButtonText>
         </Button>
-        <Button onPress={onDelete}>
-          <ButtonText color={customRed1}>Delete</ButtonText>
+        <Button onPress={handleDelete}>
+          <ButtonText color="$customRed1">Delete</ButtonText>
         </Button>
       </ButtonsContainer>
     </Container>

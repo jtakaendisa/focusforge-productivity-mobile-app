@@ -1,9 +1,15 @@
-import { Animated } from 'react-native';
 import { User } from 'firebase/auth';
+import { Animated } from 'react-native';
 
-import { categoryArray } from '../store';
 import { z } from 'zod';
-import { frequencySchema, reminderSchema } from '../validationSchemas';
+import {
+  activitySchema,
+  categorySchema,
+  checklistItemSchema,
+  frequencySchema,
+  prioritySchema,
+  reminderSchema,
+} from '../validationSchemas';
 
 export type AuthUser = User & {
   username?: string;
@@ -15,15 +21,11 @@ export type Theme = 'dark' | 'light';
 
 export type TaskFilter = 'single task' | 'recurring task';
 
-export type Category = (typeof categoryArray)[number];
+export type Category = z.infer<typeof categorySchema>;
 
-export type Priority = 'Low' | 'Normal' | 'High';
+export type Priority = z.infer<typeof prioritySchema>;
 
-export interface ChecklistItem {
-  id: string;
-  title: string;
-  isCompleted: boolean;
-}
+export type ChecklistItem = z.infer<typeof checklistItemSchema>;
 
 export type Frequency = z.infer<typeof frequencySchema>;
 
@@ -37,6 +39,8 @@ export interface IconProps {
   variant?: IconVariant;
 }
 
+export type NewActivityData = z.infer<typeof activitySchema>;
+
 export type ActivityFilter = 'all' | 'habits' | 'tasks';
 
 export type ActivityType = 'habit' | 'single task' | 'recurring task';
@@ -47,15 +51,14 @@ export type Activity = {
   title: string;
   category: Category;
   priority: Priority;
-  note: string;
-  dueDate?: Date;
+  frequency: Frequency;
+  isCompleted: boolean;
+  note?: string;
   startDate?: Date;
   endDate?: Date;
-  frequency?: Frequency;
-  reminders: Reminder[];
   checklist?: ChecklistItem[];
-  isCompleted: boolean;
-  isCarriedOver: boolean;
+  reminders?: Reminder[];
+  isCarriedOver?: boolean;
 };
 
 export interface Task {

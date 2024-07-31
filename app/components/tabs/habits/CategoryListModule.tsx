@@ -3,11 +3,11 @@ import { View, Text, styled, getTokenValue } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { categoryArray } from '@/app/store';
-import { NewHabitData } from '@/app/newHabit';
 import CategoryIcon from '../CategoryIcon';
+import { NewActivityData } from '@/app/entities';
 
 interface Props {
-  control: Control<NewHabitData>;
+  control: Control<NewActivityData>;
   navigateForward: () => void;
 }
 

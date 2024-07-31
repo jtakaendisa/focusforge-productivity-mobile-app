@@ -1,89 +1,89 @@
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Activity, Priority, Task } from '@/app/entities';
-import { useTaskStore } from '@/app/store';
-import TaskItem from '../tasks/TaskItem';
-import ModalContainer from '../modals/ModalContainer';
-import DeleteModalModule from '../modals/DeleteModalModule';
-import TaskSectionHeader from '../tasks/TaskSectionHeader';
-import PriorityModalModule from '../modals/PriorityModalModule';
+import { HabitActiveTab } from '@/app/habitDetails';
+import { useActivityStore } from '@/app/store';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import ActivityOptionsModal from '../habits/ActivityOptionsModal';
 import { router } from 'expo-router';
+import { Swipeable } from 'react-native-gesture-handler';
+import ActivityOptionsModal from '../habits/ActivityOptionsModal';
 import ChecklistModalModule from '../modals/ChecklistModalModule';
+import DeleteModalModule from '../modals/DeleteModalModule';
+import ModalContainer from '../modals/ModalContainer';
+import PriorityModalModule from '../modals/PriorityModalModule';
+import TaskListItem from '../tasks/TaskListItem';
+import TaskSectionHeader from '../tasks/TaskSectionHeader';
 
-interface Props {
-  taskListRef: MutableRefObject<FlashList<Task | (string | Task)> | null>;
-  filteredActivities: Activity[];
-  isCheckable?: boolean;
-}
+const TaskList = () => {
+  const activities = useActivityStore((s) => s.activities);
+  const taskFilter = useActivityStore((s) => s.taskFilter);
+  const setActivities = useActivityStore((s) => s.setActivities);
 
-const TaskList = ({ taskListRef, filteredActivities, isCheckable }: Props) => {
-  const tasks = useTaskStore((s) => s.tasks);
-  const setTasks = useTaskStore((s) => s.setTasks);
+  const [tasks, setTasks] = useState<Activity[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
+  const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
 
-  const [currentPriority, setCurrentPriority] = useState<Priority | null>(null);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [modalState, setModalState] = useState({
-    isDeleteOpen: false,
-    isPrioritizeOpen: false,
-    isChecklistOpen: false,
-  });
-
+  const taskListRef = useRef<FlashList<Task | (string | Task)> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
-  const { isDeleteOpen, isPrioritizeOpen, isChecklistOpen } = modalState;
+  const singleTasks = useMemo(
+    () => activities.filter((activity) => activity.type === 'single task'),
+    [activities]
+  );
+  const recurringTasks = useMemo(
+    () => activities.filter((activity) => activity.type === 'recurring task'),
+    [activities]
+  );
 
-  const handlePress = (selectedActivity: Activity, hasChecklist: boolean) => {
-    // const allCompleted = selectedActivity.checklist.every((item) => item.isCompleted);
-    // if (hasChecklist && !allCompleted) {
-    //   setSelectedTask(selectedTask);
-    //   return;
-    // }
-    // const updatedTasks = tasks.map((task) => {
-    //   if (task.id === selectedActivity.id) {
-    //     return {
-    //       ...task,
-    //       checklist:
-    //         hasChecklist && task.isCompleted
-    //           ? task.checklist.map((item) => ({ ...item, isCompleted: false }))
-    //           : task.checklist,
-    //       isCompleted: !task.isCompleted,
-    //     };
-    //   } else {
-    //     return task;
-    //   }
-    // });
-    // setTasks(updatedTasks);
-    // setSelectedTask(null);
+  const handleTaskComplete = (selectedTask: Activity) => {
+    const hasChecklist = !!selectedTask.checklist?.length;
+    if (hasChecklist) {
+      const allChecklistItemsCompleted = selectedTask.checklist?.every(
+        (item) => item.isCompleted
+      );
+      if (!allChecklistItemsCompleted) {
+        setSelectedTask(selectedTask);
+        toggleChecklistModal();
+      } else {
+        const updatedActivities = activities.map((activity) =>
+          activity.id === selectedTask.id
+            ? {
+                ...activity,
+                checklist: activity.checklist!.map((item) => ({
+                  ...item,
+                  isCompleted: false,
+                })),
+                isCompleted: false,
+              }
+            : activity
+        );
+        setActivities(updatedActivities);
+      }
+    } else {
+      const updatedActivities = activities.map((activity) =>
+        activity.id === selectedTask.id
+          ? {
+              ...activity,
+              isCompleted: !activity.isCompleted,
+            }
+          : activity
+      );
+      setActivities(updatedActivities);
+    }
   };
 
   const handlePrioritize = (priority: Priority) => {
-    const updatedTasks = tasks.map((task) => {
-      if (task.id === selectedTask?.id) {
-        return {
-          ...task,
-          priority,
-        };
-      } else {
-        return task;
-      }
-    });
-    setTasks(updatedTasks);
+    const updatedActivities = activities.map((activity) =>
+      activity.id === selectedTask?.id ? { ...activity, priority } : activity
+    );
+    setActivities(updatedActivities);
     setSelectedTask(null);
   };
 
-  const handleDelete = (id: string) => {
-    const updatedTasks = tasks.filter((task) => task.id !== id);
-    setTasks(updatedTasks);
-    taskListRef.current?.prepareForLayoutAnimationRender();
-
-    activityOptionsRef.current?.close();
-    setSelectedTask(null);
-  };
-
-  const navigateToTaskDetailsScreen = (activeTab: string, taskId: string) => {
+  const navigateToTaskDetailsScreen = (activeTab: HabitActiveTab, taskId: string) => {
     if (!taskId.length) return;
 
     activityOptionsRef.current?.dismiss();
@@ -93,99 +93,103 @@ const TaskList = ({ taskListRef, filteredActivities, isCheckable }: Props) => {
     });
   };
 
-  const handlePresentActivityOptionsModal = (task: Task) => {
+  const handleSwipe = (
+    direction: 'left' | 'right',
+    selectedTask: Activity,
+    swipeableRef: MutableRefObject<Swipeable | null>,
+    isCheckable?: boolean
+  ) => {
+    setSelectedTask(selectedTask);
+
+    if (direction === 'left') {
+      if (isCheckable) {
+        togglePriorityModal();
+      } else {
+        navigateToTaskDetailsScreen('edit', selectedTask.id);
+      }
+    } else {
+      toggleDeleteModal();
+    }
+    swipeableRef.current?.close();
+  };
+
+  const handleDelete = (id: string) => {
+    const updatedActivities = activities.filter((activity) => activity.id !== id);
+    setActivities(updatedActivities);
+    taskListRef.current?.prepareForLayoutAnimationRender();
+
+    activityOptionsRef.current?.close();
+    setSelectedTask(null);
+  };
+
+  const toggleActivityOptionsModal = (task: Activity) => {
     setSelectedTask(task);
     activityOptionsRef.current?.present();
   };
 
-  const toggleDeleteModal = () => {
-    setModalState({ ...modalState, isDeleteOpen: !isDeleteOpen });
-    setSelectedTask(null);
-  };
+  const toggleDeleteModal = () => setIsDeleteModalOpen((prev) => !prev);
 
-  const togglePriorityModal = () => {
-    setModalState({ ...modalState, isPrioritizeOpen: !isPrioritizeOpen });
-    setSelectedTask(null);
-  };
+  const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
 
-  const toggleChecklistModal = () => {
-    setModalState({ ...modalState, isChecklistOpen: !isChecklistOpen });
-    setSelectedTask(null);
-  };
+  const toggleChecklistModal = () => setIsChecklistModalOpen((prev) => !prev);
 
   useEffect(() => {
-    if (isPrioritizeOpen) {
-      const priority = filteredActivities.find(
-        (task) => task.id === selectedTask?.id
-      )?.priority;
-      if (priority) {
-        setCurrentPriority(priority);
-      }
+    let tasks: Activity[] = [];
+
+    if (taskFilter === 'single task') {
+      tasks = singleTasks;
     } else {
-      setCurrentPriority(null);
+      tasks = recurringTasks;
     }
-  }, [filteredActivities, isPrioritizeOpen, selectedTask]);
+    setTasks(tasks);
+  }, [singleTasks, recurringTasks, taskFilter]);
 
   return (
     <>
       <AnimatedFlashList
         ref={taskListRef}
-        data={filteredActivities as (string | Activity)[]}
-        renderItem={({ item }) => {
-          if (typeof item === 'string') {
-            return <TaskSectionHeader title={item} />;
-          } else {
-            return (
-              <TaskItem
-                task={item}
-                onPress={handlePress}
-                onSwipe={(selectedTask) => setSelectedTask(selectedTask)}
-                openModal={(modalName) =>
-                  setModalState({
-                    isChecklistOpen: false,
-                    isDeleteOpen: false,
-                    isPrioritizeOpen: false,
-                    [modalName]: true,
-                  })
-                }
-                isCheckable={isCheckable}
-                showOptions={handlePresentActivityOptionsModal}
-              />
-            );
-          }
-        }}
-        keyExtractor={(item) => {
-          return typeof item === 'string' ? item : item.id;
-        }}
-        getItemType={(item) => {
-          return typeof item === 'string' ? 'sectionHeader' : 'row';
-        }}
+        data={tasks}
+        renderItem={({ item }) =>
+          typeof item === 'string' ? (
+            <TaskSectionHeader title={item} />
+          ) : (
+            <TaskListItem
+              task={item}
+              onTaskComplete={handleTaskComplete}
+              onSwipe={handleSwipe}
+              isCheckable={false}
+              showOptions={toggleActivityOptionsModal}
+            />
+          )
+        }
+        keyExtractor={(item) => (typeof item === 'string' ? item : item.id)}
+        getItemType={(item) => (typeof item === 'string' ? 'sectionHeader' : 'row')}
         estimatedItemSize={72}
         showsVerticalScrollIndicator={false}
       />
 
-      <ModalContainer isOpen={isPrioritizeOpen} closeModal={togglePriorityModal}>
-        {currentPriority && (
+      <ModalContainer isOpen={isPriorityModalOpen} closeModal={togglePriorityModal}>
+        {selectedTask && (
           <PriorityModalModule
-            currentPriority={currentPriority}
-            setPriority={handlePrioritize}
+            initialPriority={selectedTask.priority}
+            onPrioritize={handlePrioritize}
             closeModal={togglePriorityModal}
           />
         )}
       </ModalContainer>
-      <ModalContainer isOpen={isDeleteOpen} closeModal={toggleDeleteModal}>
+      <ModalContainer isOpen={isDeleteModalOpen} closeModal={toggleDeleteModal}>
         {selectedTask && (
           <DeleteModalModule
             taskId={selectedTask.id}
-            deleteTask={handleDelete}
+            onDelete={handleDelete}
             closeModal={toggleDeleteModal}
           />
         )}
       </ModalContainer>
-      <ModalContainer isOpen={isChecklistOpen} closeModal={toggleChecklistModal}>
+      <ModalContainer isOpen={isChecklistModalOpen} closeModal={toggleChecklistModal}>
         {selectedTask?.checklist && (
           <ChecklistModalModule
-            activities={filteredActivities}
+            activities={activities}
             taskId={selectedTask.id}
             checklist={selectedTask.checklist}
             closeModal={toggleChecklistModal}
@@ -193,7 +197,7 @@ const TaskList = ({ taskListRef, filteredActivities, isCheckable }: Props) => {
         )}
       </ModalContainer>
       <ActivityOptionsModal
-        mode="task"
+        mode="recurring task"
         activityOptionsRef={activityOptionsRef}
         selectedActivity={selectedTask}
         onDelete={handleDelete}

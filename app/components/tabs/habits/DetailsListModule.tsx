@@ -10,10 +10,10 @@ import { Control, Controller } from 'react-hook-form';
 import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
-import { NewHabitData } from '@/app/newHabit';
+import { NewActivityData } from '@/app/entities';
 
 interface Props {
-  control: Control<NewHabitData>;
+  control: Control<NewActivityData>;
 }
 
 const DetailsListModule = ({ control }: Props) => {

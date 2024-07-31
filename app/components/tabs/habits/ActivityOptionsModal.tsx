@@ -8,7 +8,7 @@ import {
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { styled, View, Text, getTokenValue } from 'tamagui';
 
-import { Activity, Habit, Task } from '@/app/entities';
+import { Activity } from '@/app/entities';
 import { toTruncatedText } from '@/app/utils';
 import HabitOptionIcon from './HabitOptionIcon';
 import CategoryIcon from '../CategoryIcon';
@@ -17,12 +17,16 @@ import { TaskActiveTab } from '@/app/taskDetails';
 import { HabitActiveTab } from '@/app/habitDetails';
 
 interface Props {
-  mode: 'habit' | 'task';
+  mode: 'habit' | 'recurring task';
   activityOptionsRef: MutableRefObject<BottomSheetModalMethods | null>;
   selectedActivity: Activity | null;
   onDelete: (id: string) => void;
-  onNavigate: (activeTab: TaskActiveTab | HabitActiveTab, habitId: string) => void;
+  onNavigate: (activeTab: TaskActiveTab | HabitActiveTab, activityId: string) => void;
 }
+
+const renderBackdrop = (props: BottomSheetBackdropProps) => (
+  <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />
+);
 
 const ActivityOptionsModal = ({
   mode,
@@ -54,7 +58,7 @@ const ActivityOptionsModal = ({
         <TopRow>
           <DetailsContainer>
             <TitleText>{selectedActivity?.title}</TitleText>
-            {!!selectedActivity?.note.length && (
+            {!!selectedActivity?.note?.length && (
               <Text>{toTruncatedText(selectedActivity.note, 12)}</Text>
             )}
             {selectedActivity?.frequency && (
@@ -101,10 +105,6 @@ const ActivityOptionsModal = ({
     </BottomSheetModal>
   );
 };
-
-const renderBackdrop = (props: BottomSheetBackdropProps) => (
-  <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />
-);
 
 const TopRow = styled(View, {
   flexDirection: 'row',

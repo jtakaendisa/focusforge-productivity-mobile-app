@@ -10,13 +10,12 @@ import { useSharedValue, withTiming } from 'react-native-reanimated';
 import { styled, View, Text, Accordion, getTokenValue } from 'tamagui';
 
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
-import { NewHabitData } from '@/app/newHabit';
 import CircularCheckbox from '../CircularCheckbox';
 import WeekdayCard from './WeekdayCard';
-import { Frequency } from '@/app/entities';
+import { Frequency, NewActivityData } from '@/app/entities';
 
 interface Props {
-  control: Control<NewHabitData>;
+  control: Control<NewActivityData>;
   isModal?: boolean;
   closeModal?: () => void;
 }

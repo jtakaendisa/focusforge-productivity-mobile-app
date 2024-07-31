@@ -28,7 +28,6 @@ interface Props {
     habit: Activity,
     swipeableRef: MutableRefObject<Swipeable | null>
   ) => void;
-  openModal: () => void;
 }
 
 const SVG_SIZE = 18;

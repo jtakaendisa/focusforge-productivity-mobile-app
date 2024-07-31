@@ -76,3 +76,13 @@ export const toFormattedSections = (tasksByDueDate: { [key: string]: Task[] }) =
   });
   return sections;
 };
+
+export const toCleanedObject = <T extends { [key: string]: any }>(obj: T): T => {
+  const cleanedObj = {} as T;
+  for (const key in obj) {
+    if (obj[key] !== undefined) {
+      cleanedObj[key] = obj[key];
+    }
+  }
+  return cleanedObj;
+};

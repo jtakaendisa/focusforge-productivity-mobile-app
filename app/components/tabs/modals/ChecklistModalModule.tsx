@@ -1,24 +1,25 @@
-import { useRef } from 'react';
-import { Control, Controller, useForm } from 'react-hook-form';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
-import { Text, View, getTokenValue, styled } from 'tamagui';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useRef, useState } from 'react';
+import { Control, Controller } from 'react-hook-form';
+import { Text, View, styled } from 'tamagui';
 
-import { Activity, ChecklistItem as ChecklistItemType, Task } from '@/app/entities';
 import { SCREEN_HEIGHT } from '@/app/constants';
-import { NewTaskData } from '@/app/newTask';
-import CreateChecklistItem from '../tasks/CreateChecklistItem';
-import ChecklistItem from '../tasks/ChecklistItem';
+import {
+  Activity,
+  ChecklistItem as ChecklistItemType,
+  NewActivityData,
+} from '@/app/entities';
+import { useActivityStore } from '@/app/store';
 import CheckableChecklistItem from '../tasks/CheckableChecklistItem';
-import { useTaskStore } from '@/app/store';
-import { checklistSchema } from '@/app/validationSchemas';
+import ChecklistItem from '../tasks/ChecklistItem';
+import CreateChecklistItem from '../tasks/CreateChecklistItem';
 
 interface Props {
   isForm?: boolean;
-  control?: Control<NewTaskData>;
+  control?: Control<NewActivityData>;
   activities?: Activity[];
   taskId?: string;
-  checklist: ChecklistItemType[];
+  checklist?: ChecklistItemType[];
   closeModal: () => void;
 }
 
@@ -30,23 +31,24 @@ const ChecklistModalModule = ({
   checklist,
   closeModal,
 }: Props) => {
-  const setTasks = useTaskStore((s) => s.setTasks);
+  const setActivities = useActivityStore((s) => s.setActivities);
+
+  const [localChecklist, setLocalChecklist] = useState<ChecklistItemType[] | undefined>(
+    checklist
+  );
 
   const listRef = useRef<FlashList<ChecklistItemType> | null>(null);
   const setChecklistRef = useRef<((...event: any[]) => void) | null>(null);
 
-  const { control: checklistControl, watch } = useForm<{
-    checklist: ChecklistItemType[];
-  }>({
-    defaultValues: { checklist },
-    resolver: zodResolver(checklistSchema),
-  });
-
-  const { checklist: watchChecklist } = watch();
-
   const handleCreateItem = (newChecklistItem: ChecklistItemType) => {
-    const updatedChecklist = [...checklist, newChecklistItem];
-    setChecklistRef.current?.(updatedChecklist);
+    const updatedChecklist = checklist
+      ? [...checklist, newChecklistItem]
+      : [newChecklistItem];
+    if (control) {
+      setChecklistRef.current?.(updatedChecklist);
+    } else {
+      setLocalChecklist(updatedChecklist);
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -55,83 +57,104 @@ const ChecklistModalModule = ({
     const filteredChecklistItems = checklist.filter(
       (checklistItem) => checklistItem.id !== id
     );
-    setChecklistRef.current?.(filteredChecklistItems);
+
+    if (control) {
+      setChecklistRef.current?.(
+        !!filteredChecklistItems.length ? filteredChecklistItems : undefined
+      );
+    } else {
+      setLocalChecklist(filteredChecklistItems);
+    }
     listRef.current?.prepareForLayoutAnimationRender();
   };
 
   const handleCheck = (id: string) => {
-    if (!activities) return;
+    const updatedChecklist = localChecklist?.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            isCompleted: !item.isCompleted,
+          }
+        : item
+    );
+    setLocalChecklist(updatedChecklist);
 
-    const updatedChecklist = watchChecklist.map((item) => {
-      if (item.id === id) {
-        return {
-          ...item,
-          isCompleted: !item.isCompleted,
-        };
-      } else {
-        return item;
-      }
-    });
+    const allChecklistItemsCompleted = updatedChecklist?.every(
+      (item) => item.isCompleted
+    );
 
-    setChecklistRef.current?.(updatedChecklist);
+    const updatedTasks = activities?.map((activity) =>
+      activity.id === taskId
+        ? {
+            ...activity,
+            checklist: updatedChecklist,
+            isCompleted: allChecklistItemsCompleted ? true : false,
+          }
+        : activity
+    );
 
-    const allCompleted = updatedChecklist.every((item) => item.isCompleted);
-
-    const updatedTasks = activities.map((task) => {
-      if (task.id === taskId) {
-        const updatedTask = {
-          ...task,
-          isCompleted: allCompleted ? true : false,
-          checklist: updatedChecklist,
-        };
-        return updatedTask;
-      } else {
-        return task;
-      }
-    });
-
-    setTasks(updatedTasks);
+    if (updatedTasks) {
+      setActivities(updatedTasks);
+    }
   };
-
-  const customRed1 = getTokenValue('$customRed1');
 
   return (
     <Container>
       <HeadingContainer>
         <HeadingText>{isForm ? 'Create sub tasks' : 'Sub Tasks'}</HeadingText>
       </HeadingContainer>
-      <Controller
-        control={control || (checklistControl as any)}
-        name="checklist"
-        render={({ field: { onChange, value } }) => {
-          setChecklistRef.current = onChange;
-          return (
-            <MainContent>
-              <AnimatedFlashList
-                ref={listRef}
-                data={value}
-                renderItem={({ item }) =>
-                  isForm ? (
-                    <ChecklistItem listItem={item} onDelete={handleDelete} />
-                  ) : (
-                    <CheckableChecklistItem listItem={item} onCheck={handleCheck} />
-                  )
-                }
-                keyExtractor={(item) => item.id}
-                estimatedItemSize={46}
-                ListHeaderComponent={() =>
-                  isForm ? (
-                    <CreateChecklistItem setChecklist={handleCreateItem} />
-                  ) : null
-                }
-                showsVerticalScrollIndicator={false}
-              />
-            </MainContent>
-          );
-        }}
-      />
+      <MainContent>
+        {control ? (
+          <Controller
+            control={control}
+            name="checklist"
+            render={({ field: { onChange, value } }) => {
+              setChecklistRef.current = onChange;
+              return (
+                <AnimatedFlashList
+                  ref={listRef}
+                  data={value}
+                  renderItem={({ item }) =>
+                    isForm ? (
+                      <ChecklistItem listItem={item} onDelete={handleDelete} />
+                    ) : (
+                      <CheckableChecklistItem listItem={item} onCheck={handleCheck} />
+                    )
+                  }
+                  keyExtractor={(item) => item.id}
+                  estimatedItemSize={46}
+                  ListHeaderComponent={() =>
+                    isForm ? (
+                      <CreateChecklistItem setChecklist={handleCreateItem} />
+                    ) : null
+                  }
+                  showsVerticalScrollIndicator={false}
+                />
+              );
+            }}
+          />
+        ) : (
+          <AnimatedFlashList
+            ref={listRef}
+            data={localChecklist}
+            renderItem={({ item }) =>
+              isForm ? (
+                <ChecklistItem listItem={item} onDelete={handleDelete} />
+              ) : (
+                <CheckableChecklistItem listItem={item} onCheck={handleCheck} />
+              )
+            }
+            keyExtractor={(item) => item.id}
+            estimatedItemSize={46}
+            ListHeaderComponent={() =>
+              isForm ? <CreateChecklistItem setChecklist={handleCreateItem} /> : null
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </MainContent>
       <CloseButton onPress={closeModal}>
-        <ButtonText color={customRed1}>CLOSE</ButtonText>
+        <ButtonText color="$customRed1">CLOSE</ButtonText>
       </CloseButton>
     </Container>
   );

@@ -1,21 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AnimatedFlashList, FlashList, ViewToken } from '@shopify/flash-list';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { AnimatedFlashList, FlashList, ViewToken } from '@shopify/flash-list';
-import uuid from 'react-native-uuid';
+import { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, styled, getTokenValue } from 'tamagui';
+import uuid from 'react-native-uuid';
+import { Text, View, styled } from 'tamagui';
 
-import { useHabitStore } from './store';
-import { SCREEN_WIDTH, CURRENT_DATE } from './constants';
-import { habitSchema } from './validationSchemas';
-import NewHabitListItem from './components/tabs/habits/NewHabitListItem';
 import Dot from './components/tabs/habits/Dot';
-
-export type NewHabitData = z.infer<typeof habitSchema>;
+import NewHabitListItem from './components/tabs/habits/NewHabitListItem';
+import { CURRENT_DATE, SCREEN_WIDTH } from './constants';
+import { Activity, NewActivityData } from './entities';
+import { useActivityStore } from './store';
+import { toCleanedObject } from './utils';
+import { activitySchema } from './validationSchemas';
 
 type SearchParams = {
   origin: '/' | '/habits' | '/tasks';
@@ -26,8 +25,8 @@ const listItems = [0, 1, 2, 3];
 const NewHabitScreen = () => {
   const { origin } = useLocalSearchParams<SearchParams>();
 
-  const habits = useHabitStore((s) => s.habits);
-  const setHabits = useHabitStore((s) => s.setHabits);
+  const activities = useActivityStore((s) => s.activities);
+  const setActivities = useActivityStore((s) => s.setActivities);
 
   const [listIndex, setListIndex] = useState(0);
 
@@ -36,32 +35,26 @@ const NewHabitScreen = () => {
   const isFirstIndex = listIndex === 0;
   const isLastIndex = listIndex === listItems.length - 1;
 
-  const customRed1 = getTokenValue('$customRed1');
-
   const {
     control,
+    watch,
     handleSubmit,
     reset,
-    watch,
     formState: { isSubmitSuccessful },
-  } = useForm<NewHabitData>({
+  } = useForm<NewActivityData>({
     defaultValues: {
-      category: 'Task',
       title: '',
-      note: '',
+      category: 'Task',
       startDate: CURRENT_DATE,
       priority: 'Normal',
       frequency: {
         type: 'daily',
       },
-      reminders: [],
     },
-    resolver: zodResolver(habitSchema),
+    resolver: zodResolver(activitySchema),
   });
 
   const watchAllFields = watch();
-
-  const { priority, startDate, endDate, reminders } = watchAllFields;
 
   const handleViewableItemChange = ({
     viewableItems,
@@ -73,7 +66,7 @@ const NewHabitScreen = () => {
     }
   };
 
-  const handleNavigateBackward = () => {
+  const navigateBackward = () => {
     if (!isFirstIndex) {
       listRef.current?.scrollToIndex({
         index: listIndex - 1,
@@ -84,7 +77,7 @@ const NewHabitScreen = () => {
     }
   };
 
-  const handleNavigateForward = async () => {
+  const navigateForward = async () => {
     if (listIndex < listItems.length - 1) {
       listRef.current?.scrollToIndex({
         index: listIndex + 1,
@@ -93,12 +86,14 @@ const NewHabitScreen = () => {
     }
   };
 
-  const onSubmit: SubmitHandler<NewHabitData> = (data) => {
-    const newHabit = {
+  const onSubmit: SubmitHandler<NewActivityData> = (data) => {
+    const newHabit: Activity = {
       id: uuid.v4() as string,
+      type: 'habit',
+      isCompleted: false,
       ...data,
     };
-    setHabits([...habits, newHabit]);
+    setActivities([...activities, toCleanedObject(newHabit)]);
   };
 
   useEffect(() => {
@@ -117,11 +112,7 @@ const NewHabitScreen = () => {
           <NewHabitListItem
             item={item}
             control={control}
-            currentPriority={priority}
-            startDate={startDate}
-            endDate={endDate}
-            reminders={reminders}
-            navigateForward={handleNavigateForward}
+            navigateForward={navigateForward}
           />
         )}
         keyExtractor={(item) => item}
@@ -129,12 +120,12 @@ const NewHabitScreen = () => {
         onViewableItemsChanged={handleViewableItemChange}
         scrollEnabled={false}
         showsHorizontalScrollIndicator={false}
-        extraData={[priority, startDate, endDate, reminders]}
+        extraData={watchAllFields}
         pagingEnabled
         horizontal
       />
       <ButtonsContainer>
-        <Button onPress={handleNavigateBackward}>
+        <Button onPress={navigateBackward}>
           <ButtonText>{isFirstIndex ? 'CANCEL' : 'BACK'}</ButtonText>
         </Button>
         <Button style={{ maxWidth: 50 }}>
@@ -145,11 +136,11 @@ const NewHabitScreen = () => {
           </ButtonRow>
         </Button>
         <Button
-          onPress={isLastIndex ? handleSubmit(onSubmit) : handleNavigateForward}
+          onPress={isLastIndex ? handleSubmit(onSubmit) : navigateForward}
           disabled={isFirstIndex}
         >
           {!isFirstIndex && (
-            <ButtonText color={customRed1}>{isLastIndex ? 'SAVE' : 'NEXT'}</ButtonText>
+            <ButtonText color="$customRed1">{isLastIndex ? 'SAVE' : 'NEXT'}</ButtonText>
           )}
         </Button>
       </ButtonsContainer>

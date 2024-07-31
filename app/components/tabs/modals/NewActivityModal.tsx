@@ -50,7 +50,7 @@ const options = [
 const NewActivityModal = ({ newActivityModalRef }: Props) => {
   const currentPath = usePathname();
 
-  const handleCreateTask = (pathname: Pathname, isRecurring: boolean) => {
+  const navigateToNewActivityScreen = (pathname: Pathname, isRecurring: boolean) => {
     newActivityModalRef.current?.dismiss();
 
     if (pathname === '/newTask') {
@@ -84,7 +84,7 @@ const NewActivityModal = ({ newActivityModalRef }: Props) => {
             <>
               <CardContainer
                 key={heading}
-                onPress={() => handleCreateTask(pathname, isRecurring)}
+                onPress={() => navigateToNewActivityScreen(pathname, isRecurring)}
               >
                 <IconContainer isTransparent={false}>
                   <ActivityTypeIcon name={icon} fill={customRed1} />

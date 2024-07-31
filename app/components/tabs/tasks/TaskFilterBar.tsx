@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { View, Text, styled, getTokenValue } from 'tamagui';
+import { Text, View, getTokenValue, styled } from 'tamagui';
 
 import Animated, {
   SharedValue,
@@ -10,18 +10,20 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { TaskFilter } from '@/app/entities';
+import { useActivityStore } from '@/app/store';
 
-interface Props {
-  filter: TaskFilter;
-  onSelect: (filter: TaskFilter) => void;
-}
+const TaskFilterBar = () => {
+  const taskFilter = useActivityStore((s) => s.taskFilter);
+  const setTaskFilter = useActivityStore((s) => s.setTaskFilter);
 
-const FilterBar = ({ filter, onSelect }: Props) => {
   const isSingleTaskSelected = useSharedValue(0);
   const isRecurringTaskSelected = useSharedValue(0);
 
   const customGray1 = getTokenValue('$customGray1');
+
+  const handleSingleTaskFilterSelect = () => setTaskFilter('single task');
+
+  const handleRecurringTaskFilterSelect = () => setTaskFilter('recurring task');
 
   const textColorAnimation = (filter: SharedValue<number>) => {
     return useAnimatedStyle(() => ({
@@ -36,18 +38,18 @@ const FilterBar = ({ filter, onSelect }: Props) => {
   };
 
   useEffect(() => {
-    if (filter === 'single') {
+    if (taskFilter === 'single task') {
       isSingleTaskSelected.value = withTiming(1);
       isRecurringTaskSelected.value = withTiming(0);
     } else {
       isRecurringTaskSelected.value = withTiming(1);
       isSingleTaskSelected.value = withTiming(0);
     }
-  }, [filter]);
+  }, [taskFilter]);
 
   return (
     <Container>
-      <Button onPress={() => onSelect('single')}>
+      <Button onPress={handleSingleTaskFilterSelect}>
         <TextContainer>
           <AnimatedButtonText style={textColorAnimation(isSingleTaskSelected)}>
             Single Tasks
@@ -57,7 +59,7 @@ const FilterBar = ({ filter, onSelect }: Props) => {
           />
         </TextContainer>
       </Button>
-      <Button onPress={() => onSelect('recurring')}>
+      <Button onPress={handleRecurringTaskFilterSelect}>
         <TextContainer>
           <AnimatedButtonText style={textColorAnimation(isRecurringTaskSelected)}>
             Recurring Tasks
@@ -107,4 +109,4 @@ const SelectionIndicator = styled(View, {
 const AnimatedButtonText = Animated.createAnimatedComponent(ButtonText);
 const AnimatedSelectionIndicator = Animated.createAnimatedComponent(SelectionIndicator);
 
-export default FilterBar;
+export default TaskFilterBar;

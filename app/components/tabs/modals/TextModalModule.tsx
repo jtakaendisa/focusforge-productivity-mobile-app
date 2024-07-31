@@ -1,23 +1,31 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { TextInput } from 'react-native';
 import { Control, Controller } from 'react-hook-form';
 import { Text, View, getTokenValue, styled } from 'tamagui';
-
-import { NewTaskData } from '@/app/newTask';
+import { NewActivityData } from '@/app/entities';
 
 interface Props {
-  control: Control<NewTaskData>;
+  control: Control<NewActivityData>;
   name: 'title' | 'note';
-  previousText: string;
+  initialText?: string;
   closeModal: () => void;
 }
 
-const TextModalModule = ({ control, name, previousText, closeModal }: Props) => {
-  const previousTextRef = useRef<string>(previousText);
-  const clearInputRef = useRef<((...event: any[]) => void) | null>(null);
+const TextModalModule = ({ control, name, initialText, closeModal }: Props) => {
+  const memoizedInitialText = useMemo(() => initialText, []);
+  const setInputRef = useRef<((...event: any[]) => void) | null>(null);
 
   const customGray7 = getTokenValue('$customGray7');
-  const customRed1 = getTokenValue('$customRed1');
+
+  const handleCancel = () => {
+    setInputRef.current?.(memoizedInitialText);
+    closeModal();
+  };
+
+  const handleConfirm = () => {
+    setInputRef.current?.(control._getWatch('note').trim());
+    closeModal();
+  };
 
   return (
     <Container>
@@ -26,7 +34,7 @@ const TextModalModule = ({ control, name, previousText, closeModal }: Props) => 
           control={control}
           name={name}
           render={({ field: { onChange, onBlur, value } }) => {
-            clearInputRef.current = onChange;
+            setInputRef.current = onChange;
             return (
               <TextInputField
                 placeholder="Additional notes..."
@@ -43,16 +51,11 @@ const TextModalModule = ({ control, name, previousText, closeModal }: Props) => 
         />
       </MainContainer>
       <ButtonsContainer>
-        <Button
-          onPress={() => {
-            clearInputRef.current?.(previousTextRef.current);
-            closeModal();
-          }}
-        >
+        <Button onPress={handleCancel}>
           <ButtonText>CANCEL</ButtonText>
         </Button>
-        <Button onPress={closeModal}>
-          <ButtonText color={customRed1}>OK</ButtonText>
+        <Button onPress={handleConfirm}>
+          <ButtonText color="$customRed1">OK</ButtonText>
         </Button>
       </ButtonsContainer>
     </Container>

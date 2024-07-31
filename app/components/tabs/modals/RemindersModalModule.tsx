@@ -5,16 +5,15 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { getTokenValue, Image, styled, Text, View } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
-import { Reminder } from '@/app/entities';
-import { NewHabitData } from '@/app/newHabit';
+import { NewActivityData, Reminder } from '@/app/entities';
 import PlusCircleSvg from '../../icons/PlusCircleSvg';
 import ReminderListItem from '../habits/ReminderListItem';
 import ModalContainer from './ModalContainer';
 import NewReminderModalModule from './NewReminderModalModule';
 
 interface Props {
-  control: Control<NewHabitData>;
-  reminders: Reminder[];
+  control: Control<NewActivityData>;
+  reminders?: Reminder[];
   closeModal: () => void;
 }
 
@@ -24,14 +23,16 @@ const RemindersModalModule = ({ control, reminders, closeModal }: Props) => {
   const listRef = useRef<FlashList<Reminder> | null>(null);
   const setRemindersRef = useRef<((...event: any[]) => void) | null>(null);
 
-  const handleCreateReminder = (newReminder: Reminder) => {
-    const updatedReminders = [...reminders, newReminder];
+  const handleReminderAdd = (newReminder: Reminder) => {
+    const updatedReminders = reminders ? [...reminders, newReminder] : [newReminder];
     setRemindersRef.current?.(updatedReminders);
     listRef.current?.prepareForLayoutAnimationRender();
   };
 
-  const handleDeleteReminder = (reminderId: string) => {
-    const updatedReminders = reminders.filter((reminder) => reminder.id !== reminderId);
+  const handleReminderRemove = (reminderId: string) => {
+    const updatedReminders = reminders?.filter(
+      (reminder) => reminder.id !== reminderId
+    );
     setRemindersRef.current?.(updatedReminders);
     listRef.current?.prepareForLayoutAnimationRender();
   };
@@ -53,7 +54,7 @@ const RemindersModalModule = ({ control, reminders, closeModal }: Props) => {
 
           return (
             <MainContent>
-              {!reminders.length ? (
+              {!reminders?.length ? (
                 <AnimatedPlaceholderContainer entering={FadeIn} exiting={FadeOut}>
                   <Image
                     source={{
@@ -69,7 +70,7 @@ const RemindersModalModule = ({ control, reminders, closeModal }: Props) => {
                   ref={listRef}
                   data={reminders}
                   renderItem={({ item }) => (
-                    <ReminderListItem listItem={item} onDelete={handleDeleteReminder} />
+                    <ReminderListItem listItem={item} onDelete={handleReminderRemove} />
                   )}
                   keyExtractor={(item) => item.id}
                   showsVerticalScrollIndicator={false}
@@ -97,7 +98,7 @@ const RemindersModalModule = ({ control, reminders, closeModal }: Props) => {
       <ModalContainer isOpen={isNewReminderOpen} closeModal={toggleNewReminderModal}>
         <NewReminderModalModule
           closeModal={toggleNewReminderModal}
-          onAdd={handleCreateReminder}
+          onAdd={handleReminderAdd}
         />
       </ModalContainer>
     </Container>

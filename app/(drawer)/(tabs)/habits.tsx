@@ -8,13 +8,12 @@ import { usePathname } from 'expo-router';
 import NewActivityButton from '../../components/tabs/NewActivityButton';
 import HabitList from '../../components/tabs/habits/HabitList';
 import NewActivityModal from '../../components/tabs/modals/NewActivityModal';
-import { useActivityStore, useAppStore } from '../../store';
+import { useAppStore } from '../../store';
 
 const HabitsScreen = () => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
   const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
-  const activities = useActivityStore((s) => s.activities);
 
   const newActivityModalRef = useRef<BottomSheetModal | null>(null);
 
@@ -23,7 +22,7 @@ const HabitsScreen = () => {
   return (
     <Container>
       <SearchBarSpacer isExpanded={pathname === 'habits' && isSearchBarOpen} />
-      <HabitList activities={activities} />
+      <HabitList />
       <NewActivityButton onPress={toggleNewActivityModal} />
       <NewActivityModal newActivityModalRef={newActivityModalRef} />
     </Container>
@@ -32,7 +31,6 @@ const HabitsScreen = () => {
 
 const Container = styled(View, {
   flex: 1,
-  position: 'relative',
   backgroundColor: '$customBlack1',
 });
 
