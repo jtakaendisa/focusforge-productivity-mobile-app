@@ -136,6 +136,17 @@ const dummyActivities: Activity[] = [
     type: 'single task',
   },
   {
+    category: 'Nutrition',
+    endDate: new Date('2024-07-30'),
+    frequency: { type: 'once' },
+    id: '8bcb8d9f-58vf-41da-8848-b41beb4d4c70',
+    isCarriedOver: true,
+    isCompleted: true,
+    priority: 'Normal',
+    title: 'Test ST 0',
+    type: 'single task',
+  },
+  {
     category: 'Task',
     frequency: { type: 'daily' },
     id: '85700a80-7121-41c9-9d50-65fe9c280a7d',

@@ -41,7 +41,7 @@ const TaskList = () => {
     [activities]
   );
 
-  const isTasksEmpty = !tasks.length;
+  const isListEmpty = !tasks.length;
 
   const navigateToTaskDetailsScreen = (activeTab: TaskActiveTab, taskId: string) => {
     if (!taskId.length) return;
@@ -94,8 +94,8 @@ const TaskList = () => {
   }, [taskFilter, singleTasks, recurringTasks]);
 
   return (
-    <Container isContentCentered={isTasksEmpty}>
-      {isTasksEmpty ? (
+    <Container isContentCentered={isListEmpty}>
+      {isListEmpty ? (
         <ActivityListPlaceholder />
       ) : (
         <AnimatedFlashList

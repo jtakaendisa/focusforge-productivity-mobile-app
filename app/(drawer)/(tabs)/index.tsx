@@ -7,7 +7,7 @@ import SearchBarSpacer from '@/app/components/tabs/SearchBarSpacer';
 import { usePathname } from 'expo-router';
 import DateCarousel from '../../components/tabs/home/DateCarousel';
 import NewActivityModal from '../../components/tabs/modals/NewActivityModal';
-import CreateTaskButton from '../../components/tabs/NewActivityButton';
+import NewActivityButton from '../../components/tabs/NewActivityButton';
 import { TabRoute } from '../../entities';
 import { useAppStore } from '../../store';
 
@@ -25,7 +25,7 @@ const HomeScreen = () => {
       <SearchBarSpacer isExpanded={pathname === 'home' && isSearchBarOpen} />
       <DateCarousel />
       <ActivityList />
-      <CreateTaskButton onPress={toggleNewActivityModal} />
+      <NewActivityButton onPress={toggleNewActivityModal} />
       <NewActivityModal newActivityModalRef={newActivityModalRef} />
     </Container>
   );

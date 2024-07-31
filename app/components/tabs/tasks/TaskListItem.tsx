@@ -21,6 +21,7 @@ import TaskItemRightActions from './TaskItemRightActions';
 interface Props {
   task: Activity;
   isCheckable?: boolean;
+  isTaskCompletionDisabled?: boolean;
   onTaskComplete?: (task: Activity) => void;
   onSwipe: (
     direction: 'left' | 'right',
@@ -34,6 +35,7 @@ interface Props {
 const TaskListItem = ({
   task,
   isCheckable,
+  isTaskCompletionDisabled,
   onTaskComplete,
   onSwipe,
   showOptions,
@@ -100,7 +102,10 @@ const TaskListItem = ({
         <TaskContainer>
           {isCheckable && (
             <CheckboxContainer>
-              <CircularCheckbox isChecked={isChecked} />
+              <CircularCheckbox
+                isChecked={isChecked}
+                isDisabled={isTaskCompletionDisabled}
+              />
             </CheckboxContainer>
           )}
           <TextContainer>

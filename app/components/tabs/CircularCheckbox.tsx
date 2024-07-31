@@ -6,12 +6,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import { View, getTokenValue, styled } from 'tamagui';
 import CheckSvg from '../icons/CheckSvg';
+import LockSvg from '../icons/LockSvg';
 
 interface Props {
   isChecked: SharedValue<number>;
+  isDisabled?: boolean;
 }
 
-const CircularCheckbox = ({ isChecked }: Props) => {
+const CircularCheckbox = ({ isChecked, isDisabled }: Props) => {
   const customGray1 = getTokenValue('$customGray1');
   const customGreen1 = getTokenValue('$customGreen1');
 
@@ -30,9 +32,13 @@ const CircularCheckbox = ({ isChecked }: Props) => {
 
   return (
     <AnimatedCheckbox style={checkboxAnimation}>
-      <AnimatedCheckboxIcon style={checkboxIconAnimation}>
-        <CheckSvg size={10} />
-      </AnimatedCheckboxIcon>
+      {isDisabled ? (
+        <LockSvg size={10} fill={customGray1} />
+      ) : (
+        <AnimatedCheckboxIcon style={checkboxIconAnimation}>
+          <CheckSvg size={10} />
+        </AnimatedCheckboxIcon>
+      )}
     </AnimatedCheckbox>
   );
 };

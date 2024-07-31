@@ -4,13 +4,13 @@ import { useMemo, useRef } from 'react';
 import { styled, View } from 'tamagui';
 
 import { DATE_CARD_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
-import { useTaskStore } from '@/app/store';
+import { useActivityStore } from '@/app/store';
 import { toFormattedDateString } from '@/app/utils';
 import DateCard from './DateCard';
 
 const DateCarousel = () => {
-  const selectedDate = useTaskStore((s) => s.selectedDate);
-  const setSelectedDate = useTaskStore((s) => s.setSelectedDate);
+  const selectedDate = useActivityStore((s) => s.selectedDate);
+  const setSelectedDate = useActivityStore((s) => s.setSelectedDate);
 
   const weeks = useMemo(() => {
     const start = startOfWeek(new Date(), { weekStartsOn: 1 });

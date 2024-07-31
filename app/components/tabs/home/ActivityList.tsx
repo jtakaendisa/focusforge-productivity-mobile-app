@@ -1,23 +1,66 @@
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
-import { MutableRefObject, useMemo, useRef, useState } from 'react';
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Activity, Priority, Task } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
+import { toFormattedDateString } from '@/app/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Swipeable } from 'react-native-gesture-handler';
+import { styled, View } from 'tamagui';
 import ChecklistModalModule from '../modals/ChecklistModalModule';
 import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import TaskListItem from '../tasks/TaskListItem';
-import { styled, View } from 'tamagui';
 import ActivityListPlaceholder from './ActivityListPlaceholder';
+import { CURRENT_DATE } from '@/app/constants';
+
+const carryOverTasks = (singleTasks: Activity[]) =>
+  singleTasks.map((task) =>
+    task.isCarriedOver && !task.isCompleted && new Date(task.endDate!) < CURRENT_DATE
+      ? { ...task, endDate: CURRENT_DATE }
+      : task
+  );
+
+const filterRecurringActivitiesByDate = (
+  recurringActivities: Activity[],
+  date: Date
+) => {
+  const filtered = recurringActivities.filter((activity) => {
+    const startDate = new Date(activity.startDate!);
+    const endDate = activity.endDate ? new Date(activity.endDate) : null;
+
+    // Check if the activity is within the date range
+    if (endDate && date > endDate) return false;
+    if (date < startDate) return false;
+
+    // Check activity frequency
+    switch (activity.frequency.type) {
+      case 'daily':
+        return true;
+      case 'specific':
+        return activity.frequency.isRepeatedOn!.includes(
+          date.toLocaleDateString('en-US', { weekday: 'long' })
+        );
+      case 'repeats':
+        const daysDifference = Math.floor(
+          (date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        return daysDifference % activity.frequency!.isRepeatedEvery! === 0;
+      default:
+        return false;
+    }
+  });
+
+  return filtered;
+};
 
 const ActivityList = () => {
+  const selectedDate = useActivityStore((s) => s.selectedDate);
   const activities = useActivityStore((s) => s.activities);
   const setActivities = useActivityStore((s) => s.setActivities);
 
-  const [todos, setTodos] = useState([]);
+  const [activitiesDueToday, setActivitiesDueToday] = useState<Activity[]>([]);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
@@ -26,18 +69,29 @@ const ActivityList = () => {
   const taskListRef = useRef<FlashList<Task | (string | Task)> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
-  const singleTasks = useMemo(
-    () => activities.filter((activity) => activity.type === 'single task'),
-    [activities]
-  );
-  const recurringTasks = useMemo(
-    () => activities.filter((activity) => activity.type === 'recurring task'),
-    [activities]
-  );
+  const memoizedSingleTasksDueToday = useMemo(() => {
+    const singleTasks = activities.filter(
+      (activity) => activity.type === 'single task'
+    );
+    return carryOverTasks(singleTasks).filter(
+      (task) =>
+        toFormattedDateString(task.endDate!) === toFormattedDateString(selectedDate)
+    );
+  }, [activities, selectedDate]);
 
-  const isTodosEmpty = !todos.length;
+  const memoizedRecurringActivitiesDueToday = useMemo(() => {
+    const recurringActivities = activities.filter(
+      (activity) => activity.type === 'recurring task' || activity.type === 'habit'
+    );
+    return filterRecurringActivitiesByDate(recurringActivities, selectedDate);
+  }, [activities, selectedDate]);
+
+  const isListEmpty = !activitiesDueToday.length;
+  const isTaskCompletionDisabled = selectedDate > CURRENT_DATE;
 
   const handleTaskComplete = (selectedTask: Activity) => {
+    if (isTaskCompletionDisabled) return; // disable completing tasks ahead of current date
+
     const hasChecklist = !!selectedTask.checklist?.length;
     if (hasChecklist) {
       const allChecklistItemsCompleted = selectedTask.checklist?.every(
@@ -109,20 +163,28 @@ const ActivityList = () => {
 
   const toggleChecklistModal = () => setIsChecklistModalOpen((prev) => !prev);
 
+  useEffect(() => {
+    setActivitiesDueToday([
+      ...memoizedSingleTasksDueToday,
+      ...memoizedRecurringActivitiesDueToday,
+    ]);
+  }, [memoizedSingleTasksDueToday, memoizedRecurringActivitiesDueToday]);
+
   return (
-    <Container isContentCentered={isTodosEmpty}>
-      {isTodosEmpty ? (
+    <Container isContentCentered={isListEmpty}>
+      {isListEmpty ? (
         <ActivityListPlaceholder />
       ) : (
         <AnimatedFlashList
           ref={taskListRef}
-          data={todos}
+          data={activitiesDueToday}
           renderItem={({ item }) => (
             <TaskListItem
               task={item}
               onTaskComplete={handleTaskComplete}
               onSwipe={handleSwipe}
               isCheckable
+              isTaskCompletionDisabled={isTaskCompletionDisabled}
             />
           )}
           keyExtractor={(item) => item.id}

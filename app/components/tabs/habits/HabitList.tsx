@@ -29,7 +29,7 @@ const HabitList = () => {
     [activities]
   );
 
-  const isHabitsEmpty = !habits.length;
+  const isListEmpty = !habits.length;
 
   const navigateToHabitDetailsScreen = (activeTab: HabitActiveTab, habitId: string) => {
     if (!habitId.length) return;
@@ -75,8 +75,8 @@ const HabitList = () => {
   }, [allHabits]);
 
   return (
-    <Container isContentCentered={isHabitsEmpty}>
-      {isHabitsEmpty ? (
+    <Container isContentCentered={isListEmpty}>
+      {isListEmpty ? (
         <ActivityListPlaceholder />
       ) : (
         <AnimatedFlashList
