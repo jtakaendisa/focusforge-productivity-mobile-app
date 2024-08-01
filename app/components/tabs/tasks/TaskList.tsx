@@ -1,7 +1,7 @@
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Activity, Task, TaskActiveTab } from '@/app/entities';
+import { Activity, Task, TaskActiveTab, TaskFilter } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
@@ -15,9 +15,12 @@ import { styled, View } from 'tamagui';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
 import { toDateGroupedTasks, toFormattedSections } from '@/app/utils';
 
-const TaskList = () => {
+interface Props {
+  taskFilter: TaskFilter;
+}
+
+const TaskList = ({ taskFilter }: Props) => {
   const activities = useActivityStore((s) => s.activities);
-  const taskFilter = useActivityStore((s) => s.taskFilter);
   const setActivities = useActivityStore((s) => s.setActivities);
 
   const [tasks, setTasks] = useState<(string | Activity)[]>([]);

@@ -1,8 +1,7 @@
 import { create } from 'zustand';
-import uuid from 'react-native-uuid';
 
-import { Theme, AuthUser, Activity, Habit, Task, TaskFilter } from '../entities';
 import { CURRENT_DATE } from '../constants';
+import { Activity, AuthUser, Theme } from '../entities';
 
 interface AppStore {
   theme: Theme;
@@ -20,25 +19,9 @@ interface AuthStore {
 
 interface ActivityStore {
   activities: Activity[];
-  taskFilter: TaskFilter;
   selectedDate: Date;
   setActivities: (activities: Activity[]) => void;
-  setTaskFilter: (taskFilter: TaskFilter) => void;
   setSelectedDate: (selectedDate: Date) => void;
-}
-
-interface TaskStore {
-  tasks: Task[];
-  selectedDate: Date;
-  filter: TaskFilter;
-  setTasks: (tasks: Task[]) => void;
-  setSelectedDate: (selectedDate: Date) => void;
-  setFilter: (filter: TaskFilter) => void;
-}
-
-interface HabitStore {
-  habits: Habit[];
-  setHabits: (habits: Habit[]) => void;
 }
 
 export const categoryArray = [
@@ -219,26 +202,9 @@ const useAuthStore = create<AuthStore>((set) => ({
 
 const useActivityStore = create<ActivityStore>((set) => ({
   activities: dummyActivities,
-  taskFilter: 'single task',
   selectedDate: CURRENT_DATE,
-  filteredRecurringTasks: [],
   setActivities: (activities) => set((state) => ({ ...state, activities })),
-  setTaskFilter: (taskFilter) => set((state) => ({ ...state, taskFilter })),
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
 }));
 
-const useTaskStore = create<TaskStore>((set) => ({
-  tasks: [],
-  selectedDate: CURRENT_DATE,
-  filter: 'single task',
-  setTasks: (tasks) => set((state) => ({ ...state, tasks })),
-  setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
-  setFilter: (filter) => set((state) => ({ ...state, filter })),
-}));
-
-const useHabitStore = create<HabitStore>((set) => ({
-  habits: [],
-  setHabits: (habits) => set((state) => ({ ...state, habits })),
-}));
-
-export { useAppStore, useAuthStore, useActivityStore, useTaskStore, useHabitStore };
+export { useActivityStore, useAppStore, useAuthStore };

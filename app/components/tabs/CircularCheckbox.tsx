@@ -31,34 +31,33 @@ const CircularCheckbox = ({ isChecked, isDisabled }: Props) => {
   }));
 
   return (
-    <AnimatedCheckbox style={checkboxAnimation}>
+    <AnimatedContainer style={checkboxAnimation}>
       {isDisabled ? (
         <LockSvg size={10} fill={customGray1} />
       ) : (
-        <AnimatedCheckboxIcon style={checkboxIconAnimation}>
+        <AnimatedIconContainer style={checkboxIconAnimation}>
           <CheckSvg size={10} />
-        </AnimatedCheckboxIcon>
+        </AnimatedIconContainer>
       )}
-    </AnimatedCheckbox>
+    </AnimatedContainer>
   );
 };
 
-const CheckboxCircle = styled(View, {
+const Container = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
   width: 26,
   height: 26,
   borderRadius: 13,
   borderWidth: 2,
-  borderColor: '$customGray1',
 });
 
-const CheckboxIcon = styled(View, {
+const IconContainer = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
 });
 
-const AnimatedCheckbox = Animated.createAnimatedComponent(CheckboxCircle);
-const AnimatedCheckboxIcon = Animated.createAnimatedComponent(CheckboxIcon);
+const AnimatedContainer = Animated.createAnimatedComponent(Container);
+const AnimatedIconContainer = Animated.createAnimatedComponent(IconContainer);
 
 export default CircularCheckbox;

@@ -15,11 +15,14 @@ import TaskListItem from '../tasks/TaskListItem';
 import ActivityListPlaceholder from './ActivityListPlaceholder';
 import { CURRENT_DATE } from '@/app/constants';
 
-const carryOverTasks = (singleTasks: Activity[]) =>
-  singleTasks.map((task) =>
-    task.isCarriedOver && !task.isCompleted && new Date(task.endDate!) < CURRENT_DATE
-      ? { ...task, endDate: CURRENT_DATE }
-      : task
+const carryOverTasks = (activities: Activity[]) =>
+  activities.map((activity) =>
+    activity.type === 'single task' &&
+    activity.isCarriedOver &&
+    !activity.isCompleted &&
+    new Date(activity.endDate!) < CURRENT_DATE
+      ? { ...activity, endDate: CURRENT_DATE }
+      : activity
   );
 
 const filterRecurringActivitiesByDate = (
@@ -62,6 +65,7 @@ const ActivityList = () => {
 
   const [activitiesDueToday, setActivitiesDueToday] = useState<Activity[]>([]);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
+  const [carriedOverPendingTasks, setCarriedOverPendingTasks] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
   const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
@@ -70,14 +74,14 @@ const ActivityList = () => {
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
   const memoizedSingleTasksDueToday = useMemo(() => {
-    const singleTasks = activities.filter(
-      (activity) => activity.type === 'single task'
+    if (!carriedOverPendingTasks) return [];
+
+    return activities.filter(
+      (activity) =>
+        activity.type === 'single task' &&
+        toFormattedDateString(activity.endDate!) === toFormattedDateString(selectedDate)
     );
-    return carryOverTasks(singleTasks).filter(
-      (task) =>
-        toFormattedDateString(task.endDate!) === toFormattedDateString(selectedDate)
-    );
-  }, [activities, selectedDate]);
+  }, [carriedOverPendingTasks, activities, selectedDate]);
 
   const memoizedRecurringActivitiesDueToday = useMemo(() => {
     const recurringActivities = activities.filter(
@@ -90,8 +94,6 @@ const ActivityList = () => {
   const isTaskCompletionDisabled = selectedDate > CURRENT_DATE;
 
   const handleTaskComplete = (selectedTask: Activity) => {
-    if (isTaskCompletionDisabled) return; // disable completing tasks ahead of current date
-
     const hasChecklist = !!selectedTask.checklist?.length;
     if (hasChecklist) {
       const allChecklistItemsCompleted = selectedTask.checklist?.every(
@@ -162,6 +164,12 @@ const ActivityList = () => {
   const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
 
   const toggleChecklistModal = () => setIsChecklistModalOpen((prev) => !prev);
+
+  useEffect(() => {
+    const updatedActivities = carryOverTasks(activities);
+    setActivities(updatedActivities);
+    setCarriedOverPendingTasks(true);
+  }, []);
 
   useEffect(() => {
     setActivitiesDueToday([

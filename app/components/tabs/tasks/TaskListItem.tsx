@@ -85,7 +85,11 @@ const TaskListItem = ({
   }, [isCompleted]);
 
   return (
-    <AnimatedContainer entering={FadeIn} exiting={FadeOut} onPress={handlePress}>
+    <AnimatedContainer
+      entering={FadeIn}
+      exiting={FadeOut}
+      onPress={!isTaskCompletionDisabled ? handlePress : null}
+    >
       <Swipeable
         ref={swipeableRef}
         renderLeftActions={(_, dragAnimatedValue) => (

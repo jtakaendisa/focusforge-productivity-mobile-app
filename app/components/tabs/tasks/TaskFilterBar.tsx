@@ -10,20 +10,22 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useActivityStore } from '@/app/store';
+import { TaskFilter } from '@/app/entities';
 
-const TaskFilterBar = () => {
-  const taskFilter = useActivityStore((s) => s.taskFilter);
-  const setTaskFilter = useActivityStore((s) => s.setTaskFilter);
+interface Props {
+  taskFilter: TaskFilter;
+  onSelect: (taskFilter: TaskFilter) => void;
+}
 
+const TaskFilterBar = ({ taskFilter, onSelect }: Props) => {
   const isSingleTaskSelected = useSharedValue(0);
   const isRecurringTaskSelected = useSharedValue(0);
 
   const customGray1 = getTokenValue('$customGray1');
 
-  const handleSingleTaskFilterSelect = () => setTaskFilter('single task');
+  const handleSingleTaskFilterSelect = () => onSelect('single task');
 
-  const handleRecurringTaskFilterSelect = () => setTaskFilter('recurring task');
+  const handleRecurringTaskFilterSelect = () => onSelect('recurring task');
 
   const textColorAnimation = (filter: SharedValue<number>) => {
     return useAnimatedStyle(() => ({
