@@ -3,11 +3,12 @@ import { View, Text, styled, ScrollView, getTokenValue } from 'tamagui';
 
 import { categoryArray } from '@/app/store';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
-import { NewTaskData } from '@/app/newTask';
 import CategoryIcon from '../CategoryIcon';
+import { NewActivityData } from '@/app/entities';
+import RippleButton from '../RippleButton';
 
 interface Props {
-  control: Control<NewTaskData>;
+  control: Control<NewActivityData>;
   closeModal: () => void;
 }
 
@@ -30,27 +31,31 @@ const CategoryModalModule = ({ control, closeModal }: Props) => {
             render={({ field: { onChange } }) => (
               <>
                 {categoryArray.map((category) => (
-                  <CategoryCard
+                  <RippleButton
                     key={category}
                     onPress={() => {
                       onChange(category);
                       closeModal();
                     }}
                   >
-                    <CategoryContainer>
-                      <CategoryIcon category={category} fill={customBlack1} />
-                    </CategoryContainer>
-                    <CategoryTitle>{category}</CategoryTitle>
-                  </CategoryCard>
+                    <CategoryCard>
+                      <CategoryContainer>
+                        <CategoryIcon category={category} fill={customBlack1} />
+                      </CategoryContainer>
+                      <CategoryTitle>{category}</CategoryTitle>
+                    </CategoryCard>
+                  </RippleButton>
                 ))}
               </>
             )}
           />
         </MainContent>
       </ScrollView>
-      <CloseButton onPress={closeModal}>
-        <ButtonText color={customRed1}>CLOSE</ButtonText>
-      </CloseButton>
+      <RippleButton onPress={closeModal}>
+        <CloseButton>
+          <ButtonText color={customRed1}>CLOSE</ButtonText>
+        </CloseButton>
+      </RippleButton>
     </Container>
   );
 };

@@ -13,6 +13,7 @@ import Switch from '../../components/tabs/settings/Switch';
 import { SCREEN_HEIGHT } from '../../constants';
 import { signOutAuthUser } from '../../services/auth';
 import { useAuthStore } from '../../store';
+import RippleButton from '@/app/components/tabs/RippleButton';
 
 const SettingsScreen = () => {
   const authUser = useAuthStore((s) => s.authUser);
@@ -20,8 +21,8 @@ const SettingsScreen = () => {
 
   const [darkMode, setDarkMode] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [photoUri, setPhotoUri] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -33,9 +34,9 @@ const SettingsScreen = () => {
     }
   };
 
-  const removeImage = () => {
+  const handleImageRemoval = () => {
     setPhotoUri('');
-    setIsModalOpen(false);
+    toggleModal();
   };
 
   const uploadImage = async (mode: 'camera' | 'gallery') => {
@@ -67,11 +68,21 @@ const SettingsScreen = () => {
     } catch (error) {
       console.log((error as Error).message);
     } finally {
-      setIsModalOpen(false);
+      toggleModal();
     }
   };
 
   const customRed1 = getTokenValue('$customRed1');
+
+  const handleCameraImageUpload = () => uploadImage('camera');
+
+  const handleGalleryImageUpload = () => uploadImage('gallery');
+
+  const toggleDarkMode = () => setDarkMode((prev) => !prev);
+
+  const togglePushNotifications = () => setPushNotifications((prev) => !prev);
+
+  const toggleModal = () => setIsModalOpen((prev) => !prev);
 
   return (
     <Container>
@@ -92,14 +103,18 @@ const SettingsScreen = () => {
           <Email>{authUser?.email}</Email>
         </InfoContainer>
         <ButtonsContainer>
-          <Button onPress={() => setIsModalOpen(true)}>
-            <PenToSquareSvg size={16} fill={customRed1} variant="outline" />
-            <ButtonText>Edit Photo</ButtonText>
-          </Button>
-          <Button onPress={handleSignOut}>
-            <ArrowRightFromBracketSvg size={16} fill={customRed1} />
-            <ButtonText>Sign Out</ButtonText>
-          </Button>
+          <RippleButton onPress={toggleModal}>
+            <Button>
+              <PenToSquareSvg size={16} fill={customRed1} variant="outline" />
+              <ButtonText>Edit Photo</ButtonText>
+            </Button>
+          </RippleButton>
+          <RippleButton onPress={handleSignOut}>
+            <Button>
+              <ArrowRightFromBracketSvg size={16} fill={customRed1} />
+              <ButtonText>Sign Out</ButtonText>
+            </Button>
+          </RippleButton>
         </ButtonsContainer>
       </ProfileContainer>
       <Separator />
@@ -110,10 +125,7 @@ const SettingsScreen = () => {
             <MoonStarsSvg size={24} fill={customRed1} />
             <SettingTitle>Dark Mode</SettingTitle>
           </SettingInfo>
-          <Switch
-            value={darkMode ? 1 : 0}
-            onToggle={() => setDarkMode((prev) => !prev)}
-          />
+          <Switch value={darkMode ? 1 : 0} onToggle={toggleDarkMode} />
         </SettingCard>
         <SettingCard>
           <SettingInfo>
@@ -122,16 +134,16 @@ const SettingsScreen = () => {
           </SettingInfo>
           <Switch
             value={pushNotifications ? 1 : 0}
-            onToggle={() => setPushNotifications((prev) => !prev)}
+            onToggle={togglePushNotifications}
           />
         </SettingCard>
       </ApplicationSettingsContainer>
 
-      <ModalContainer isOpen={isModalOpen} closeModal={() => setIsModalOpen(false)}>
+      <ModalContainer isOpen={isModalOpen} closeModal={toggleModal}>
         <EditPhotoModalModule
-          onCameraPress={() => uploadImage('camera')}
-          onGalleryPress={() => uploadImage('gallery')}
-          onRemovePress={removeImage}
+          onCameraPress={handleCameraImageUpload}
+          onGalleryPress={handleGalleryImageUpload}
+          onRemovePress={handleImageRemoval}
         />
       </ModalContainer>
     </Container>

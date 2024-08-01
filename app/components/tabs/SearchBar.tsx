@@ -51,8 +51,10 @@ const SearchBar = ({ height }: Props) => {
 
   const isSearchRowVisible = useSharedValue(0);
 
-  const handleActivityFilterChange = (activityFilter: ActivityFilter) =>
+  const handleActivityFilterSelect = (activityFilter: ActivityFilter) => {
     setActivityFilter(activityFilter);
+    toggleActivityFilterModal();
+  };
 
   const handleSearchTermChange = (text: string) => {
     setLocalSearchTerm(text);
@@ -166,7 +168,7 @@ const SearchBar = ({ height }: Props) => {
       >
         {statusBarHeight && (
           <ActivityFilterModalModule
-            onSelect={handleActivityFilterChange}
+            onSelect={handleActivityFilterSelect}
             offsetTop={statusBarHeight}
             width={SCREEN_WIDTH / 3 - height * 0.75}
           />

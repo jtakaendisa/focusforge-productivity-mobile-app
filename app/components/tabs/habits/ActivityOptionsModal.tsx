@@ -13,6 +13,7 @@ import { toTruncatedText } from '@/app/utils';
 import CategoryIcon from '../CategoryIcon';
 import FrequencyBadge from './FrequencyBadge';
 import HabitOptionIcon from './HabitOptionIcon';
+import RippleButton from '../RippleButton';
 
 interface HabitProps {
   mode: 'habit';
@@ -84,26 +85,26 @@ const ActivityOptionsModal = ({
 
           const fill = isLastIndex ? customRed1 : customGray1;
 
+          if (!selectedActivity) return null;
+
           return (
-            <View key={option}>
-              {selectedActivity?.id && (
-                <CardContainer
-                  onPress={() =>
-                    isLastIndex
-                      ? onDelete(selectedActivity.id)
-                      : onNavigate(option as any, selectedActivity.id)
-                  }
-                  isBordered={isLastIndex}
-                >
-                  <IconContainer>
-                    <HabitOptionIcon name={option} fill={fill} />
-                  </IconContainer>
-                  <CardTextContainer>
-                    <CardTitle isRed={isLastIndex}>{option}</CardTitle>
-                  </CardTextContainer>
-                </CardContainer>
-              )}
-            </View>
+            <RippleButton
+              key={option}
+              onPress={() =>
+                isLastIndex
+                  ? onDelete(selectedActivity.id)
+                  : onNavigate(option as any, selectedActivity.id)
+              }
+            >
+              <CardContainer isBordered={isLastIndex}>
+                <IconContainer>
+                  <HabitOptionIcon name={option} fill={fill} />
+                </IconContainer>
+                <CardTextContainer>
+                  <CardTitle isRed={isLastIndex}>{option}</CardTitle>
+                </CardTextContainer>
+              </CardContainer>
+            </RippleButton>
           );
         })}
       </BottomSheetView>

@@ -117,7 +117,7 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
           renderItem={({ item }) => (
             <HabitListItem
               habit={item}
-              showOptions={toggleActivityOptionsModal}
+              onShowOptions={toggleActivityOptionsModal}
               onNavigate={navigateToHabitDetailsScreen}
               onSwipe={handleSwipe}
             />

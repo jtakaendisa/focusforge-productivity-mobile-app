@@ -4,6 +4,7 @@ import { Text, View, styled } from 'tamagui';
 
 import { NewActivityData, Priority } from '@/app/entities';
 import PriorityButton from './PriorityButton';
+import RippleButton from '../RippleButton';
 
 interface Props {
   initialPriority: Priority;
@@ -51,7 +52,7 @@ const PriorityModalModule = ({
       </HeadingContainer>
       <MainContent>
         <PrioritiesRow>
-          {control && (
+          {control ? (
             <Controller
               control={control}
               name="priority"
@@ -71,8 +72,7 @@ const PriorityModalModule = ({
                 );
               }}
             />
-          )}
-          {!control && (
+          ) : (
             <>
               {priorities.map((priority) => (
                 <PriorityButton
@@ -92,12 +92,16 @@ const PriorityModalModule = ({
         </PriorityInfo>
       </MainContent>
       <ButtonsContainer>
-        <Button onPress={handleSelectionCancel}>
-          <Text>CANCEL</Text>
-        </Button>
-        <Button onPress={handleSelectionConfirm}>
-          <ButtonText color="$customRed1">OK</ButtonText>
-        </Button>
+        <RippleButton flex onPress={handleSelectionCancel}>
+          <Button>
+            <Text>CANCEL</Text>
+          </Button>
+        </RippleButton>
+        <RippleButton flex onPress={handleSelectionConfirm}>
+          <Button>
+            <ButtonText color="$customRed1">OK</ButtonText>
+          </Button>
+        </RippleButton>
       </ButtonsContainer>
     </Container>
   );
@@ -147,7 +151,6 @@ const ButtonsContainer = styled(View, {
 const Button = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
-  width: '50%',
   paddingVertical: 16,
 });
 

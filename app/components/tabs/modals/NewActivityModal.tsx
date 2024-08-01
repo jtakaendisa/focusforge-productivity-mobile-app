@@ -11,6 +11,7 @@ import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import ActivityTypeIcon from './ActivityTypeIcon';
 import ArrowRightSvg from '../../icons/ArrowRightSvg';
+import RippleButton from '../RippleButton';
 
 interface Props {
   newActivityModalRef: MutableRefObject<BottomSheetModalMethods | null>;
@@ -79,13 +80,14 @@ const NewActivityModal = ({ newActivityModalRef }: Props) => {
       <BottomSheetView>
         {options.map((option, index) => {
           const { heading, description, icon, pathname, isRecurring } = option;
+          const isLastIndex = index === options.length - 1;
 
           return (
-            <>
-              <CardContainer
-                key={heading}
-                onPress={() => navigateToNewActivityScreen(pathname, isRecurring)}
-              >
+            <RippleButton
+              key={heading}
+              onPress={() => navigateToNewActivityScreen(pathname, isRecurring)}
+            >
+              <CardContainer isBordered={!isLastIndex}>
                 <IconContainer isTransparent={false}>
                   <ActivityTypeIcon name={icon} fill={customRed1} />
                 </IconContainer>
@@ -97,8 +99,7 @@ const NewActivityModal = ({ newActivityModalRef }: Props) => {
                   <ArrowRightSvg fill={customGray1} />
                 </IconContainer>
               </CardContainer>
-              {index < options.length - 1 && <Separator />}
-            </>
+            </RippleButton>
           );
         })}
       </BottomSheetView>
@@ -111,6 +112,17 @@ const CardContainer = styled(View, {
   alignItems: 'center',
   paddingHorizontal: 12,
   paddingVertical: 16,
+  borderBottomWidth: 1,
+  variants: {
+    isBordered: {
+      true: {
+        borderColor: '$customGray2',
+      },
+      false: {
+        borderColor: 'transparent',
+      },
+    },
+  },
 });
 
 const IconContainer = styled(View, {
@@ -144,12 +156,6 @@ const CardHeading = styled(Text, {
 const CardDescription = styled(Text, {
   fontSize: 12,
   color: '$customGray8',
-});
-
-const Separator = styled(View, {
-  height: 1,
-  borderBottomWidth: 1,
-  borderColor: '$customGray2',
 });
 
 export default NewActivityModal;

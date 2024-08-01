@@ -17,6 +17,7 @@ import CategoryIcon from '../CategoryIcon';
 import CircularCheckbox from '../CircularCheckbox';
 import TaskItemLeftActions from './TaskItemLeftActions';
 import TaskItemRightActions from './TaskItemRightActions';
+import RippleButton from '../RippleButton';
 
 interface Props {
   task: Activity;
@@ -29,7 +30,7 @@ interface Props {
     swipeableRef: MutableRefObject<Swipeable | null>,
     isCheckable?: boolean
   ) => void;
-  showOptions?: (task: Activity) => void;
+  onShowOptions?: (task: Activity) => void;
 }
 
 const TaskListItem = ({
@@ -38,7 +39,7 @@ const TaskListItem = ({
   isTaskCompletionDisabled,
   onTaskComplete,
   onSwipe,
-  showOptions,
+  onShowOptions,
 }: Props) => {
   const { type, title, isCompleted, note, category, checklist } = task;
 
@@ -59,11 +60,13 @@ const TaskListItem = ({
   }));
 
   const handlePress = () => {
+    if (isTaskCompletionDisabled) return;
+
     if (isCheckable) {
       onTaskComplete?.(task);
     } else {
       if (type === 'recurring task') {
-        showOptions?.(task);
+        onShowOptions?.(task);
       }
     }
   };
@@ -85,59 +88,57 @@ const TaskListItem = ({
   }, [isCompleted]);
 
   return (
-    <AnimatedContainer
-      entering={FadeIn}
-      exiting={FadeOut}
-      onPress={!isTaskCompletionDisabled ? handlePress : null}
-    >
-      <Swipeable
-        ref={swipeableRef}
-        renderLeftActions={(_, dragAnimatedValue) => (
-          <TaskItemLeftActions
-            dragAnimatedValue={dragAnimatedValue}
-            isCheckable={isCheckable}
-          />
-        )}
-        renderRightActions={(_, dragAnimatedValue) => (
-          <TaskItemRightActions dragAnimatedValue={dragAnimatedValue} />
-        )}
-        onSwipeableOpen={handleSwipe}
-      >
-        <TaskContainer>
-          {isCheckable && (
-            <CheckboxContainer>
-              <CircularCheckbox
-                isChecked={isChecked}
-                isDisabled={isTaskCompletionDisabled}
-              />
-            </CheckboxContainer>
+    <RippleButton onPress={handlePress}>
+      <AnimatedContainer entering={FadeIn} exiting={FadeOut}>
+        <Swipeable
+          ref={swipeableRef}
+          renderLeftActions={(_, dragAnimatedValue) => (
+            <TaskItemLeftActions
+              dragAnimatedValue={dragAnimatedValue}
+              isCheckable={isCheckable}
+            />
           )}
-          <TextContainer>
-            <AnimatedTitle style={textColorAnimation}>
-              {toTruncatedText(title, 30)}
-            </AnimatedTitle>
-            {note && (
-              <AnimatedNote style={textOpacityAnimation}>
-                {toTruncatedText(note, 37)}
-              </AnimatedNote>
+          renderRightActions={(_, dragAnimatedValue) => (
+            <TaskItemRightActions dragAnimatedValue={dragAnimatedValue} />
+          )}
+          onSwipeableOpen={handleSwipe}
+        >
+          <TaskContainer>
+            {isCheckable && (
+              <CheckboxContainer>
+                <CircularCheckbox
+                  isChecked={isChecked}
+                  isDisabled={isTaskCompletionDisabled}
+                />
+              </CheckboxContainer>
             )}
-          </TextContainer>
-          <InfoContainer>
-            <MetricsContainer>
-              <CategoryBadge>
-                <BadgeText>{category}</BadgeText>
-              </CategoryBadge>
-              {isCheckable && (
-                <ProgressText>{generateProgressText(checklist)}</ProgressText>
+            <TextContainer>
+              <AnimatedTitle style={textColorAnimation}>
+                {toTruncatedText(title, 30)}
+              </AnimatedTitle>
+              {note && (
+                <AnimatedNote style={textOpacityAnimation}>
+                  {toTruncatedText(note, 37)}
+                </AnimatedNote>
               )}
-            </MetricsContainer>
-            <CategoryContainer>
-              <CategoryIcon category={category} fill={customBlack1} />
-            </CategoryContainer>
-          </InfoContainer>
-        </TaskContainer>
-      </Swipeable>
-    </AnimatedContainer>
+            </TextContainer>
+            <InfoContainer>
+              <MetricsContainer>
+                <CategoryBadge>
+                  <BadgeText>{category}</BadgeText>
+                </CategoryBadge>
+                {isCheckable && (
+                  <ProgressText>{generateProgressText(checklist)}</ProgressText>
+                )}
+              </MetricsContainer>
+              <CategoryContainer>
+                <CategoryIcon category={category} fill={customBlack1} />
+              </CategoryContainer>
+            </InfoContainer>
+          </TaskContainer>
+        </Swipeable>
+      </AnimatedContainer>
+    </RippleButton>
   );
 };
 

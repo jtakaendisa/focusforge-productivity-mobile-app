@@ -155,7 +155,7 @@ const TaskList = ({ taskFilter, isSearchBarOpen }: Props) => {
               <TaskListItem
                 task={item}
                 onSwipe={handleSwipe}
-                showOptions={toggleActivityOptionsModal}
+                onShowOptions={toggleActivityOptionsModal}
               />
             )
           }

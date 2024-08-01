@@ -1,18 +1,19 @@
+import Constants from 'expo-constants';
 import { useEffect, useRef, useState } from 'react';
+import { Control, Controller } from 'react-hook-form';
 import {
   NativeSyntheticEvent,
   TextInput,
   TextInputChangeEventData,
 } from 'react-native';
-import Constants from 'expo-constants';
-import { Control, Controller } from 'react-hook-form';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
-import { styled, View, Text, Accordion, getTokenValue } from 'tamagui';
+import { Accordion, styled, Text, View } from 'tamagui';
 
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
-import CircularCheckbox from '../CircularCheckbox';
-import WeekdayCard from './WeekdayCard';
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { Frequency, NewActivityData } from '@/app/entities';
+import CircularCheckbox from '../CircularCheckbox';
+import RippleButton from '../RippleButton';
+import WeekdayCard from './WeekdayCard';
 
 interface Props {
   control: Control<NewActivityData>;
@@ -124,9 +125,6 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
     isRepeatChecked.value = isRepeatSelected ? withTiming(1) : withTiming(0);
   }, [isDailySelected, isSpecificSelected, isRepeatSelected]);
 
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
-
   return (
     <Container isFullScreen={isModal}>
       <HeadingContainer>
@@ -191,7 +189,7 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
                     <AccordionContent animation="medium" exitStyle={{ opacity: 0 }}>
                       <RepeatFieldContainer>
                         <RepeatFieldCard>
-                          <Text color={customGray1} fontSize={15}>
+                          <Text color="$customGray1" fontSize={15}>
                             Every
                           </Text>
                           <DaysInputField
@@ -199,7 +197,7 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
                             maxLength={3}
                             onChange={handleRepeatSelect}
                           />
-                          <Text color={customGray1} fontSize={15}>
+                          <Text color="$customGray1" fontSize={15}>
                             days
                           </Text>
                         </RepeatFieldCard>
@@ -215,12 +213,16 @@ const FrequencyListModule = ({ control, isModal, closeModal }: Props) => {
 
       {isModal && (
         <ButtonsContainer>
-          <Button onPress={handleResetFrequency}>
-            <ButtonText>CANCEL</ButtonText>
-          </Button>
-          <Button onPress={closeModal}>
-            <ButtonText color={customRed1}>CONFIRM</ButtonText>
-          </Button>
+          <RippleButton flex onPress={handleResetFrequency}>
+            <Button>
+              <ButtonText>CANCEL</ButtonText>
+            </Button>
+          </RippleButton>
+          <RippleButton flex onPress={closeModal!}>
+            <Button>
+              <ButtonText color="$customRed1">CONFIRM</ButtonText>
+            </Button>
+          </RippleButton>
         </ButtonsContainer>
       )}
     </Container>
@@ -326,7 +328,8 @@ const ButtonsContainer = styled(View, {
 });
 
 const Button = styled(View, {
-  width: '50%',
+  width: '100%',
+  height: '100%',
   justifyContent: 'center',
   alignItems: 'center',
 });

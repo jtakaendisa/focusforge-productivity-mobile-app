@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { TaskFilter } from '@/app/entities';
+import RippleButton from '../RippleButton';
 
 interface Props {
   taskFilter: TaskFilter;
@@ -51,26 +52,30 @@ const TaskFilterBar = ({ taskFilter, onSelect }: Props) => {
 
   return (
     <Container>
-      <Button onPress={handleSingleTaskFilterSelect}>
-        <TextContainer>
-          <AnimatedButtonText style={textColorAnimation(isSingleTaskSelected)}>
-            Single Tasks
-          </AnimatedButtonText>
-          <AnimatedSelectionIndicator
-            style={indicatorOpacityAnimation(isSingleTaskSelected)}
-          />
-        </TextContainer>
-      </Button>
-      <Button onPress={handleRecurringTaskFilterSelect}>
-        <TextContainer>
-          <AnimatedButtonText style={textColorAnimation(isRecurringTaskSelected)}>
-            Recurring Tasks
-          </AnimatedButtonText>
-          <AnimatedSelectionIndicator
-            style={indicatorOpacityAnimation(isRecurringTaskSelected)}
-          />
-        </TextContainer>
-      </Button>
+      <RippleButton flex onPress={handleSingleTaskFilterSelect}>
+        <Button>
+          <TextContainer>
+            <AnimatedButtonText style={textColorAnimation(isSingleTaskSelected)}>
+              Single Tasks
+            </AnimatedButtonText>
+            <AnimatedSelectionIndicator
+              style={indicatorOpacityAnimation(isSingleTaskSelected)}
+            />
+          </TextContainer>
+        </Button>
+      </RippleButton>
+      <RippleButton flex onPress={handleRecurringTaskFilterSelect}>
+        <Button>
+          <TextContainer>
+            <AnimatedButtonText style={textColorAnimation(isRecurringTaskSelected)}>
+              Recurring Tasks
+            </AnimatedButtonText>
+            <AnimatedSelectionIndicator
+              style={indicatorOpacityAnimation(isRecurringTaskSelected)}
+            />
+          </TextContainer>
+        </Button>
+      </RippleButton>
     </Container>
   );
 };
@@ -84,7 +89,6 @@ const Container = styled(View, {
 
 const Button = styled(View, {
   alignItems: 'center',
-  width: '50%',
 });
 
 const TextContainer = styled(View, {

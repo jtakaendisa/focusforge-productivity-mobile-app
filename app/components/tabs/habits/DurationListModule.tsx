@@ -18,6 +18,7 @@ import RemindersModalModule from '../modals/RemindersModalModule';
 import { NewActivityData } from '@/app/entities';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import BinSvg from '../../icons/BinSvg';
+import RippleButton from '../RippleButton';
 
 interface Props {
   control: Control<NewActivityData>;
@@ -85,90 +86,98 @@ const DurationListModule = ({ control }: Props) => {
         <Heading>When do you want to do it?</Heading>
       </HeadingContainer>
 
-      <OptionContainer onPress={handleStartDateSelect}>
-        <OptionInfo>
-          <CalendarStartSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTitle>Start date</OptionTitle>
-        </OptionInfo>
-        <Controller
-          control={control}
-          name="startDate"
-          render={({ field: { onChange } }) => {
-            setStartDateRef.current = onChange;
-            return (
-              <OptionLabel>
-                <LabelText>
-                  {startDate &&
-                    (toFormattedDateString(startDate) ===
-                    toFormattedDateString(CURRENT_DATE)
-                      ? 'Today'
-                      : toFormattedDateString(startDate))}
-                </LabelText>
-              </OptionLabel>
-            );
-          }}
-        />
-      </OptionContainer>
-      <OptionContainer onPress={handleEndDateSelect}>
-        <OptionInfo>
-          <CalendarEndSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTitle>End date</OptionTitle>
-        </OptionInfo>
-        <Controller
-          control={control}
-          name="endDate"
-          render={({ field: { onChange } }) => {
-            setEndDateRef.current = onChange;
-            return (
-              <Row>
-                {endDate && (
-                  <AnimatedIconContainer
-                    onPress={handleEndDateClear}
-                    entering={FadeIn}
-                    exiting={FadeOut}
-                  >
-                    <BinSvg size={SVG_SIZE / 1.2} fill={customGray1} />
-                  </AnimatedIconContainer>
-                )}
+      <RippleButton onPress={handleStartDateSelect}>
+        <OptionContainer>
+          <OptionInfo>
+            <CalendarStartSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>Start date</OptionTitle>
+          </OptionInfo>
+          <Controller
+            control={control}
+            name="startDate"
+            render={({ field: { onChange } }) => {
+              setStartDateRef.current = onChange;
+              return (
                 <OptionLabel>
                   <LabelText>
-                    {endDate
-                      ? toFormattedDateString(endDate) ===
-                        toFormattedDateString(CURRENT_DATE)
+                    {startDate &&
+                      (toFormattedDateString(startDate) ===
+                      toFormattedDateString(CURRENT_DATE)
                         ? 'Today'
-                        : toFormattedDateString(endDate)
-                      : '---'}
+                        : toFormattedDateString(startDate))}
                   </LabelText>
                 </OptionLabel>
-              </Row>
-            );
-          }}
-        />
-      </OptionContainer>
-      <OptionContainer onPress={toggleRemindersModal}>
-        <OptionInfo>
-          <BellSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTitle>Time and reminders</OptionTitle>
-        </OptionInfo>
-        <OptionLabel>
-          <LabelText>
-            {!!reminders?.length
-              ? reminders.length === 1
-                ? `${reminders.length} reminder`
-                : `${reminders.length} reminders`
-              : '---'}
-          </LabelText>
-        </OptionLabel>
-      </OptionContainer>
-      <OptionContainer onPress={togglePriorityModal}>
-        <OptionInfo>
-          <FlagSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
-          <OptionTitle>Priority</OptionTitle>
-        </OptionInfo>
-        <OptionLabel>
-          <LabelText>{currentPriority}</LabelText>
-        </OptionLabel>
-      </OptionContainer>
+              );
+            }}
+          />
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={handleEndDateSelect}>
+        <OptionContainer>
+          <OptionInfo>
+            <CalendarEndSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>End date</OptionTitle>
+          </OptionInfo>
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field: { onChange } }) => {
+              setEndDateRef.current = onChange;
+              return (
+                <Row>
+                  {endDate && (
+                    <AnimatedIconContainer
+                      onPress={handleEndDateClear}
+                      entering={FadeIn}
+                      exiting={FadeOut}
+                    >
+                      <BinSvg size={SVG_SIZE / 1.2} fill={customGray1} />
+                    </AnimatedIconContainer>
+                  )}
+                  <OptionLabel>
+                    <LabelText>
+                      {endDate
+                        ? toFormattedDateString(endDate) ===
+                          toFormattedDateString(CURRENT_DATE)
+                          ? 'Today'
+                          : toFormattedDateString(endDate)
+                        : '---'}
+                    </LabelText>
+                  </OptionLabel>
+                </Row>
+              );
+            }}
+          />
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={toggleRemindersModal}>
+        <OptionContainer>
+          <OptionInfo>
+            <BellSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>Time and reminders</OptionTitle>
+          </OptionInfo>
+          <OptionLabel>
+            <LabelText>
+              {!!reminders?.length
+                ? reminders.length === 1
+                  ? `${reminders.length} reminder`
+                  : `${reminders.length} reminders`
+                : '---'}
+            </LabelText>
+          </OptionLabel>
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={togglePriorityModal}>
+        <OptionContainer>
+          <OptionInfo>
+            <FlagSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
+            <OptionTitle>Priority</OptionTitle>
+          </OptionInfo>
+          <OptionLabel>
+            <LabelText>{currentPriority}</LabelText>
+          </OptionLabel>
+        </OptionContainer>
+      </RippleButton>
 
       <ModalContainer isOpen={isRemindersModalOpen} closeModal={toggleRemindersModal}>
         <RemindersModalModule

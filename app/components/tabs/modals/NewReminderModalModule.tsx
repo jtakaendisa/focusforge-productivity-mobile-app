@@ -10,6 +10,7 @@ import { Reminder } from '@/app/entities';
 import { CURRENT_DATE } from '@/app/constants';
 import { toFormattedTimeString } from '@/app/utils';
 import ReminderButton from '../habits/ReminderButton';
+import RippleButton from '../RippleButton';
 
 interface Props {
   closeModal: () => void;
@@ -36,6 +37,11 @@ const NewReminderModalModule = ({ closeModal, onAdd }: Props) => {
     if (selectedDateTime) {
       setNewReminder({ ...newReminder, time: selectedDateTime });
     }
+  };
+
+  const handleSetNewReminder = () => {
+    onAdd(newReminder);
+    closeModal();
   };
 
   const showTimePicker = () => {
@@ -76,17 +82,16 @@ const NewReminderModalModule = ({ closeModal, onAdd }: Props) => {
         </ReminderButtonsContainer>
       </MainContent>
       <ButtonsContainer>
-        <Button onPress={closeModal}>
-          <Text>CANCEL</Text>
-        </Button>
-        <Button
-          onPress={() => {
-            onAdd(newReminder);
-            closeModal();
-          }}
-        >
-          <ButtonText color={customRed1}>CONFIRM</ButtonText>
-        </Button>
+        <RippleButton flex onPress={closeModal}>
+          <Button>
+            <Text>CANCEL</Text>
+          </Button>
+        </RippleButton>
+        <RippleButton flex onPress={handleSetNewReminder}>
+          <Button>
+            <ButtonText color={customRed1}>CONFIRM</ButtonText>
+          </Button>
+        </RippleButton>
       </ButtonsContainer>
     </Container>
   );
@@ -150,7 +155,7 @@ const ButtonsContainer = styled(View, {
 const Button = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
-  width: '50%',
+  width: '100%',
   paddingVertical: 16,
 });
 

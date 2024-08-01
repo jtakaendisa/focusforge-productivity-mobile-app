@@ -17,10 +17,11 @@ import FrequencyBadge from './FrequencyBadge';
 import HabitDateCard from './HabitDateCard';
 import HabitItemLeftActions from './HabitItemLeftActions';
 import HabitItemRightActions from './HabitItemRightActions';
+import RippleButton from '../RippleButton';
 
 interface Props {
   habit: Activity;
-  showOptions: (habit: Activity) => void;
+  onShowOptions: (habit: Activity) => void;
   onNavigate: (activeTab: HabitActiveTab, habitId: string) => void;
   onSwipe: (
     direction: 'left' | 'right',
@@ -31,7 +32,7 @@ interface Props {
 
 const SVG_SIZE = 18;
 
-const HabitListItem = ({ habit, showOptions, onNavigate, onSwipe }: Props) => {
+const HabitListItem = ({ habit, onShowOptions, onNavigate, onSwipe }: Props) => {
   const { id, title, category, frequency, endDate } = habit;
 
   const swipeableRef = useRef<Swipeable | null>(null);
@@ -52,6 +53,12 @@ const HabitListItem = ({ habit, showOptions, onNavigate, onSwipe }: Props) => {
 
   const handleSwipe = (direction: 'left' | 'right') =>
     onSwipe(direction, habit, swipeableRef);
+
+  const handleNavigateToCalendarTab = () => onNavigate('calendar', id);
+
+  const handleNavigateToStatisticsTab = () => onNavigate('statistics', id);
+
+  const handleShowOptions = () => onShowOptions(habit);
 
   const customBlack1 = getTokenValue('$customBlack1');
   const customGray1 = getTokenValue('$customGray1');
@@ -96,15 +103,21 @@ const HabitListItem = ({ habit, showOptions, onNavigate, onSwipe }: Props) => {
               </Stat>
             </StatsContainer>
             <ActionsContainer>
-              <ActionButton onPress={() => onNavigate('calendar', id)}>
-                <CalendarSvg size={SVG_SIZE} fill={customGray1} />
-              </ActionButton>
-              <ActionButton onPress={() => onNavigate('statistics', id)}>
-                <BarChartSvg size={SVG_SIZE} fill={customGray1} />
-              </ActionButton>
-              <ActionButton onPress={() => showOptions(habit)}>
-                <EllipsisVerticalSvg size={SVG_SIZE} fill={customGray1} />
-              </ActionButton>
+              <RippleButton onPress={handleNavigateToCalendarTab}>
+                <ActionButton>
+                  <CalendarSvg size={SVG_SIZE} fill={customGray1} />
+                </ActionButton>
+              </RippleButton>
+              <RippleButton onPress={handleNavigateToStatisticsTab}>
+                <ActionButton>
+                  <BarChartSvg size={SVG_SIZE} fill={customGray1} />
+                </ActionButton>
+              </RippleButton>
+              <RippleButton onPress={handleShowOptions}>
+                <ActionButton>
+                  <EllipsisVerticalSvg size={SVG_SIZE} fill={customGray1} />
+                </ActionButton>
+              </RippleButton>
             </ActionsContainer>
           </BottomRow>
         </HabitContainer>
@@ -182,14 +195,13 @@ const StatText = styled(Text, {
 const ActionsContainer = styled(View, {
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 12,
 });
 
 const ActionButton = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
-  width: 28,
-  height: 28,
+  width: 36,
+  height: '100%',
 });
 
 const AnimatedContainer = Animated.createAnimatedComponent(View);

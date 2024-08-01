@@ -31,6 +31,7 @@ import RemindersModalModule from '../modals/RemindersModalModule';
 import TextModalModule from '../modals/TextModalModule';
 import FrequencyBadge from './FrequencyBadge';
 import FrequencyListModule from './FrequencyListModule';
+import RippleButton from '../RippleButton';
 
 interface Props {
   activities: Activity[];
@@ -120,6 +121,12 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
     setActivities(updatedActivities);
   };
 
+  const handleStartDateSelect = () => showDatePicker('start');
+
+  const handleEndDateSelect = () => showDatePicker('end');
+
+  const handleCancel = () => router.replace('/habits');
+
   const toggleTitleModal = () => setIsTitleModalOpen((prev) => !prev);
 
   const toggleCategoryModal = () => setIsCategoryModalOpen((prev) => !prev);
@@ -145,132 +152,155 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
 
   return (
     <Container>
-      <OptionContainer onPress={toggleTitleModal}>
-        <OptionInfo>
-          <PenSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTitle>Title</OptionTitle>
-        </OptionInfo>
-        <Text color="$customGray1">{toTruncatedText(title, 24)}</Text>
-      </OptionContainer>
-      <OptionContainer onPress={toggleCategoryModal}>
-        <OptionInfo>
-          <SquareGridSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTitle>Category</OptionTitle>
-        </OptionInfo>
-        <CategoryContainer>
-          <CategoryIcon category={category} fill={customBlack1} />
-        </CategoryContainer>
-      </OptionContainer>
-      <OptionContainer onPress={toggleNoteModal}>
-        <OptionInfo>
-          <PenToSquareSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
-          <OptionTitle>Notes</OptionTitle>
-        </OptionInfo>
-        {note && <Text color="$customGray1">{toTruncatedText(note, 16)}</Text>}
-      </OptionContainer>
-      <OptionContainer onPress={toggleRemindersModal}>
-        <OptionInfo>
-          <BellSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTitle>Time and reminders</OptionTitle>
-        </OptionInfo>
-        <OptionLabel>
-          <LabelText>
-            {!!reminders?.length
-              ? reminders.length + (reminders.length === 1 ? ' reminder' : ' reminders')
-              : '---'}
-          </LabelText>
-        </OptionLabel>
-      </OptionContainer>
-      <OptionContainer onPress={togglePriorityModal}>
-        <OptionInfo>
-          <FlagSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
-          <OptionTitle>Priority</OptionTitle>
-        </OptionInfo>
-        <OptionLabel>
-          <LabelText>{priority}</LabelText>
-        </OptionLabel>
-      </OptionContainer>
-      <OptionContainer onPress={toggleFrequencyModal}>
-        <OptionInfo>
-          <LoopSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTitle>Frequency</OptionTitle>
-        </OptionInfo>
-        <FrequencyBadge frequency={frequency} isForm />
-      </OptionContainer>
-      <OptionContainer onPress={() => showDatePicker('start')}>
-        <OptionInfo>
-          <CalendarStartSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTitle>Start date</OptionTitle>
-        </OptionInfo>
-        <Controller
-          control={control}
-          name="startDate"
-          render={({ field: { onChange } }) => {
-            setStartDateRef.current = onChange;
-            return (
-              <OptionLabel>
-                <LabelText>
-                  {startDate &&
-                    (toFormattedDateString(startDate) ===
-                    toFormattedDateString(CURRENT_DATE)
-                      ? 'Today'
-                      : toFormattedDateString(startDate))}
-                </LabelText>
-              </OptionLabel>
-            );
-          }}
-        />
-      </OptionContainer>
-      <OptionContainer onPress={() => showDatePicker('end')}>
-        <OptionInfo>
-          <CalendarEndSvg size={SVG_SIZE} fill={customRed1} />
-          <OptionTitle>End date</OptionTitle>
-        </OptionInfo>
-        <Controller
-          control={control}
-          name="endDate"
-          render={({ field: { onChange } }) => {
-            setEndDateRef.current = onChange;
-            return (
-              <LabelRow>
-                {endDate && (
-                  <AnimatedIconContainer
-                    onPress={handleEndDateClear}
-                    entering={FadeIn}
-                    exiting={FadeOut}
-                  >
-                    <BinSvg size={SVG_SIZE / 1.2} fill={customGray1} />
-                  </AnimatedIconContainer>
-                )}
+      <RippleButton onPress={toggleTitleModal}>
+        <OptionContainer>
+          <OptionInfo>
+            <PenSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>Title</OptionTitle>
+          </OptionInfo>
+          <Text color="$customGray1">{toTruncatedText(title, 24)}</Text>
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={toggleCategoryModal}>
+        <OptionContainer>
+          <OptionInfo>
+            <SquareGridSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>Category</OptionTitle>
+          </OptionInfo>
+          <CategoryContainer>
+            <CategoryIcon category={category} fill={customBlack1} />
+          </CategoryContainer>
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={toggleNoteModal}>
+        <OptionContainer>
+          <OptionInfo>
+            <PenToSquareSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
+            <OptionTitle>Notes</OptionTitle>
+          </OptionInfo>
+          {note && <Text color="$customGray1">{toTruncatedText(note, 16)}</Text>}
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={toggleRemindersModal}>
+        <OptionContainer>
+          <OptionInfo>
+            <BellSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>Time and reminders</OptionTitle>
+          </OptionInfo>
+          <OptionLabel>
+            <LabelText>
+              {!!reminders?.length
+                ? reminders.length +
+                  (reminders.length === 1 ? ' reminder' : ' reminders')
+                : '---'}
+            </LabelText>
+          </OptionLabel>
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={togglePriorityModal}>
+        <OptionContainer>
+          <OptionInfo>
+            <FlagSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
+            <OptionTitle>Priority</OptionTitle>
+          </OptionInfo>
+          <OptionLabel>
+            <LabelText>{priority}</LabelText>
+          </OptionLabel>
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={toggleFrequencyModal}>
+        <OptionContainer>
+          <OptionInfo>
+            <LoopSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>Frequency</OptionTitle>
+          </OptionInfo>
+          <FrequencyBadge frequency={frequency} isForm />
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={handleStartDateSelect}>
+        <OptionContainer>
+          <OptionInfo>
+            <CalendarStartSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>Start date</OptionTitle>
+          </OptionInfo>
+          <Controller
+            control={control}
+            name="startDate"
+            render={({ field: { onChange } }) => {
+              setStartDateRef.current = onChange;
+              return (
                 <OptionLabel>
                   <LabelText>
-                    {endDate
-                      ? toFormattedDateString(endDate) ===
-                        toFormattedDateString(CURRENT_DATE)
+                    {startDate &&
+                      (toFormattedDateString(startDate) ===
+                      toFormattedDateString(CURRENT_DATE)
                         ? 'Today'
-                        : toFormattedDateString(endDate)
-                      : '---'}
+                        : toFormattedDateString(startDate))}
                   </LabelText>
                 </OptionLabel>
-              </LabelRow>
-            );
-          }}
-        />
-      </OptionContainer>
-      <OptionContainer onPress={handleDelete}>
-        <OptionInfo>
-          <BinSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
-          <OptionTitle>Delete</OptionTitle>
-        </OptionInfo>
-      </OptionContainer>
+              );
+            }}
+          />
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={handleEndDateSelect}>
+        <OptionContainer>
+          <OptionInfo>
+            <CalendarEndSvg size={SVG_SIZE} fill={customRed1} />
+            <OptionTitle>End date</OptionTitle>
+          </OptionInfo>
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field: { onChange } }) => {
+              setEndDateRef.current = onChange;
+              return (
+                <LabelRow>
+                  {endDate && (
+                    <AnimatedIconContainer
+                      onPress={handleEndDateClear}
+                      entering={FadeIn}
+                      exiting={FadeOut}
+                    >
+                      <BinSvg size={SVG_SIZE / 1.2} fill={customGray1} />
+                    </AnimatedIconContainer>
+                  )}
+                  <OptionLabel>
+                    <LabelText>
+                      {endDate
+                        ? toFormattedDateString(endDate) ===
+                          toFormattedDateString(CURRENT_DATE)
+                          ? 'Today'
+                          : toFormattedDateString(endDate)
+                        : '---'}
+                    </LabelText>
+                  </OptionLabel>
+                </LabelRow>
+              );
+            }}
+          />
+        </OptionContainer>
+      </RippleButton>
+      <RippleButton onPress={handleDelete}>
+        <OptionContainer>
+          <OptionInfo>
+            <BinSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
+            <OptionTitle>Delete</OptionTitle>
+          </OptionInfo>
+        </OptionContainer>
+      </RippleButton>
 
       <ButtonsContainer>
-        <Button onPress={() => router.replace('/habits')}>
-          <ButtonText>CANCEL</ButtonText>
-        </Button>
-        <Button onPress={handleSubmit(onSubmit)}>
-          <ButtonText color="$customRed1">CONFIRM</ButtonText>
-        </Button>
+        <RippleButton flex onPress={handleCancel}>
+          <Button>
+            <ButtonText>CANCEL</ButtonText>
+          </Button>
+        </RippleButton>
+        <RippleButton flex onPress={handleSubmit(onSubmit)}>
+          <Button>
+            <ButtonText color="$customRed1">CONFIRM</ButtonText>
+          </Button>
+        </RippleButton>
       </ButtonsContainer>
 
       <ModalContainer isOpen={isTitleModalOpen} closeModal={toggleTitleModal}>
@@ -389,7 +419,8 @@ const ButtonsContainer = styled(View, {
 });
 
 const Button = styled(View, {
-  width: '50%',
+  width: '100%',
+  height: '100%',
   justifyContent: 'center',
   alignItems: 'center',
 });

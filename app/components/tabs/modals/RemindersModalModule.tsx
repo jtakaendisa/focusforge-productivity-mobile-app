@@ -10,6 +10,7 @@ import PlusCircleSvg from '../../icons/PlusCircleSvg';
 import ReminderListItem from '../habits/ReminderListItem';
 import ModalContainer from './ModalContainer';
 import NewReminderModalModule from './NewReminderModalModule';
+import RippleButton from '../RippleButton';
 
 interface Props {
   control: Control<NewActivityData>;
@@ -85,15 +86,19 @@ const RemindersModalModule = ({ control, reminders, closeModal }: Props) => {
           );
         }}
       />
-      <Button onPress={toggleNewReminderModal}>
-        <ButtonTextRow>
-          <PlusCircleSvg fill={customRed1} />
-          <ButtonText color={customRed1}>NEW REMINDER</ButtonText>
-        </ButtonTextRow>
-      </Button>
-      <Button onPress={closeModal}>
-        <ButtonText>CLOSE</ButtonText>
-      </Button>
+      <RippleButton onPress={toggleNewReminderModal}>
+        <Button>
+          <ButtonTextRow>
+            <PlusCircleSvg fill={customRed1} />
+            <ButtonText color={customRed1}>NEW REMINDER</ButtonText>
+          </ButtonTextRow>
+        </Button>
+      </RippleButton>
+      <RippleButton onPress={closeModal}>
+        <Button>
+          <ButtonText>CLOSE</ButtonText>
+        </Button>
+      </RippleButton>
 
       <ModalContainer isOpen={isNewReminderOpen} closeModal={toggleNewReminderModal}>
         <NewReminderModalModule

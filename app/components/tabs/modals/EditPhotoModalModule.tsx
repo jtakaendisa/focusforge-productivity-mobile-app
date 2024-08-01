@@ -2,14 +2,13 @@ import { getTokenValue, styled, Text, View } from 'tamagui';
 import BinSvg from '../../icons/BinSvg';
 import CameraSvg from '../../icons/CameraSvg';
 import GallerySvg from '../../icons/GallerySvg';
+import RippleButton from '../RippleButton';
 
 interface Props {
   onCameraPress: () => void;
   onGalleryPress: () => void;
   onRemovePress: () => void;
 }
-
-const SVG_SIZE = 24;
 
 const EditPhotoModalModule = ({
   onCameraPress,
@@ -26,18 +25,24 @@ const EditPhotoModalModule = ({
       </HeadingContainer>
       <MainContent>
         <ButtonsContainer>
-          <Button onPress={onCameraPress}>
-            <CameraSvg size={24} fill={customGray1} />
-            <ButtonText>Camera</ButtonText>
-          </Button>
-          <Button onPress={onGalleryPress}>
-            <GallerySvg size={24} fill={customGray1} />
-            <ButtonText>Gallery</ButtonText>
-          </Button>
-          <Button onPress={onRemovePress}>
-            <BinSvg size={24} fill={customRed1} />
-            <ButtonText color={customRed1}>Remove</ButtonText>
-          </Button>
+          <RippleButton flex onPress={onCameraPress}>
+            <Button>
+              <CameraSvg size={24} fill={customGray1} />
+              <ButtonText>Camera</ButtonText>
+            </Button>
+          </RippleButton>
+          <RippleButton flex onPress={onGalleryPress}>
+            <Button>
+              <GallerySvg size={24} fill={customGray1} />
+              <ButtonText>Gallery</ButtonText>
+            </Button>
+          </RippleButton>
+          <RippleButton flex onPress={onRemovePress}>
+            <Button>
+              <BinSvg size={24} fill={customRed1} />
+              <ButtonText color="$customRed1">Remove</ButtonText>
+            </Button>
+          </RippleButton>
         </ButtonsContainer>
       </MainContent>
     </Container>
@@ -64,23 +69,20 @@ const HeadingText = styled(Text, {
 const MainContent = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
-  paddingHorizontal: 32,
-  paddingVertical: 20,
 });
 
 const ButtonsContainer = styled(View, {
+  height: 120,
   flexDirection: 'row',
-  justifyContent: 'space-between',
   alignItems: 'center',
-  width: '100%',
 });
 
 const Button = styled(View, {
-  justifyContent: 'space-between',
+  justifyContent: 'center',
   alignItems: 'center',
-  width: 64,
-  height: 64,
-  paddingVertical: 8,
+  gap: 4,
+  height: '100%',
+  width: '100%',
 });
 
 const ButtonText = styled(Text, {

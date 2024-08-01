@@ -5,6 +5,7 @@ import { getTokenValue, styled, Text, View } from 'tamagui';
 import AlarmClockSvg from '../../icons/AlarmClockSvg';
 import BellSvg from '../../icons/BellSvg';
 import BinSvg from '../../icons/BinSvg';
+import RippleButton from '../RippleButton';
 
 interface Props {
   listItem: Reminder;
@@ -17,6 +18,8 @@ const ReminderListItem = ({ listItem, onDelete }: Props) => {
   const customGray1 = getTokenValue('$customGray1');
   const customRed1 = getTokenValue('$customRed1');
 
+  const handleDeleteReminder = () => onDelete(id);
+
   return (
     <AnimatedContainer entering={FadeIn} exiting={FadeOut}>
       <IconContainer>
@@ -27,9 +30,11 @@ const ReminderListItem = ({ listItem, onDelete }: Props) => {
         )}
       </IconContainer>
       <Title>{toFormattedTimeString(time)}</Title>
-      <IconContainer onPress={() => onDelete(id)}>
-        <BinSvg size={18} fill={customRed1} />
-      </IconContainer>
+      <RippleButton onPress={handleDeleteReminder}>
+        <IconContainer>
+          <BinSvg size={18} fill={customRed1} />
+        </IconContainer>
+      </RippleButton>
     </AnimatedContainer>
   );
 };
@@ -53,7 +58,7 @@ const IconContainer = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
   width: 42,
-  height: 32,
+  height: '100%',
 });
 
 const AnimatedContainer = Animated.createAnimatedComponent(Container);

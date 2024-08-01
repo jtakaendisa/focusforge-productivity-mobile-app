@@ -1,5 +1,5 @@
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 import { Text, View, styled } from 'tamagui';
 
@@ -13,9 +13,9 @@ import { useActivityStore } from '@/app/store';
 import CheckableChecklistItem from '../tasks/CheckableChecklistItem';
 import ChecklistItem from '../tasks/ChecklistItem';
 import CreateChecklistItem from '../tasks/CreateChecklistItem';
+import RippleButton from '../RippleButton';
 
 interface Props {
-  isForm?: boolean;
   control?: Control<NewActivityData>;
   activities?: Activity[];
   taskId?: string;
@@ -24,7 +24,6 @@ interface Props {
 }
 
 const ChecklistModalModule = ({
-  isForm,
   control,
   activities,
   taskId,
@@ -52,15 +51,13 @@ const ChecklistModalModule = ({
   };
 
   const handleDelete = (id: string) => {
-    if (!checklist?.length) return;
-
-    const filteredChecklistItems = checklist.filter(
+    const filteredChecklistItems = checklist?.filter(
       (checklistItem) => checklistItem.id !== id
     );
 
     if (control) {
       setChecklistRef.current?.(
-        !!filteredChecklistItems.length ? filteredChecklistItems : undefined
+        !!filteredChecklistItems?.length ? filteredChecklistItems : undefined
       );
     } else {
       setLocalChecklist(filteredChecklistItems);
@@ -101,7 +98,7 @@ const ChecklistModalModule = ({
   return (
     <Container>
       <HeadingContainer>
-        <HeadingText>{isForm ? 'Create sub tasks' : 'Sub Tasks'}</HeadingText>
+        <HeadingText>{control ? 'Create sub tasks' : 'Sub Tasks'}</HeadingText>
       </HeadingContainer>
       <MainContent>
         {control ? (
@@ -114,20 +111,18 @@ const ChecklistModalModule = ({
                 <AnimatedFlashList
                   ref={listRef}
                   data={value}
-                  renderItem={({ item }) =>
-                    isForm ? (
-                      <ChecklistItem listItem={item} onDelete={handleDelete} />
-                    ) : (
-                      <CheckableChecklistItem listItem={item} onCheck={handleCheck} />
-                    )
-                  }
+                  renderItem={({ item, index }) => (
+                    <ChecklistItem
+                      listItem={item}
+                      isLastIndex={index === value!.length - 1}
+                      onDelete={handleDelete}
+                    />
+                  )}
                   keyExtractor={(item) => item.id}
                   estimatedItemSize={46}
-                  ListHeaderComponent={() =>
-                    isForm ? (
-                      <CreateChecklistItem setChecklist={handleCreateItem} />
-                    ) : null
-                  }
+                  ListHeaderComponent={() => (
+                    <CreateChecklistItem setChecklist={handleCreateItem} />
+                  )}
                   showsVerticalScrollIndicator={false}
                 />
               );
@@ -137,25 +132,24 @@ const ChecklistModalModule = ({
           <AnimatedFlashList
             ref={listRef}
             data={localChecklist}
-            renderItem={({ item }) =>
-              isForm ? (
-                <ChecklistItem listItem={item} onDelete={handleDelete} />
-              ) : (
-                <CheckableChecklistItem listItem={item} onCheck={handleCheck} />
-              )
-            }
+            renderItem={({ item, index }) => (
+              <CheckableChecklistItem
+                listItem={item}
+                isLastIndex={localChecklist && index === localChecklist.length - 1}
+                onCheck={handleCheck}
+              />
+            )}
             keyExtractor={(item) => item.id}
             estimatedItemSize={46}
-            ListHeaderComponent={() =>
-              isForm ? <CreateChecklistItem setChecklist={handleCreateItem} /> : null
-            }
             showsVerticalScrollIndicator={false}
           />
         )}
       </MainContent>
-      <CloseButton onPress={closeModal}>
-        <ButtonText color="$customRed1">CLOSE</ButtonText>
-      </CloseButton>
+      <RippleButton onPress={closeModal}>
+        <CloseButton>
+          <ButtonText color="$customRed1">CLOSE</ButtonText>
+        </CloseButton>
+      </RippleButton>
     </Container>
   );
 };

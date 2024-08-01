@@ -52,33 +52,6 @@ export const frequencySchema = z.object({
   isRepeatedEvery: z.number().optional(),
 });
 
-export const taskSchema = z.object({
-  title: titleSchema,
-  category: z.enum(categoryArray),
-  note: z.string(),
-  dueDate: z.date({ message: 'Invalid date string' }).optional(),
-  startDate: z.date({ message: 'Invalid date string' }).optional(),
-  endDate: z.date({ message: 'Invalid date string' }).optional(),
-  priority: prioritySchema,
-  frequency: frequencySchema.optional(),
-  checklist: checklistSchema,
-  reminders: z.array(reminderSchema),
-  isCarriedOver: z.boolean({
-    message: 'isCarriedOver must be a boolean (true / false)',
-  }),
-});
-
-export const habitSchema = z.object({
-  title: titleSchema,
-  category: z.enum(categoryArray),
-  note: z.string(),
-  startDate: z.date({ message: 'Invalid date entered' }),
-  endDate: z.date({ message: 'Invalid date entered' }).optional(),
-  priority: prioritySchema,
-  frequency: frequencySchema,
-  reminders: z.array(reminderSchema),
-});
-
 export const activitySchema = z.object({
   title: z
     .string()

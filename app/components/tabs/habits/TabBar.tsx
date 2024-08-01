@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { HabitActiveTab, TaskActiveTab } from '@/app/entities';
+import RippleButton from '../RippleButton';
 
 interface HabitProps {
   mode: 'habit';
@@ -77,38 +78,44 @@ const TabBar = ({ mode, activeTab, onSelect }: Props) => {
 
   return (
     <Container>
-      <Button isHalfWidth={isTaskMode} onPress={selectCalendarTab}>
-        <TextContainer>
-          <AnimatedButtonText style={textColorAnimation(isCalendarSelected)}>
-            Calendar
-          </AnimatedButtonText>
-          <AnimatedSelectionIndicator
-            style={indicatorOpacityAnimation(isCalendarSelected)}
-          />
-        </TextContainer>
-      </Button>
-      {mode === 'habit' && (
-        <Button isHalfWidth={isTaskMode} onPress={selectStatisticsTab}>
+      <RippleButton flex onPress={selectCalendarTab}>
+        <Button>
           <TextContainer>
-            <AnimatedButtonText style={textColorAnimation(isStatisticsSelected)}>
-              Statistics
+            <AnimatedButtonText style={textColorAnimation(isCalendarSelected)}>
+              Calendar
             </AnimatedButtonText>
             <AnimatedSelectionIndicator
-              style={indicatorOpacityAnimation(isStatisticsSelected)}
+              style={indicatorOpacityAnimation(isCalendarSelected)}
             />
           </TextContainer>
         </Button>
+      </RippleButton>
+      {mode === 'habit' && (
+        <RippleButton flex onPress={selectStatisticsTab}>
+          <Button>
+            <TextContainer>
+              <AnimatedButtonText style={textColorAnimation(isStatisticsSelected)}>
+                Statistics
+              </AnimatedButtonText>
+              <AnimatedSelectionIndicator
+                style={indicatorOpacityAnimation(isStatisticsSelected)}
+              />
+            </TextContainer>
+          </Button>
+        </RippleButton>
       )}
-      <Button isHalfWidth={isTaskMode} onPress={selectEditTab}>
-        <TextContainer>
-          <AnimatedButtonText style={textColorAnimation(isEditSelected)}>
-            Edit
-          </AnimatedButtonText>
-          <AnimatedSelectionIndicator
-            style={indicatorOpacityAnimation(isEditSelected)}
-          />
-        </TextContainer>
-      </Button>
+      <RippleButton flex onPress={selectEditTab}>
+        <Button>
+          <TextContainer>
+            <AnimatedButtonText style={textColorAnimation(isEditSelected)}>
+              Edit
+            </AnimatedButtonText>
+            <AnimatedSelectionIndicator
+              style={indicatorOpacityAnimation(isEditSelected)}
+            />
+          </TextContainer>
+        </Button>
+      </RippleButton>
     </Container>
   );
 };
@@ -122,16 +129,6 @@ const Container = styled(View, {
 
 const Button = styled(View, {
   alignItems: 'center',
-  variants: {
-    isHalfWidth: {
-      true: {
-        width: '50%',
-      },
-      false: {
-        width: '33.333%',
-      },
-    },
-  } as const,
 });
 
 const TextContainer = styled(View, {

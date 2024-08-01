@@ -23,7 +23,13 @@ const RippleButton = ({ children, rippleColor, fade, flex, onPress }: Props) => 
       }}
     >
       {({ pressed }) => (
-        <View style={{ opacity: pressed && fade ? 0.5 : 1 }}>{children}</View>
+        <View
+          style={{
+            opacity: pressed && fade ? 0.5 : 1,
+          }}
+        >
+          {children}
+        </View>
       )}
     </Pressable>
   );

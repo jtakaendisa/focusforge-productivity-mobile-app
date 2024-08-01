@@ -4,6 +4,7 @@ import { getTokenValue, styled, Text, View } from 'tamagui';
 
 import { SCREEN_WIDTH } from '@/app/constants';
 import SquareCheckbox from '../SquareCheckbox';
+import RippleButton from '../RippleButton';
 
 interface Props {
   day: string;
@@ -16,15 +17,19 @@ const WeekdayCard = ({ day, isSelected, onSelect }: Props) => {
 
   const customGray1 = getTokenValue('$customGray1');
 
+  const handleDaySelect = () => onSelect(day);
+
   useEffect(() => {
     isChecked.value = isSelected ? withTiming(1) : withTiming(0);
   }, [isSelected]);
 
   return (
-    <Container onPress={() => onSelect(day)}>
-      <SquareCheckbox isChecked={isChecked} />
-      <Text color={customGray1}>{day}</Text>
-    </Container>
+    <RippleButton onPress={handleDaySelect}>
+      <Container>
+        <SquareCheckbox isChecked={isChecked} />
+        <Text color={customGray1}>{day}</Text>
+      </Container>
+    </RippleButton>
   );
 };
 

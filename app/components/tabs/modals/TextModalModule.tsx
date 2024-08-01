@@ -3,6 +3,7 @@ import { TextInput } from 'react-native';
 import { Control, Controller } from 'react-hook-form';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 import { NewActivityData } from '@/app/entities';
+import RippleButton from '../RippleButton';
 
 interface Props {
   control: Control<NewActivityData>;
@@ -25,8 +26,8 @@ const TextModalModule = ({ control, name, initialText, closeModal }: Props) => {
   const handleConfirm = () => {
     setInputRef.current?.(
       name === 'title'
-        ? control._getWatch('title').trim()
-        : control._getWatch('note').trim()
+        ? control._getWatch('title')?.trim()
+        : control._getWatch('note')?.trim()
     );
     closeModal();
   };
@@ -55,12 +56,16 @@ const TextModalModule = ({ control, name, initialText, closeModal }: Props) => {
         />
       </MainContainer>
       <ButtonsContainer>
-        <Button onPress={handleCancel}>
-          <ButtonText>CANCEL</ButtonText>
-        </Button>
-        <Button onPress={handleConfirm}>
-          <ButtonText color="$customRed1">OK</ButtonText>
-        </Button>
+        <RippleButton flex onPress={handleCancel}>
+          <Button>
+            <ButtonText>CANCEL</ButtonText>
+          </Button>
+        </RippleButton>
+        <RippleButton flex onPress={handleConfirm}>
+          <Button>
+            <ButtonText color="$customRed1">OK</ButtonText>
+          </Button>
+        </RippleButton>
       </ButtonsContainer>
     </Container>
   );
@@ -97,7 +102,7 @@ const ButtonsContainer = styled(View, {
 const Button = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
-  width: '50%',
+  width: '100%',
   paddingVertical: 16,
 });
 

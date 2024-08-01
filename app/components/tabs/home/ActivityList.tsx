@@ -58,11 +58,19 @@ const filterRecurringActivitiesByDate = (
   return filtered;
 };
 
-const ActivityList = () => {
+interface Props {
+  isSearchBarOpen: boolean;
+}
+
+const ActivityList = ({ isSearchBarOpen }: Props) => {
   const selectedDate = useActivityStore((s) => s.selectedDate);
   const activities = useActivityStore((s) => s.activities);
   const setActivities = useActivityStore((s) => s.setActivities);
   const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
+
+  const activityFilter = useSearchStore((s) => s.activityFilter);
+  const searchTerm = useSearchStore((s) => s.searchTerm);
+  const selectedCategories = useSearchStore((s) => s.selectedCategories);
 
   const [activitiesDueToday, setActivitiesDueToday] = useState<Activity[]>([]);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
@@ -85,11 +93,13 @@ const ActivityList = () => {
   }, [carriedOverPendingTasks, activities, selectedDate]);
 
   const memoizedRecurringActivitiesDueToday = useMemo(() => {
+    if (!carriedOverPendingTasks) return [];
+
     const recurringActivities = activities.filter(
       (activity) => activity.type === 'recurring task' || activity.type === 'habit'
     );
     return filterRecurringActivitiesByDate(recurringActivities, selectedDate);
-  }, [activities, selectedDate]);
+  }, [carriedOverPendingTasks, activities, selectedDate]);
 
   const isListEmpty = !activitiesDueToday.length;
   const isTaskCompletionDisabled = selectedDate > CURRENT_DATE;
@@ -173,13 +183,98 @@ const ActivityList = () => {
   }, []);
 
   useEffect(() => {
-    const activitiesDueToday = [
+    setActivitiesDueToday([
       ...memoizedSingleTasksDueToday,
       ...memoizedRecurringActivitiesDueToday,
-    ];
-    setActivitiesDueToday(activitiesDueToday);
-    setFilteredActivities(activitiesDueToday);
+    ]);
   }, [memoizedSingleTasksDueToday, memoizedRecurringActivitiesDueToday]);
+
+  useEffect(() => {
+    if (isSearchBarOpen) {
+      setFilteredActivities([
+        ...memoizedSingleTasksDueToday,
+        ...memoizedRecurringActivitiesDueToday,
+      ]);
+    }
+  }, [
+    isSearchBarOpen,
+    memoizedSingleTasksDueToday,
+    memoizedRecurringActivitiesDueToday,
+  ]);
+
+  // useEffect(() => {
+  //   if (!isSearchBarOpen) return;
+
+  //   const activitiesDueToday = [
+  //     ...memoizedSingleTasksDueToday,
+  //     ...memoizedRecurringActivitiesDueToday,
+  //   ];
+
+  //   if (!searchTerm.length) {
+  //     setActivitiesDueToday(activitiesDueToday);
+  //   } else {
+  //     setActivitiesDueToday(
+  //       activitiesDueToday.filter((activity) =>
+  //         activity.title.toLowerCase().includes(searchTerm.toLowerCase())
+  //       )
+  //     );
+  //   }
+  // }, [
+  //   isSearchBarOpen,
+  //   memoizedSingleTasksDueToday,
+  //   memoizedRecurringActivitiesDueToday,
+  //   searchTerm,
+  // ]);
+
+  // useEffect(() => {
+  //   if (!isSearchBarOpen) return;
+
+  //   if (selectedCategories.length) {
+  //     setActivitiesDueToday(
+  //       activitiesDueToday.filter((activity) =>
+  //         selectedCategories.includes(activity.category)
+  //       )
+  //     );
+  //   }
+  // }, [
+  //   isSearchBarOpen,
+  //   memoizedSingleTasksDueToday,
+  //   memoizedRecurringActivitiesDueToday,
+  //   selectedCategories,
+  // ]);
+
+  // useEffect(() => {
+  //   if (!isSearchBarOpen) return;
+
+  //   const activitiesDueToday = [
+  //     ...memoizedSingleTasksDueToday,
+  //     ...memoizedRecurringActivitiesDueToday,
+  //   ];
+
+  //   switch (activityFilter) {
+  //     case 'all':
+  //       setActivitiesDueToday(activitiesDueToday);
+  //       break;
+  //     case 'habits':
+  //       setActivitiesDueToday(
+  //         activitiesDueToday.filter((activity) => activity.type === 'habit')
+  //       );
+  //       break;
+  //     case 'tasks':
+  //       setActivitiesDueToday(
+  //         activitiesDueToday.filter(
+  //           (activity) =>
+  //             activity.type === 'single task' || activity.type === 'recurring task'
+  //         )
+  //       );
+  //       break;
+  //   }
+  // }, [
+  //   isSearchBarOpen,
+  //   memoizedSingleTasksDueToday,
+  //   memoizedRecurringActivitiesDueToday,
+  //   activityFilter,
+  // ]);
 
   return (
     <Container isContentCentered={isListEmpty}>

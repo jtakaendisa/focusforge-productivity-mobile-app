@@ -4,6 +4,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useEffect, useState } from 'react';
 import { getTokenValue, ScrollView, styled, Text, View } from 'tamagui';
 import SearchBarCategoryCard from '../SearchBarCategoryCard';
+import RippleButton from '../RippleButton';
 
 interface Props {
   activities: (string | Activity)[];
@@ -57,12 +58,16 @@ const SearchBarCategoryModalModule = ({
         </MainContent>
       </ScrollView>
 
-      <Button onPress={onClear}>
-        <ButtonText>Clear Selection</ButtonText>
-      </Button>
-      <Button onPress={closeModal}>
-        <ButtonText color={customRed1}>Close</ButtonText>
-      </Button>
+      <RippleButton onPress={onClear}>
+        <Button>
+          <ButtonText>Clear Selection</ButtonText>
+        </Button>
+      </RippleButton>
+      <RippleButton onPress={closeModal}>
+        <Button>
+          <ButtonText color={customRed1}>Close</ButtonText>
+        </Button>
+      </RippleButton>
     </Container>
   );
 };
