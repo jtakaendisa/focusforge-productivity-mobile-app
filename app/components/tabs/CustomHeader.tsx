@@ -1,4 +1,4 @@
-import { useAppStore } from '@/app/store';
+import { useAppStore, useSearchStore } from '@/app/store';
 import { getDefaultHeaderHeight } from '@react-navigation/elements';
 import { useEffect } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const CustomHeader = ({ title }: Props) => {
-  const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
+  const isSearchBarOpen = useSearchStore((s) => s.isSearchBarOpen);
   const setHeaderHeight = useAppStore((s) => s.setHeaderHeight);
 
   const frame = useSafeAreaFrame();

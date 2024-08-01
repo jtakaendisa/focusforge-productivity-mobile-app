@@ -1,15 +1,13 @@
 import { create } from 'zustand';
 
 import { CURRENT_DATE } from '../constants';
-import { Activity, AuthUser, Theme } from '../entities';
+import { Activity, ActivityFilter, AuthUser, Category, Theme } from '../entities';
 
 interface AppStore {
   theme: Theme;
   headerHeight: number;
-  isSearchBarOpen: boolean;
   setTheme: (theme: Theme) => void;
   setHeaderHeight: (headerHeight: number) => void;
-  setIsSearchBarOpen: (isSearchBarOpen: boolean) => void;
 }
 
 interface AuthStore {
@@ -22,6 +20,19 @@ interface ActivityStore {
   selectedDate: Date;
   setActivities: (activities: Activity[]) => void;
   setSelectedDate: (selectedDate: Date) => void;
+}
+
+interface SearchStore {
+  isSearchBarOpen: boolean;
+  searchTerm: string;
+  activityFilter: ActivityFilter;
+  selectedCategories: Category[];
+  filteredActivities: (string | Activity)[];
+  setIsSearchBarOpen: (isSearchBarOpen: boolean) => void;
+  setSearchTerm: (searchTerm: string) => void;
+  setActivityFilter: (activityFilter: ActivityFilter) => void;
+  setSelectedCategories: (selectedCategories: Category[]) => void;
+  setFilteredActivities: (filteredActivities: (string | Activity)[]) => void;
 }
 
 export const categoryArray = [
@@ -57,7 +68,29 @@ const dummyActivities: Activity[] = [
       },
     ],
     startDate: new Date('2024-07-30'),
-    title: 'hello',
+    title: 'Test Habit 1',
+    type: 'habit',
+  },
+  {
+    category: 'Finance',
+    endDate: new Date('2024-08-31'),
+    frequency: { isRepeatedOn: ['Tuesday', 'Thursday'], type: 'specific' },
+    id: '14018d47-074a-42e3-a9b2-fe1dc84739d1',
+    isCompleted: false,
+    note: 'hey there',
+    priority: 'High',
+    startDate: new Date('2024-08-01'),
+    title: 'Test Habit 2',
+    type: 'habit',
+  },
+  {
+    category: 'Outdoor',
+    frequency: { isRepeatedEvery: 3, type: 'repeats' },
+    id: '3013b23c-a4f6-42ed-918d-e2ad78b0cd59',
+    isCompleted: false,
+    priority: 'Normal',
+    startDate: new Date('2024-08-01'),
+    title: 'Test Habit 3',
     type: 'habit',
   },
   {
@@ -188,11 +221,8 @@ const dummyActivities: Activity[] = [
 const useAppStore = create<AppStore>((set) => ({
   theme: 'dark',
   headerHeight: 0,
-  isSearchBarOpen: false,
   setTheme: (theme) => set((state) => ({ ...state, theme })),
   setHeaderHeight: (headerHeight) => set((state) => ({ ...state, headerHeight })),
-  setIsSearchBarOpen: (isSearchBarOpen) =>
-    set((state) => ({ ...state, isSearchBarOpen })),
 }));
 
 const useAuthStore = create<AuthStore>((set) => ({
@@ -207,4 +237,20 @@ const useActivityStore = create<ActivityStore>((set) => ({
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
 }));
 
-export { useActivityStore, useAppStore, useAuthStore };
+const useSearchStore = create<SearchStore>((set) => ({
+  isSearchBarOpen: false,
+  searchTerm: '',
+  activityFilter: 'all',
+  selectedCategories: [],
+  filteredActivities: [],
+  setIsSearchBarOpen: (isSearchBarOpen) =>
+    set((state) => ({ ...state, isSearchBarOpen })),
+  setSearchTerm: (searchTerm) => set((state) => ({ ...state, searchTerm })),
+  setActivityFilter: (activityFilter) => set((state) => ({ ...state, activityFilter })),
+  setSelectedCategories: (selectedCategories) =>
+    set((state) => ({ ...state, selectedCategories })),
+  setFilteredActivities: (filteredActivities) =>
+    set((state) => ({ ...state, filteredActivities })),
+}));
+
+export { useActivityStore, useAppStore, useAuthStore, useSearchStore };

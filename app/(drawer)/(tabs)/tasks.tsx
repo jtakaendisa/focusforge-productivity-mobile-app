@@ -4,17 +4,17 @@ import { View, styled } from 'tamagui';
 
 import SearchBarSpacer from '@/app/components/tabs/SearchBarSpacer';
 import { usePathname } from 'expo-router';
-import NewActivityButton from '../../components/tabs/NewActivityButton';
-import TaskList from '../../components/tabs/tasks/TaskList';
 import NewActivityModal from '../../components/tabs/modals/NewActivityModal';
+import NewActivityButton from '../../components/tabs/NewActivityButton';
 import TaskFilterBar from '../../components/tabs/tasks/TaskFilterBar';
+import TaskList from '../../components/tabs/tasks/TaskList';
 import { TabRoute, TaskFilter } from '../../entities';
-import { useAppStore } from '../../store';
+import { useSearchStore } from '../../store';
 
 const TasksScreen = () => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
-  const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
+  const isSearchBarOpen = useSearchStore((s) => s.isSearchBarOpen);
 
   const [taskFilter, setTaskFilter] = useState<TaskFilter>('single task');
 

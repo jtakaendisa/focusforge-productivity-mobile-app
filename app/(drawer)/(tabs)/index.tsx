@@ -9,12 +9,12 @@ import DateCarousel from '../../components/tabs/home/DateCarousel';
 import NewActivityModal from '../../components/tabs/modals/NewActivityModal';
 import NewActivityButton from '../../components/tabs/NewActivityButton';
 import { TabRoute } from '../../entities';
-import { useAppStore } from '../../store';
+import { useSearchStore } from '../../store';
 
 const HomeScreen = () => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
-  const isSearchBarOpen = useAppStore((s) => s.isSearchBarOpen);
+  const isSearchBarOpen = useSearchStore((s) => s.isSearchBarOpen);
 
   const newActivityModalRef = useRef<BottomSheetModal | null>(null);
 

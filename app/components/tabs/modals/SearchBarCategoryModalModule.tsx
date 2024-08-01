@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Activity, Category, Task } from '@/app/entities';
-import { styled, View, Text, ScrollView, getTokenValue } from 'tamagui';
 import { SCREEN_HEIGHT } from '@/app/constants';
+import { Activity, Category } from '@/app/entities';
 import { FlashList } from '@shopify/flash-list';
+import { useEffect, useState } from 'react';
+import { getTokenValue, ScrollView, styled, Text, View } from 'tamagui';
 import SearchBarCategoryCard from '../SearchBarCategoryCard';
 
 interface Props {
-  activities: Activity[] | (Task | string)[];
+  activities: (string | Activity)[];
   selectedCategories: Category[];
-  onSelect: (category: Category) => void;
+  onSelect: (selectedCategory: Category) => void;
   onClear: () => void;
   closeModal: () => void;
 }
@@ -42,11 +42,12 @@ const SearchBarCategoryModalModule = ({
         <MainContent>
           <FlashList
             data={uniqueCategories}
-            renderItem={({ item }) => (
+            renderItem={({ item, index }) => (
               <SearchBarCategoryCard
                 isSelected={selectedCategories.includes(item)}
                 category={item}
                 onSelect={onSelect}
+                isLastIndex={index === uniqueCategories.length - 1}
               />
             )}
             keyExtractor={(item) => item}

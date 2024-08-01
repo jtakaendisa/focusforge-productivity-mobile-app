@@ -1,5 +1,5 @@
 import { TabRoute } from '@/app/entities';
-import { useAppStore } from '@/app/store';
+import { useSearchStore } from '@/app/store';
 import { DrawerActions } from '@react-navigation/native';
 import { useNavigation, usePathname } from 'expo-router';
 import { getTokenValue, styled, Text, View } from 'tamagui';
@@ -19,7 +19,7 @@ const DefaultHeader = ({ height, title }: Props) => {
   const navigation = useNavigation();
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
-  const setIsSearchBarOpen = useAppStore((s) => s.setIsSearchBarOpen);
+  const setIsSearchBarOpen = useSearchStore((s) => s.setIsSearchBarOpen);
 
   const toggleDrawerMenu = () => navigation.dispatch(DrawerActions.toggleDrawer());
 

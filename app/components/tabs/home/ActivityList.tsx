@@ -1,8 +1,9 @@
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Activity, Priority, Task } from '@/app/entities';
-import { useActivityStore } from '@/app/store';
+import { CURRENT_DATE } from '@/app/constants';
+import { Activity, Priority } from '@/app/entities';
+import { useActivityStore, useSearchStore } from '@/app/store';
 import { toFormattedDateString } from '@/app/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -13,7 +14,6 @@ import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import TaskListItem from '../tasks/TaskListItem';
 import ActivityListPlaceholder from './ActivityListPlaceholder';
-import { CURRENT_DATE } from '@/app/constants';
 
 const carryOverTasks = (activities: Activity[]) =>
   activities.map((activity) =>
@@ -62,6 +62,7 @@ const ActivityList = () => {
   const selectedDate = useActivityStore((s) => s.selectedDate);
   const activities = useActivityStore((s) => s.activities);
   const setActivities = useActivityStore((s) => s.setActivities);
+  const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
 
   const [activitiesDueToday, setActivitiesDueToday] = useState<Activity[]>([]);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
@@ -70,7 +71,7 @@ const ActivityList = () => {
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
   const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
 
-  const taskListRef = useRef<FlashList<Task | (string | Task)> | null>(null);
+  const listRef = useRef<FlashList<Activity> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
   const memoizedSingleTasksDueToday = useMemo(() => {
@@ -155,7 +156,7 @@ const ActivityList = () => {
   const handleDelete = (id: string) => {
     const updatedActivities = activities.filter((activity) => activity.id !== id);
     setActivities(updatedActivities);
-    taskListRef.current?.prepareForLayoutAnimationRender();
+    listRef.current?.prepareForLayoutAnimationRender();
     activityOptionsRef.current?.close();
   };
 
@@ -172,10 +173,12 @@ const ActivityList = () => {
   }, []);
 
   useEffect(() => {
-    setActivitiesDueToday([
+    const activitiesDueToday = [
       ...memoizedSingleTasksDueToday,
       ...memoizedRecurringActivitiesDueToday,
-    ]);
+    ];
+    setActivitiesDueToday(activitiesDueToday);
+    setFilteredActivities(activitiesDueToday);
   }, [memoizedSingleTasksDueToday, memoizedRecurringActivitiesDueToday]);
 
   return (
@@ -184,7 +187,7 @@ const ActivityList = () => {
         <ActivityListPlaceholder />
       ) : (
         <AnimatedFlashList
-          ref={taskListRef}
+          ref={listRef}
           data={activitiesDueToday}
           renderItem={({ item }) => (
             <TaskListItem

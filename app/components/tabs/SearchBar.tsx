@@ -1,6 +1,6 @@
 import { SCREEN_WIDTH } from '@/app/constants';
 import { ActivityFilter, Category, TabRoute } from '@/app/entities';
-import { useAppStore } from '@/app/store';
+import { useSearchStore } from '@/app/store';
 import { usePathname } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StatusBar, TextInput } from 'react-native';
@@ -34,140 +34,66 @@ const SearchBar = ({ height }: Props) => {
 
   const statusBarHeight = StatusBar.currentHeight;
 
-  const setIsSearchBarOpen = useAppStore((s) => s.setIsSearchBarOpen);
+  const activityFilter = useSearchStore((s) => s.activityFilter);
+  const filteredActivities = useSearchStore((s) => s.filteredActivities);
+  const setIsSearchBarOpen = useSearchStore((s) => s.setIsSearchBarOpen);
+  const setSearchTerm = useSearchStore((s) => s.setSearchTerm);
+  const setActivityFilter = useSearchStore((s) => s.setActivityFilter);
+  const setSelectedCategories = useSearchStore((s) => s.setSelectedCategories);
+  const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activityFilter, setActivityFilter] = useState<ActivityFilter>('all');
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  const [localSearchTerm, setLocalSearchTerm] = useState('');
+  const [localSelectedCategories, setLocalSelectedCategories] = useState<Category[]>(
+    []
+  );
   const [isActivityFilterModalOpen, setIsActivityFilterModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
   const isSearchRowVisible = useSharedValue(0);
 
-  const handleActivitiesReset = () => {
-    // switch (pathname) {
-    //   case 'home':
-    //     setFilteredActivities(initialFilteredActivities);
-    //     break;
-    //   case 'habits':
-    //     setFilteredHabits(habits);
-    //     break;
-    //   case 'tasks':
-    //     if (filter === 'single') {
-    //       setFilteredSingleTasks(singleTasks);
-    //     } else {
-    //       setFilteredRecurringTasks(recurringTasks);
-    //     }
-    //     break;
-    // }
-  };
-
-  const filterActivitiesByActivityFilter = (filter: ActivityFilter) => {
-    // let filtered: any[] = [];
-    // if (filter === 'all') {
-    //   filtered = initialFilteredActivities;
-    // }
-    // if (filter === 'habits') {
-    //   filtered = initialFilteredActivities.filter((activity) => {
-    //     const isHabit = Boolean((activity as Task)?.checklist) === false;
-    //     if (isHabit) {
-    //       return activity;
-    //     }
-    //   });
-    // }
-    // if (filter === 'tasks') {
-    //   filtered = initialFilteredActivities.filter((activity) => {
-    //     const isTask = Boolean((activity as Task)?.checklist) === true;
-    //     if (isTask) {
-    //       return activity;
-    //     }
-    //   });
-    // }
-    // setActivities(filtered);
-    // setFilteredActivities(filtered);
-  };
-
-  const handleActivityFilterChange = (activityFilter: ActivityFilter) => {
-    filterActivitiesByActivityFilter(activityFilter);
+  const handleActivityFilterChange = (activityFilter: ActivityFilter) =>
     setActivityFilter(activityFilter);
-    toggleActivityFilterModal();
+
+  const handleSearchTermChange = (text: string) => {
+    setLocalSearchTerm(text);
+    setSearchTerm(text);
   };
 
-  const handleSearchTermChange = (text: string) => setSearchTerm(text);
+  const handleCategorySelect = (selectedCategory: Category) => {
+    const isCategoryAlreadySelected =
+      localSelectedCategories.includes(selectedCategory);
 
-  const handleSearchTermClear = () => {
-    setSearchTerm('');
-    handleActivitiesReset();
-  };
-
-  const handleSearchTermSubmit = () => {
-    // if (!searchTerm.trim().length) return;
-    // const filteredActivities = activities.filter((activity) => {
-    //   if (typeof activity !== 'string') {
-    //     return activity.title.toLowerCase().includes(searchTerm.trim().toLowerCase());
-    //   }
-    // });
-    // switch (pathname) {
-    //   case 'home':
-    //     setFilteredActivities(filteredActivities as Activity[]);
-    //     break;
-    //   case 'habits':
-    //     setFilteredHabits(filteredActivities as Habit[]);
-    //     break;
-    //   case 'tasks':
-    //     if (filter === 'single') {
-    //       const dateGroupedTasks = toDateGroupedTasks(filteredActivities as Task[]);
-    //       setFilteredSingleTasks(toFormattedSections(dateGroupedTasks));
-    //     } else {
-    //       setFilteredRecurringTasks(filteredActivities as Task[]);
-    //     }
-    //     break;
-    // }
-  };
-
-  const filterActivitiesByCategory = (selectedCategories: Category[]) => {
-    // const filteredActivities = activities.filter(
-    //   (activity) =>
-    //     typeof activity !== 'string' && selectedCategories.includes(activity.category)
-    // );
-    // switch (pathname) {
-    //   case 'home':
-    //     setFilteredActivities(filteredActivities as Activity[]);
-    //     break;
-    //   case 'habits':
-    //     setFilteredHabits(filteredActivities as Habit[]);
-    //     break;
-    //   case 'tasks':
-    //     if (filter === 'single') {
-    //       const dateGroupedTasks = toDateGroupedTasks(filteredActivities as Task[]);
-    //       setFilteredSingleTasks(toFormattedSections(dateGroupedTasks));
-    //     } else {
-    //       setFilteredRecurringTasks(filteredActivities as Task[]);
-    //     }
-    //     break;
-    // }
-  };
-
-  const handleCategorySelect = (category: Category) => {
-    const isCategorySelected = selectedCategories.includes(category);
     let updatedSelectedCategories: Category[] = [];
 
-    if (isCategorySelected) {
-      updatedSelectedCategories = selectedCategories.filter((cat) => cat !== category);
-      filterActivitiesByCategory(updatedSelectedCategories);
-      setSelectedCategories(updatedSelectedCategories);
+    if (isCategoryAlreadySelected) {
+      updatedSelectedCategories = localSelectedCategories.filter(
+        (category) => category !== selectedCategory
+      );
     } else {
-      updatedSelectedCategories = [...selectedCategories, category];
-      filterActivitiesByCategory(updatedSelectedCategories);
-      setSelectedCategories(updatedSelectedCategories);
+      updatedSelectedCategories = [...localSelectedCategories, selectedCategory];
     }
+    setLocalSelectedCategories(updatedSelectedCategories);
+    setSelectedCategories(updatedSelectedCategories);
   };
 
-  const handleCategoryClear = () => setSelectedCategories([]);
+  const handleCategoryClear = () => {
+    setLocalSelectedCategories([]);
+    setSelectedCategories([]);
+  };
+
+  const handleFilterReset = () => {
+    setLocalSearchTerm('');
+    handleCategoryClear();
+
+    setSearchTerm('');
+    setSelectedCategories([]);
+    setActivityFilter('all');
+  };
 
   const handleSearchBarClose = () => {
+    handleFilterReset();
+    setFilteredActivities([]);
     setIsSearchBarOpen(false);
-    handleActivitiesReset();
   };
 
   const toggleActivityFilterModal = () => setIsActivityFilterModalOpen((prev) => !prev);
@@ -179,32 +105,6 @@ const SearchBar = ({ height }: Props) => {
       ? withTiming(height, animationConfig)
       : withTiming(0, animationConfig),
   }));
-
-  // useEffect(() => {
-  //   switch (pathname) {
-  //     case 'home':
-  //       setActivities(initialFilteredActivities);
-  //       break;
-  //     case 'habits':
-  //       setActivities(habits);
-  //       break;
-  //     case 'tasks':
-  //       if (filter === 'single') {
-  //         setActivities(singleTasks);
-  //       } else {
-  //         setActivities(recurringTasks);
-  //       }
-  //       break;
-  //   }
-  // }, [pathname, initialFilteredActivities, habits, singleTasks, recurringTasks]);
-
-  // useEffect(() => {
-  //   if (!isCategoryOpen) return;
-
-  //   if (!selectedCategories.length) {
-  //     handleActivitiesReset();
-  //   }
-  // }, [selectedCategories, isCategoryOpen]);
 
   useEffect(() => {
     isSearchRowVisible.value = 1;
@@ -227,7 +127,13 @@ const SearchBar = ({ height }: Props) => {
         )}
         <RippleButton flex onPress={toggleCategoryModal}>
           <CategoryContainer height={height}>
-            <FilterText color="$customGray1">Select a category</FilterText>
+            <FilterText color="$customGray1">
+              {!!localSelectedCategories.length
+                ? `${localSelectedCategories.length} ${
+                    localSelectedCategories.length === 1 ? 'category' : 'categories'
+                  } selected`
+                : 'Select a category'}
+            </FilterText>
           </CategoryContainer>
         </RippleButton>
       </FilterRow>
@@ -237,11 +143,10 @@ const SearchBar = ({ height }: Props) => {
           placeholder="Search for an activity..."
           placeholderTextColor={customGray1}
           onChangeText={handleSearchTermChange}
-          onEndEditing={handleSearchTermSubmit}
-          value={searchTerm}
+          value={localSearchTerm}
         />
         <ButtonContainer>
-          <RippleButton fade onPress={handleSearchTermClear}>
+          <RippleButton fade onPress={handleFilterReset}>
             <IconContainer width={height} height={height}>
               <BinSvg size={22} fill={customGray1} variant="outline" />
             </IconContainer>
@@ -267,15 +172,15 @@ const SearchBar = ({ height }: Props) => {
           />
         )}
       </ModalContainer>
-      {/* <ModalContainer isOpen={isCategoryModalOpen} closeModal={toggleCategoryModal}>
+      <ModalContainer isOpen={isCategoryModalOpen} closeModal={toggleCategoryModal}>
         <SearchBarCategoryModalModule
-          activities={activities}
-          selectedCategories={selectedCategories}
+          activities={filteredActivities}
+          selectedCategories={localSelectedCategories}
           onSelect={handleCategorySelect}
           onClear={handleCategoryClear}
           closeModal={toggleCategoryModal}
         />
-      </ModalContainer> */}
+      </ModalContainer>
     </AnimatedContainer>
   );
 };

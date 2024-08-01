@@ -1,14 +1,14 @@
 import { Redirect, Tabs } from 'expo-router';
 import { getTokenValue } from 'tamagui';
 
-import { useAppStore, useAuthStore } from '../../store';
-import { SCREEN_HEIGHT } from '../../constants';
-import TabBarButton from '../../components/tabs/TabBarButton';
 import CustomHeader from '@/app/components/tabs/CustomHeader';
+import TabBarButton from '../../components/tabs/TabBarButton';
+import { SCREEN_HEIGHT } from '../../constants';
+import { useAuthStore, useSearchStore } from '../../store';
 
 const TabLayout = () => {
   const authUser = useAuthStore((s) => s.authUser);
-  const setisSearchBarOpen = useAppStore((s) => s.setIsSearchBarOpen);
+  const setisSearchBarOpen = useSearchStore((s) => s.setIsSearchBarOpen);
 
   const customGray3 = getTokenValue('$customGray3');
 

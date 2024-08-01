@@ -9,10 +9,16 @@ import { useEffect } from 'react';
 interface Props {
   category: Category;
   isSelected: boolean;
+  isLastIndex: boolean;
   onSelect: (category: Category) => void;
 }
 
-const SearchBarCategoryCard = ({ category, isSelected, onSelect }: Props) => {
+const SearchBarCategoryCard = ({
+  category,
+  isSelected,
+  isLastIndex,
+  onSelect,
+}: Props) => {
   const isChecked = useSharedValue(isSelected ? 1 : 0);
 
   const customBlack1 = getTokenValue('$customBlack1');
@@ -25,7 +31,7 @@ const SearchBarCategoryCard = ({ category, isSelected, onSelect }: Props) => {
 
   return (
     <RippleButton onPress={handleSelect}>
-      <Container>
+      <Container isBordered={!isLastIndex}>
         <InnerRow>
           <CategoryContainer>
             <CategoryIcon category={category} fill={customBlack1} />
@@ -45,7 +51,16 @@ const Container = styled(View, {
   height: 54,
   paddingHorizontal: 12,
   borderBottomWidth: 1,
-  borderColor: '$customGray2',
+  variants: {
+    isBordered: {
+      true: {
+        borderColor: '$customGray2',
+      },
+      false: {
+        borderColor: 'transparent',
+      },
+    },
+  } as const,
 });
 
 const InnerRow = styled(View, {

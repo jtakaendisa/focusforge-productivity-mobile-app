@@ -39,6 +39,8 @@ export interface IconProps {
   variant?: IconVariant;
 }
 
+export type TabRoute = 'home' | 'habits' | 'tasks' | 'timer' | 'settings';
+
 export type HabitActiveTab = 'calendar' | 'statistics' | 'edit';
 
 export type TaskActiveTab = 'calendar' | 'edit';
@@ -64,34 +66,3 @@ export type Activity = {
   reminders?: Reminder[];
   isCarriedOver?: boolean;
 };
-
-export interface Task {
-  id: string;
-  title: string;
-  isCompleted: boolean;
-  category: Category;
-  dueDate?: Date;
-  startDate?: Date;
-  endDate?: Date;
-  priority: Priority;
-  note: string;
-  frequency?: Frequency;
-  reminders: Reminder[];
-  isCarriedOver: boolean;
-  isRecurring: boolean;
-  checklist: ChecklistItem[];
-}
-
-export interface Habit {
-  id: string;
-  title: string;
-  note: string;
-  category: Category;
-  startDate: Date;
-  endDate?: Date;
-  priority: Priority;
-  frequency: Frequency;
-  reminders: Reminder[];
-}
-
-export type TabRoute = 'home' | 'habits' | 'tasks' | 'timer' | 'settings';

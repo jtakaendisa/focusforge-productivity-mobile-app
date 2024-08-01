@@ -4,32 +4,37 @@ import { router } from 'expo-router';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { View, styled } from 'tamagui';
 
-import { Activity, Habit, HabitActiveTab } from '@/app/entities';
-import { useActivityStore } from '@/app/store';
+import { Activity, HabitActiveTab } from '@/app/entities';
+import { useActivityStore, useSearchStore } from '@/app/store';
+import { Swipeable } from 'react-native-gesture-handler';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
 import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
 import ActivityOptionsModal from './ActivityOptionsModal';
 import HabitListItem from './HabitListItem';
-import { Swipeable } from 'react-native-gesture-handler';
 
 const HabitList = () => {
   const activities = useActivityStore((s) => s.activities);
+  const isSearchBarOpen = useSearchStore((s) => s.isSearchBarOpen);
   const setActivities = useActivityStore((s) => s.setActivities);
+  const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
+
+  const searchTerm = useSearchStore((s) => s.searchTerm);
+  const selectedCategories = useSearchStore((s) => s.selectedCategories);
 
   const [habits, setHabits] = useState<Activity[]>([]);
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const listRef = useRef<FlashList<Habit> | null>(null);
+  const listRef = useRef<FlashList<Activity> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
+
+  const isListEmpty = !habits.length;
 
   const allHabits = useMemo(
     () => activities.filter((activity) => activity.type === 'habit'),
     [activities]
   );
-
-  const isListEmpty = !habits.length;
 
   const navigateToHabitDetailsScreen = (activeTab: HabitActiveTab, habitId: string) => {
     if (!habitId.length) return;
@@ -73,6 +78,30 @@ const HabitList = () => {
   useEffect(() => {
     setHabits(allHabits);
   }, [allHabits]);
+
+  useEffect(() => {
+    if (isSearchBarOpen) {
+      setFilteredActivities(allHabits);
+    }
+  }, [allHabits, isSearchBarOpen]);
+
+  useEffect(() => {
+    if (!searchTerm.length) {
+      setHabits(allHabits);
+    } else {
+      setHabits(
+        allHabits.filter((habit) =>
+          habit.title.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+
+    if (selectedCategories.length) {
+      setHabits(
+        allHabits.filter((habit) => selectedCategories.includes(habit.category))
+      );
+    }
+  }, [allHabits, searchTerm, selectedCategories]);
 
   return (
     <Container isContentCentered={isListEmpty}>

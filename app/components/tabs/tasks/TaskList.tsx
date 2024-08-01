@@ -1,19 +1,19 @@
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Activity, Task, TaskActiveTab, TaskFilter } from '@/app/entities';
-import { useActivityStore } from '@/app/store';
+import { Activity, TaskActiveTab, TaskFilter } from '@/app/entities';
+import { useActivityStore, useSearchStore } from '@/app/store';
+import { toDateGroupedTasks, toFormattedSections } from '@/app/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
 import { Swipeable } from 'react-native-gesture-handler';
+import { styled, View } from 'tamagui';
 import ActivityOptionsModal from '../habits/ActivityOptionsModal';
+import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
 import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
 import TaskListItem from './TaskListItem';
 import TaskSectionHeader from './TaskSectionHeader';
-import { styled, View } from 'tamagui';
-import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
-import { toDateGroupedTasks, toFormattedSections } from '@/app/utils';
 
 interface Props {
   taskFilter: TaskFilter;
@@ -22,12 +22,13 @@ interface Props {
 const TaskList = ({ taskFilter }: Props) => {
   const activities = useActivityStore((s) => s.activities);
   const setActivities = useActivityStore((s) => s.setActivities);
+  const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
 
   const [tasks, setTasks] = useState<(string | Activity)[]>([]);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const listRef = useRef<FlashList<Task | (string | Task)> | null>(null);
+  const listRef = useRef<FlashList<string | Activity> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
   const singleTasks = useMemo(() => {
@@ -94,6 +95,7 @@ const TaskList = ({ taskFilter }: Props) => {
       tasks = recurringTasks;
     }
     setTasks(tasks);
+    setFilteredActivities(tasks);
   }, [taskFilter, singleTasks, recurringTasks]);
 
   return (
