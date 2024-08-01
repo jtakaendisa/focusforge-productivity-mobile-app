@@ -17,12 +17,16 @@ import TaskSectionHeader from './TaskSectionHeader';
 
 interface Props {
   taskFilter: TaskFilter;
+  isSearchBarOpen: boolean;
 }
 
-const TaskList = ({ taskFilter }: Props) => {
+const TaskList = ({ taskFilter, isSearchBarOpen }: Props) => {
   const activities = useActivityStore((s) => s.activities);
   const setActivities = useActivityStore((s) => s.setActivities);
   const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
+
+  const searchTerm = useSearchStore((s) => s.searchTerm);
+  const selectedCategories = useSearchStore((s) => s.selectedCategories);
 
   const [tasks, setTasks] = useState<(string | Activity)[]>([]);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
@@ -87,16 +91,54 @@ const TaskList = ({ taskFilter }: Props) => {
   const toggleDeleteModal = () => setIsDeleteModalOpen((prev) => !prev);
 
   useEffect(() => {
-    let tasks: (string | Activity)[] = [];
-
-    if (taskFilter === 'single task') {
-      tasks = singleTasks;
-    } else {
-      tasks = recurringTasks;
-    }
+    const tasks = taskFilter === 'single task' ? singleTasks : recurringTasks;
     setTasks(tasks);
-    setFilteredActivities(tasks);
   }, [taskFilter, singleTasks, recurringTasks]);
+
+  useEffect(() => {
+    if (!isSearchBarOpen) return;
+
+    const tasks = taskFilter === 'single task' ? singleTasks : recurringTasks;
+    setFilteredActivities(tasks);
+  }, [isSearchBarOpen, taskFilter, singleTasks, recurringTasks]);
+
+  useEffect(() => {
+    if (!isSearchBarOpen) return;
+
+    const tasks = taskFilter === 'single task' ? singleTasks : recurringTasks;
+
+    if (!searchTerm.length) {
+      setTasks(tasks);
+    } else {
+      const filteredTasks = tasks.filter(
+        (task) =>
+          typeof task !== 'string' &&
+          task.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      if (taskFilter === 'single task') {
+        const dateGroupedTasks = toDateGroupedTasks(filteredTasks as Activity[]);
+        const formattedTasks = toFormattedSections(dateGroupedTasks);
+        setTasks(formattedTasks);
+      } else {
+        setTasks(filteredTasks);
+      }
+    }
+
+    if (selectedCategories.length) {
+      const filteredTasks = tasks.filter(
+        (task) => typeof task !== 'string' && selectedCategories.includes(task.category)
+      );
+
+      if (taskFilter === 'single task') {
+        const dateGroupedTasks = toDateGroupedTasks(filteredTasks as Activity[]);
+        const formattedTasks = toFormattedSections(dateGroupedTasks);
+        setTasks(formattedTasks);
+      } else {
+        setTasks(filteredTasks);
+      }
+    }
+  }, [isSearchBarOpen, taskFilter, searchTerm, selectedCategories]);
 
   return (
     <Container isContentCentered={isListEmpty}>

@@ -28,7 +28,7 @@ const TasksScreen = () => {
     <Container>
       <SearchBarSpacer isExpanded={pathname === 'tasks' && isSearchBarOpen} />
       <TaskFilterBar taskFilter={taskFilter} onSelect={handleTaskFilterSelect} />
-      <TaskList taskFilter={taskFilter} />
+      <TaskList taskFilter={taskFilter} isSearchBarOpen={isSearchBarOpen} />
       <NewActivityButton onPress={toggleNewActivityModal} />
       <NewActivityModal newActivityModalRef={newActivityModalRef} />
     </Container>

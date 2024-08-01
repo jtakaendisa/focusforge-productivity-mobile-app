@@ -13,9 +13,12 @@ import ModalContainer from '../modals/ModalContainer';
 import ActivityOptionsModal from './ActivityOptionsModal';
 import HabitListItem from './HabitListItem';
 
-const HabitList = () => {
+interface Props {
+  isSearchBarOpen: boolean;
+}
+
+const HabitList = ({ isSearchBarOpen }: Props) => {
   const activities = useActivityStore((s) => s.activities);
-  const isSearchBarOpen = useSearchStore((s) => s.isSearchBarOpen);
   const setActivities = useActivityStore((s) => s.setActivities);
   const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
 
