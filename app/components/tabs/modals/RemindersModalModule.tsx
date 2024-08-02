@@ -70,8 +70,12 @@ const RemindersModalModule = ({ control, reminders, closeModal }: Props) => {
                 <AnimatedFlashList
                   ref={listRef}
                   data={reminders}
-                  renderItem={({ item }) => (
-                    <ReminderListItem listItem={item} onDelete={handleReminderRemove} />
+                  renderItem={({ item, index }) => (
+                    <ReminderListItem
+                      listItem={item}
+                      isLastIndex={index === reminders.length - 1}
+                      onDelete={handleReminderRemove}
+                    />
                   )}
                   keyExtractor={(item) => item.id}
                   showsVerticalScrollIndicator={false}

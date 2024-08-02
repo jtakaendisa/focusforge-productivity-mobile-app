@@ -89,6 +89,8 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
   }, [allHabits, isSearchBarOpen]);
 
   useEffect(() => {
+    if (!isSearchBarOpen) return;
+
     if (!searchTerm.length) {
       setHabits(allHabits);
     } else {
@@ -98,13 +100,19 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
         )
       );
     }
+  }, [isSearchBarOpen, allHabits, searchTerm]);
 
-    if (selectedCategories.length) {
+  useEffect(() => {
+    if (!isSearchBarOpen) return;
+
+    if (!selectedCategories.length) {
+      setHabits(allHabits);
+    } else {
       setHabits(
         allHabits.filter((habit) => selectedCategories.includes(habit.category))
       );
     }
-  }, [allHabits, searchTerm, selectedCategories]);
+  }, [isSearchBarOpen, allHabits, selectedCategories]);
 
   return (
     <Container isContentCentered={isListEmpty}>

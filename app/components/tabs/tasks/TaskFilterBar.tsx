@@ -10,23 +10,21 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { TaskFilter } from '@/app/entities';
 import RippleButton from '../RippleButton';
+import { useSearchStore } from '@/app/store';
 
-interface Props {
-  taskFilter: TaskFilter;
-  onSelect: (taskFilter: TaskFilter) => void;
-}
+const TaskFilterBar = () => {
+  const taskFilter = useSearchStore((s) => s.taskFilter);
+  const setTaskFilter = useSearchStore((s) => s.setTaskFilter);
 
-const TaskFilterBar = ({ taskFilter, onSelect }: Props) => {
   const isSingleTaskSelected = useSharedValue(0);
   const isRecurringTaskSelected = useSharedValue(0);
 
   const customGray1 = getTokenValue('$customGray1');
 
-  const handleSingleTaskFilterSelect = () => onSelect('single task');
+  const handleSingleTaskFilterSelect = () => setTaskFilter('single task');
 
-  const handleRecurringTaskFilterSelect = () => onSelect('recurring task');
+  const handleRecurringTaskFilterSelect = () => setTaskFilter('recurring task');
 
   const textColorAnimation = (filter: SharedValue<number>) => {
     return useAnimatedStyle(() => ({

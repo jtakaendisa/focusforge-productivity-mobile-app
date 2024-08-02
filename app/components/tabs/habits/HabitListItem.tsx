@@ -103,17 +103,17 @@ const HabitListItem = ({ habit, onShowOptions, onNavigate, onSwipe }: Props) => 
               </Stat>
             </StatsContainer>
             <ActionsContainer>
-              <RippleButton onPress={handleNavigateToCalendarTab}>
+              <RippleButton fade onPress={handleNavigateToCalendarTab}>
                 <ActionButton>
                   <CalendarSvg size={SVG_SIZE} fill={customGray1} />
                 </ActionButton>
               </RippleButton>
-              <RippleButton onPress={handleNavigateToStatisticsTab}>
+              <RippleButton fade onPress={handleNavigateToStatisticsTab}>
                 <ActionButton>
                   <BarChartSvg size={SVG_SIZE} fill={customGray1} />
                 </ActionButton>
               </RippleButton>
-              <RippleButton onPress={handleShowOptions}>
+              <RippleButton fade onPress={handleShowOptions}>
                 <ActionButton>
                   <EllipsisVerticalSvg size={SVG_SIZE} fill={customGray1} />
                 </ActionButton>

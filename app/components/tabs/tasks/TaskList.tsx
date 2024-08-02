@@ -16,12 +16,12 @@ import TaskListItem from './TaskListItem';
 import TaskSectionHeader from './TaskSectionHeader';
 
 interface Props {
-  taskFilter: TaskFilter;
   isSearchBarOpen: boolean;
 }
 
-const TaskList = ({ taskFilter, isSearchBarOpen }: Props) => {
+const TaskList = ({ isSearchBarOpen }: Props) => {
   const activities = useActivityStore((s) => s.activities);
+  const taskFilter = useSearchStore((s) => s.taskFilter);
   const setActivities = useActivityStore((s) => s.setActivities);
   const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
 
@@ -96,10 +96,10 @@ const TaskList = ({ taskFilter, isSearchBarOpen }: Props) => {
   }, [taskFilter, singleTasks, recurringTasks]);
 
   useEffect(() => {
-    if (!isSearchBarOpen) return;
-
-    const tasks = taskFilter === 'single task' ? singleTasks : recurringTasks;
-    setFilteredActivities(tasks);
+    if (isSearchBarOpen) {
+      const tasks = taskFilter === 'single task' ? singleTasks : recurringTasks;
+      setFilteredActivities(tasks);
+    }
   }, [isSearchBarOpen, taskFilter, singleTasks, recurringTasks]);
 
   useEffect(() => {
@@ -124,8 +124,16 @@ const TaskList = ({ taskFilter, isSearchBarOpen }: Props) => {
         setTasks(filteredTasks);
       }
     }
+  }, [isSearchBarOpen, taskFilter, searchTerm]);
 
-    if (selectedCategories.length) {
+  useEffect(() => {
+    if (!isSearchBarOpen) return;
+
+    const tasks = taskFilter === 'single task' ? singleTasks : recurringTasks;
+
+    if (!selectedCategories.length) {
+      setTasks(tasks);
+    } else {
       const filteredTasks = tasks.filter(
         (task) => typeof task !== 'string' && selectedCategories.includes(task.category)
       );
@@ -138,7 +146,7 @@ const TaskList = ({ taskFilter, isSearchBarOpen }: Props) => {
         setTasks(filteredTasks);
       }
     }
-  }, [isSearchBarOpen, taskFilter, searchTerm, selectedCategories]);
+  }, [isSearchBarOpen, taskFilter, selectedCategories]);
 
   return (
     <Container isContentCentered={isListEmpty}>

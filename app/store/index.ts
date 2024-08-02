@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 
 import { CURRENT_DATE } from '../constants';
-import { Activity, ActivityFilter, AuthUser, Category, Theme } from '../entities';
+import {
+  Activity,
+  ActivityFilter,
+  AuthUser,
+  Category,
+  TaskFilter,
+  Theme,
+} from '../entities';
 
 interface AppStore {
   theme: Theme;
@@ -26,11 +33,13 @@ interface SearchStore {
   isSearchBarOpen: boolean;
   searchTerm: string;
   activityFilter: ActivityFilter;
+  taskFilter: TaskFilter;
   selectedCategories: Category[];
   filteredActivities: (string | Activity)[];
   setIsSearchBarOpen: (isSearchBarOpen: boolean) => void;
   setSearchTerm: (searchTerm: string) => void;
   setActivityFilter: (activityFilter: ActivityFilter) => void;
+  setTaskFilter: (taskFilter: TaskFilter) => void;
   setSelectedCategories: (selectedCategories: Category[]) => void;
   setFilteredActivities: (filteredActivities: (string | Activity)[]) => void;
 }
@@ -241,12 +250,14 @@ const useSearchStore = create<SearchStore>((set) => ({
   isSearchBarOpen: false,
   searchTerm: '',
   activityFilter: 'all',
+  taskFilter: 'single task',
   selectedCategories: [],
   filteredActivities: [],
   setIsSearchBarOpen: (isSearchBarOpen) =>
     set((state) => ({ ...state, isSearchBarOpen })),
   setSearchTerm: (searchTerm) => set((state) => ({ ...state, searchTerm })),
   setActivityFilter: (activityFilter) => set((state) => ({ ...state, activityFilter })),
+  setTaskFilter: (taskFilter) => set((state) => ({ ...state, taskFilter })),
   setSelectedCategories: (selectedCategories) =>
     set((state) => ({ ...state, selectedCategories })),
   setFilteredActivities: (filteredActivities) =>

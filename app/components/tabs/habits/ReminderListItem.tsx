@@ -9,10 +9,11 @@ import RippleButton from '../RippleButton';
 
 interface Props {
   listItem: Reminder;
+  isLastIndex: boolean;
   onDelete: (id: string) => void;
 }
 
-const ReminderListItem = ({ listItem, onDelete }: Props) => {
+const ReminderListItem = ({ listItem, isLastIndex, onDelete }: Props) => {
   const { id, time, type } = listItem;
 
   const customGray1 = getTokenValue('$customGray1');
@@ -21,7 +22,7 @@ const ReminderListItem = ({ listItem, onDelete }: Props) => {
   const handleDeleteReminder = () => onDelete(id);
 
   return (
-    <AnimatedContainer entering={FadeIn} exiting={FadeOut}>
+    <AnimatedContainer isBordered={!isLastIndex} entering={FadeIn} exiting={FadeOut}>
       <IconContainer>
         {type === 'notification' ? (
           <BellSvg size={18} fill={customGray1} />
@@ -47,6 +48,16 @@ const Container = styled(View, {
   height: 46,
   borderBottomWidth: 1,
   borderColor: '$customGray2',
+  variants: {
+    isBordered: {
+      true: {
+        borderColor: '$customGray2',
+      },
+      false: {
+        borderColor: 'transparent',
+      },
+    },
+  } as const,
 });
 
 const Title = styled(Text, {
