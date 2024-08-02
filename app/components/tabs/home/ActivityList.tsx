@@ -202,79 +202,86 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
     memoizedRecurringActivitiesDueToday,
   ]);
 
-  // useEffect(() => {
-  //   if (!isSearchBarOpen) return;
+  useEffect(() => {
+    if (!isSearchBarOpen) return;
 
-  //   const activitiesDueToday = [
-  //     ...memoizedSingleTasksDueToday,
-  //     ...memoizedRecurringActivitiesDueToday,
-  //   ];
+    const activitiesDueToday = [
+      ...memoizedSingleTasksDueToday,
+      ...memoizedRecurringActivitiesDueToday,
+    ];
 
-  //   if (!searchTerm.length) {
-  //     setActivitiesDueToday(activitiesDueToday);
-  //   } else {
-  //     setActivitiesDueToday(
-  //       activitiesDueToday.filter((activity) =>
-  //         activity.title.toLowerCase().includes(searchTerm.toLowerCase())
-  //       )
-  //     );
-  //   }
-  // }, [
-  //   isSearchBarOpen,
-  //   memoizedSingleTasksDueToday,
-  //   memoizedRecurringActivitiesDueToday,
-  //   searchTerm,
-  // ]);
+    if (!searchTerm.length) {
+      setActivitiesDueToday(activitiesDueToday);
+    } else {
+      setActivitiesDueToday(
+        activitiesDueToday.filter((activity) =>
+          activity.title.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  }, [
+    isSearchBarOpen,
+    memoizedSingleTasksDueToday,
+    memoizedRecurringActivitiesDueToday,
+    searchTerm,
+  ]);
 
-  // useEffect(() => {
-  //   if (!isSearchBarOpen) return;
+  useEffect(() => {
+    if (!isSearchBarOpen) return;
 
-  //   if (selectedCategories.length) {
-  //     setActivitiesDueToday(
-  //       activitiesDueToday.filter((activity) =>
-  //         selectedCategories.includes(activity.category)
-  //       )
-  //     );
-  //   }
-  // }, [
-  //   isSearchBarOpen,
-  //   memoizedSingleTasksDueToday,
-  //   memoizedRecurringActivitiesDueToday,
-  //   selectedCategories,
-  // ]);
+    const activitiesDueToday = [
+      ...memoizedSingleTasksDueToday,
+      ...memoizedRecurringActivitiesDueToday,
+    ];
 
-  // useEffect(() => {
-  //   if (!isSearchBarOpen) return;
+    if (!selectedCategories.length) {
+      setActivitiesDueToday(activitiesDueToday);
+    } else {
+      setActivitiesDueToday(
+        activitiesDueToday.filter((activity) =>
+          selectedCategories.includes(activity.category)
+        )
+      );
+    }
+  }, [
+    isSearchBarOpen,
+    memoizedSingleTasksDueToday,
+    memoizedRecurringActivitiesDueToday,
+    selectedCategories,
+  ]);
 
-  //   const activitiesDueToday = [
-  //     ...memoizedSingleTasksDueToday,
-  //     ...memoizedRecurringActivitiesDueToday,
-  //   ];
+  useEffect(() => {
+    if (!isSearchBarOpen) return;
 
-  //   switch (activityFilter) {
-  //     case 'all':
-  //       setActivitiesDueToday(activitiesDueToday);
-  //       break;
-  //     case 'habits':
-  //       setActivitiesDueToday(
-  //         activitiesDueToday.filter((activity) => activity.type === 'habit')
-  //       );
-  //       break;
-  //     case 'tasks':
-  //       setActivitiesDueToday(
-  //         activitiesDueToday.filter(
-  //           (activity) =>
-  //             activity.type === 'single task' || activity.type === 'recurring task'
-  //         )
-  //       );
-  //       break;
-  //   }
-  // }, [
-  //   isSearchBarOpen,
-  //   memoizedSingleTasksDueToday,
-  //   memoizedRecurringActivitiesDueToday,
-  //   activityFilter,
-  // ]);
+    const activitiesDueToday = [
+      ...memoizedSingleTasksDueToday,
+      ...memoizedRecurringActivitiesDueToday,
+    ];
+
+    switch (activityFilter) {
+      case 'all':
+        setActivitiesDueToday(activitiesDueToday);
+        break;
+      case 'habits':
+        setActivitiesDueToday(
+          activitiesDueToday.filter((activity) => activity.type === 'habit')
+        );
+        break;
+      case 'tasks':
+        setActivitiesDueToday(
+          activitiesDueToday.filter(
+            (activity) =>
+              activity.type === 'single task' || activity.type === 'recurring task'
+          )
+        );
+        break;
+    }
+  }, [
+    isSearchBarOpen,
+    memoizedSingleTasksDueToday,
+    memoizedRecurringActivitiesDueToday,
+    activityFilter,
+  ]);
 
   return (
     <Container isContentCentered={isListEmpty}>
