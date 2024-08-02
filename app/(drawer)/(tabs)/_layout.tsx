@@ -2,7 +2,7 @@ import { Redirect, Tabs } from 'expo-router';
 import { getTokenValue } from 'tamagui';
 
 import CustomHeader from '@/app/components/tabs/CustomHeader';
-import TabBarButton from '../../components/tabs/TabBarButton';
+import CustomTabBarButton from '../../components/tabs/CustomTabBarButton';
 import { SCREEN_HEIGHT } from '../../constants';
 import { useAuthStore, useSearchStore } from '../../store';
 
@@ -22,12 +22,13 @@ const TabLayout = () => {
     <Tabs
       screenOptions={{
         header: ({ options: { title } }) => <CustomHeader title={title} />,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           height: SCREEN_HEIGHT / 12,
           backgroundColor: customGray3,
           borderTopWidth: 0,
         },
-        tabBarButton: TabBarButton,
+        tabBarButton: CustomTabBarButton,
       }}
       screenListeners={{
         tabPress: handleSearchBarClose,

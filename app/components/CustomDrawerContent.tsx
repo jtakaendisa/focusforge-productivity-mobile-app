@@ -15,41 +15,35 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
 
   const authUser = useAuthStore((s) => s.authUser);
 
-  const isCurrentScreenHome = pathname === 'home';
-  const isCurrentScreenHabits = pathname === 'habits';
-  const isCurrentScreenTasks = pathname === 'tasks';
-  const isCurrentScreenTimer = pathname === 'timer';
-  const isCurrentScreenSettings = pathname === 'settings';
-
   const routes = [
     {
       label: 'Home',
       icon: 'home',
-      isSelected: isCurrentScreenHome,
+      isSelected: pathname === 'home',
       onNavigate: () => router.push('/(drawer)/(tabs)'),
     },
     {
       label: 'Habits',
       icon: 'habits',
-      isSelected: isCurrentScreenHabits,
+      isSelected: pathname === 'habits',
       onNavigate: () => router.push('/(drawer)/(tabs)/habits'),
     },
     {
       label: 'Tasks',
       icon: 'tasks',
-      isSelected: isCurrentScreenTasks,
+      isSelected: pathname === 'tasks',
       onNavigate: () => router.push('/(drawer)/(tabs)/tasks'),
     },
     {
       label: 'Timer',
       icon: 'timer',
-      isSelected: isCurrentScreenTimer,
+      isSelected: pathname === 'timer',
       onNavigate: () => router.push('/(drawer)/(tabs)/timer'),
     },
     {
       label: 'Settings',
       icon: 'settings',
-      isSelected: isCurrentScreenSettings,
+      isSelected: pathname === 'settings',
       onNavigate: () => router.push('/(drawer)/(tabs)/settings'),
     },
   ] as const;

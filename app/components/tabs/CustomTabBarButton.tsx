@@ -22,7 +22,7 @@ const animationConfig = {
   easing: Easing.bezier(0.25, 0.1, 0.25, 1),
 };
 
-const TabBarButton = ({ accessibilityState, to, onPress }: Props) => {
+const CustomTabBarButton = ({ accessibilityState, to, onPress }: Props) => {
   const currentPath = (to?.substring(1) || 'home') as TabRoute;
 
   const isSelected = accessibilityState?.selected;
@@ -104,4 +104,4 @@ const Label = styled(Text, {
 const AnimatedIconBackground = Animated.createAnimatedComponent(IconBackground);
 const AnimatedLabel = Animated.createAnimatedComponent(Label);
 
-export default TabBarButton;
+export default CustomTabBarButton;

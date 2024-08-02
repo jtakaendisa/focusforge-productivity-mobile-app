@@ -41,6 +41,8 @@ export interface IconProps {
 
 export type TabRoute = 'home' | 'habits' | 'tasks' | 'timer' | 'settings';
 
+export type SearchRoute = 'home' | 'habits' | 'tasks';
+
 export type HabitActiveTab = 'calendar' | 'statistics' | 'edit';
 
 export type TaskActiveTab = 'calendar' | 'edit';

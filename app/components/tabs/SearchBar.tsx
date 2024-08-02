@@ -30,7 +30,6 @@ const animationConfig = {
 
 const SearchBar = ({ height }: Props) => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
-  const isCurrentScreenHome = pathname === 'home';
 
   const statusBarHeight = StatusBar.currentHeight;
 
@@ -117,7 +116,7 @@ const SearchBar = ({ height }: Props) => {
   return (
     <AnimatedContainer height={height} entering={FadeIn} exiting={FadeOut}>
       <FilterRow>
-        {isCurrentScreenHome && (
+        {pathname === 'home' && (
           <ActivityFilterContainer width={SCREEN_WIDTH / 3}>
             <FilterText textTransform="capitalize">{activityFilter}</FilterText>
             <RippleButton fade onPress={toggleActivityFilterModal}>
