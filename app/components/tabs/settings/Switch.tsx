@@ -29,7 +29,7 @@ const Switch = ({ value, onToggle }: Props) => {
   }));
 
   const thumbAnimation = useAnimatedStyle(() => ({
-    transform: [{ translateX: interpolate(sharedValue.value, [0, 1], [2, 20]) }],
+    transform: [{ translateX: interpolate(sharedValue.value, [0, 1], [2, 23]) }],
     backgroundColor: interpolateColor(
       sharedValue.value,
       [0, 1],
@@ -50,15 +50,14 @@ const Switch = ({ value, onToggle }: Props) => {
 
 const Container = styled(View, {
   justifyContent: 'center',
-  width: 40,
-  height: 20,
-  borderRadius: 10,
-  marginLeft: 10,
+  width: 46,
+  height: 24,
+  borderRadius: 12,
 });
 
 const Thumb = styled(View, {
-  width: 18,
-  height: 18,
+  width: 20,
+  height: 20,
   borderRadius: 10,
 });
 
