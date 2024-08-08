@@ -5,7 +5,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { styled, View, Text, getTokenValue } from 'tamagui';
+import { getTokenValue, styled, Text, View } from 'tamagui';
 
 import { DATE_CARD_HEIGHT } from '@/app/constants';
 import { toFormattedDateString } from '@/app/utils';
@@ -29,6 +29,8 @@ const DateCard = ({ day, selectedDate, onPress }: Props) => {
   const customGray3 = getTokenValue('$customGray3');
   const customRed1 = getTokenValue('$customRed1');
   const customRed3 = getTokenValue('$customRed3');
+
+  const handlePress = () => onPress(date);
 
   const textColorAnimation = useAnimatedStyle(() => ({
     color: interpolateColor(isSelected.value, [0, 1], [customGray1, 'white']),
@@ -58,7 +60,7 @@ const DateCard = ({ day, selectedDate, onPress }: Props) => {
   }, [date, selectedDate]);
 
   return (
-    <Container onPress={() => onPress(date)}>
+    <Container onPress={handlePress}>
       <AnimatedWeekdayContainer style={weekdayBackgroundAnimation}>
         <AnimatedWeekdayText style={textColorAnimation}>{weekday}</AnimatedWeekdayText>
       </AnimatedWeekdayContainer>

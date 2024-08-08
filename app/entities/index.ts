@@ -19,6 +19,14 @@ export type AnimatedInterpolation = Animated.AnimatedInterpolation<string | numb
 
 export type Theme = 'dark' | 'light';
 
+export type IconVariant = 'outline' | 'solid';
+
+export interface IconProps {
+  size?: number;
+  fill?: string;
+  variant?: IconVariant;
+}
+
 export type TaskFilter = 'single task' | 'recurring task';
 
 export type Category = z.infer<typeof categorySchema>;
@@ -31,13 +39,7 @@ export type Frequency = z.infer<typeof frequencySchema>;
 
 export type Reminder = z.infer<typeof reminderSchema>;
 
-export type IconVariant = 'outline' | 'solid';
-
-export interface IconProps {
-  size?: number;
-  fill?: string;
-  variant?: IconVariant;
-}
+export type NewActivityData = z.infer<typeof activitySchema>;
 
 export type TabRoute = 'home' | 'habits' | 'tasks' | 'timer' | 'settings';
 
@@ -47,13 +49,11 @@ export type HabitActiveTab = 'calendar' | 'statistics' | 'edit';
 
 export type TaskActiveTab = 'calendar' | 'edit';
 
-export type NewActivityData = z.infer<typeof activitySchema>;
-
 export type ActivityFilter = 'all' | 'habits' | 'tasks';
 
 export type ActivityType = 'habit' | 'single task' | 'recurring task';
 
-export type Activity = {
+export interface Activity {
   id: string;
   type: ActivityType;
   title: string;
@@ -61,10 +61,17 @@ export type Activity = {
   priority: Priority;
   frequency: Frequency;
   isCompleted: boolean;
+  currentStreak?: number;
+  bestStreak?: number;
   note?: string;
   startDate?: Date;
   endDate?: Date;
   checklist?: ChecklistItem[];
   reminders?: Reminder[];
   isCarriedOver?: boolean;
-};
+}
+
+export interface CompletionDate {
+  date: string;
+  isCompleted: boolean;
+}

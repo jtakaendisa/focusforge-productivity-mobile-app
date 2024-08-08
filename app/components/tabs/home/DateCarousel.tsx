@@ -1,5 +1,6 @@
+import { UTCDate } from '@date-fns/utc';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
-import { addDays, addWeeks, format, startOfWeek } from 'date-fns';
+import { addWeeks, eachDayOfInterval, endOfWeek, format, startOfWeek } from 'date-fns';
 import { useMemo, useRef } from 'react';
 import { styled, View } from 'tamagui';
 
@@ -13,18 +14,16 @@ const DateCarousel = () => {
   const setSelectedDate = useActivityStore((s) => s.setSelectedDate);
 
   const weeks = useMemo(() => {
-    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const startDate = startOfWeek(addWeeks(new UTCDate(), -1), { weekStartsOn: 1 });
+    const endDate = endOfWeek(addWeeks(new UTCDate(), 3), { weekStartsOn: 1 });
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-    return [-1, 0, 1, 2, 3].flatMap((adj) => {
-      return Array.from({ length: 7 }).map((_, index) => {
-        const date = addDays(addWeeks(start, adj), index);
+    const dayObjects = days.map((date) => ({
+      weekday: format(date, 'EEE'),
+      date,
+    }));
 
-        return {
-          weekday: format(date, 'eee'),
-          date: date,
-        };
-      });
-    });
+    return dayObjects;
   }, []);
 
   const listRef = useRef<FlashList<(typeof weeks)[number]> | null>(null);
@@ -40,17 +39,15 @@ const DateCarousel = () => {
     });
   };
 
+  const handleDateSelect = (date: Date) => setSelectedDate(date);
+
   return (
     <Container>
       <AnimatedFlashList
         ref={listRef}
         data={weeks}
         renderItem={({ item }) => (
-          <DateCard
-            day={item}
-            selectedDate={selectedDate}
-            onPress={(date) => setSelectedDate(date)}
-          />
+          <DateCard day={item} selectedDate={selectedDate} onPress={handleDateSelect} />
         )}
         keyExtractor={(item) => item.date.toString()}
         estimatedItemSize={50}

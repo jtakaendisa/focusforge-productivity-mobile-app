@@ -6,7 +6,15 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { CURRENT_DATE } from '@/app/constants';
 import { Activity, NewActivityData } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
-import { toCleanedObject, toFormattedDateString, toTruncatedText } from '@/app/utils';
+import {
+  generateCompletionDates,
+  getCompletionDates,
+  mergeCompletionDates,
+  setCompletionDates,
+  toCleanedObject,
+  toFormattedDateString,
+  toTruncatedText,
+} from '@/app/utils';
 import { activitySchema } from '@/app/validationSchemas';
 import {
   DateTimePickerAndroid,
@@ -20,6 +28,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 import BellSvg from '../../icons/BellSvg';
+import BinSvg from '../../icons/BinSvg';
 import CalendarEndSvg from '../../icons/CalendarEndSvg';
 import CalendarStartSvg from '../../icons/CalendarStartSvg';
 import CalendarSvg from '../../icons/CalendarSvg';
@@ -32,6 +41,7 @@ import PendingSvg from '../../icons/PendingSvg';
 import SquareGridSvg from '../../icons/SquareGridSvg';
 import CategoryIcon from '../CategoryIcon';
 import CircularCheckbox from '../CircularCheckbox';
+import RippleButton from '../RippleButton';
 import FrequencyBadge from '../habits/FrequencyBadge';
 import FrequencyListModule from '../habits/FrequencyListModule';
 import CategoryModalModule from '../modals/CategoryModalModule';
@@ -40,8 +50,6 @@ import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import RemindersModalModule from '../modals/RemindersModalModule';
 import TextModalModule from '../modals/TextModalModule';
-import BinSvg from '../../icons/BinSvg';
-import RippleButton from '../RippleButton';
 
 interface Props {
   activities: Activity[];
@@ -139,11 +147,33 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
 
   const handleEndDateClear = () => setEndDateRef.current?.();
 
-  const onSubmit: SubmitHandler<NewActivityData> = (data) => {
+  const onSubmit: SubmitHandler<NewActivityData> = async (data) => {
     const updatedTask: Activity = {
       ...selectedTask,
       ...data,
     };
+
+    if (isRecurring) {
+      // Retrieve existing completion dates from local storage
+      const existingCompletionDates = await getCompletionDates(selectedTask.id);
+
+      // Generate new completion dates based on the updated data
+      const newCompletionDates = generateCompletionDates(
+        data.startDate!,
+        data.frequency,
+        data.endDate
+      );
+
+      // Merge existing completion dates with new ones, ensuring no duplicates
+      const mergedCompletionDates = mergeCompletionDates(
+        existingCompletionDates,
+        newCompletionDates
+      );
+
+      // Update the local storage with the merged completion dates
+      await setCompletionDates(selectedTask.id, mergedCompletionDates);
+    }
+
     const updatedActivities = activities.map((activity) =>
       activity.id === selectedTask.id ? toCleanedObject(updatedTask) : activity
     );

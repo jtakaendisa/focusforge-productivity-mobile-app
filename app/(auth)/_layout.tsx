@@ -30,7 +30,7 @@ export default function AuthLayout() {
     getData();
   }, []);
 
-  if (authUser) return <Redirect href="/(tabs)" />;
+  if (authUser) return <Redirect href="/(drawer)/(tabs)" />;
 
   if (!fetchedStatus) return null;
 

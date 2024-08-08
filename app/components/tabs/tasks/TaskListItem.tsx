@@ -22,8 +22,8 @@ import RippleButton from '../RippleButton';
 interface Props {
   task: Activity;
   isCheckable?: boolean;
-  isTaskCompletionDisabled?: boolean;
-  onTaskComplete?: (task: Activity) => void;
+  isPressDisabled?: boolean;
+  onPress?: (task: Activity) => void;
   onSwipe: (
     direction: 'left' | 'right',
     task: Activity,
@@ -36,8 +36,8 @@ interface Props {
 const TaskListItem = ({
   task,
   isCheckable,
-  isTaskCompletionDisabled,
-  onTaskComplete,
+  isPressDisabled,
+  onPress,
   onSwipe,
   onShowOptions,
 }: Props) => {
@@ -60,10 +60,10 @@ const TaskListItem = ({
   }));
 
   const handlePress = () => {
-    if (isTaskCompletionDisabled) return;
+    if (isPressDisabled) return;
 
     if (isCheckable) {
-      onTaskComplete?.(task);
+      onPress?.(task);
     } else {
       if (type === 'recurring task') {
         onShowOptions?.(task);
@@ -106,10 +106,7 @@ const TaskListItem = ({
           <TaskContainer>
             {isCheckable && (
               <CheckboxContainer>
-                <CircularCheckbox
-                  isChecked={isChecked}
-                  isDisabled={isTaskCompletionDisabled}
-                />
+                <CircularCheckbox isChecked={isChecked} isDisabled={isPressDisabled} />
               </CheckboxContainer>
             )}
             <TextContainer>

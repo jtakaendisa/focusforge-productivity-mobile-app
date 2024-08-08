@@ -42,7 +42,13 @@ import TextModalModule from './components/tabs/modals/TextModalModule';
 import { CURRENT_DATE } from './constants';
 import { Activity, NewActivityData } from './entities';
 import { useActivityStore } from './store';
-import { toCleanedObject, toFormattedDateString, toTruncatedText } from './utils';
+import {
+  generateCompletionDates,
+  setCompletionDates,
+  toCleanedObject,
+  toFormattedDateString,
+  toTruncatedText,
+} from './utils';
 import { activitySchema } from './validationSchemas';
 import RippleButton from './components/tabs/RippleButton';
 
@@ -152,13 +158,26 @@ const NewTaskScreen = () => {
 
   const handleEndDateClear = () => setEndDateRef.current?.();
 
-  const onSubmit: SubmitHandler<NewActivityData> = (data) => {
+  const onSubmit: SubmitHandler<NewActivityData> = async (data) => {
     const newTask: Activity = {
       id: uuid.v4() as string,
       type: isRecurring ? 'recurring task' : 'single task',
       isCompleted: false,
       ...data,
     };
+
+    if (isRecurring) {
+      // Generate and save completion dates to localStorage
+      const initialCompletionDates = generateCompletionDates(
+        data.startDate!,
+        data.frequency,
+        data.endDate
+      );
+
+      // Save the initial completion dates to local storage
+      await setCompletionDates(newTask.id, initialCompletionDates);
+    }
+
     setActivities([...activities, toCleanedObject(newTask)]);
   };
 

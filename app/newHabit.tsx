@@ -13,7 +13,7 @@ import NewHabitListItem from './components/tabs/habits/NewHabitListItem';
 import { CURRENT_DATE, SCREEN_WIDTH } from './constants';
 import { Activity, NewActivityData } from './entities';
 import { useActivityStore } from './store';
-import { toCleanedObject } from './utils';
+import { generateCompletionDates, setCompletionDates, toCleanedObject } from './utils';
 import { activitySchema } from './validationSchemas';
 
 type SearchParams = {
@@ -86,13 +86,26 @@ const NewHabitScreen = () => {
     }
   };
 
-  const onSubmit: SubmitHandler<NewActivityData> = (data) => {
+  const onSubmit: SubmitHandler<NewActivityData> = async (data) => {
     const newHabit: Activity = {
       id: uuid.v4() as string,
       type: 'habit',
       isCompleted: false,
+      currentStreak: 0,
+      bestStreak: 0,
       ...data,
     };
+
+    // Generate and save completion dates to localStorage
+    const initialCompletionDates = generateCompletionDates(
+      data.startDate!,
+      data.frequency,
+      data.endDate
+    );
+
+    // Save the initial completion dates to local storage
+    await setCompletionDates(newHabit.id, initialCompletionDates);
+
     setActivities([...activities, toCleanedObject(newHabit)]);
   };
 

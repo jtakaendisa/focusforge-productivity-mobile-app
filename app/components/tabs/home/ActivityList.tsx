@@ -4,7 +4,7 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { CURRENT_DATE } from '@/app/constants';
 import { Activity, Priority } from '@/app/entities';
 import { useActivityStore, useSearchStore } from '@/app/store';
-import { toFormattedDateString } from '@/app/utils';
+import { setDateToMidnight, toFormattedDateString } from '@/app/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Swipeable } from 'react-native-gesture-handler';
 import { styled, View } from 'tamagui';
@@ -14,6 +14,10 @@ import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import TaskListItem from '../tasks/TaskListItem';
 import ActivityListPlaceholder from './ActivityListPlaceholder';
+
+interface Props {
+  isSearchBarOpen: boolean;
+}
 
 const carryOverTasks = (activities: Activity[]) =>
   activities.map((activity) =>
@@ -30,12 +34,12 @@ const filterRecurringActivitiesByDate = (
   date: Date
 ) => {
   const filtered = recurringActivities.filter((activity) => {
-    const startDate = new Date(activity.startDate!);
-    const endDate = activity.endDate ? new Date(activity.endDate) : null;
+    const startDate = activity.startDate!;
+    const endDate = activity?.endDate || null;
 
     // Check if the activity is within the date range
-    if (endDate && date > endDate) return false;
-    if (date < startDate) return false;
+    if (endDate && date > setDateToMidnight(endDate)) return false;
+    if (date < setDateToMidnight(startDate)) return false;
 
     // Check activity frequency
     switch (activity.frequency.type) {
@@ -57,10 +61,6 @@ const filterRecurringActivitiesByDate = (
 
   return filtered;
 };
-
-interface Props {
-  isSearchBarOpen: boolean;
-}
 
 const ActivityList = ({ isSearchBarOpen }: Props) => {
   const selectedDate = useActivityStore((s) => s.selectedDate);
@@ -102,10 +102,11 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
   }, [carriedOverPendingTasks, activities, selectedDate]);
 
   const isListEmpty = !activitiesDueToday.length;
-  const isTaskCompletionDisabled = selectedDate > CURRENT_DATE;
+  const isPressDisabled = selectedDate > CURRENT_DATE;
 
-  const handleTaskComplete = (selectedTask: Activity) => {
+  const completeSingleTask = (selectedTask: Activity) => {
     const hasChecklist = !!selectedTask.checklist?.length;
+
     if (hasChecklist) {
       const allChecklistItemsCompleted = selectedTask.checklist?.every(
         (item) => item.isCompleted
@@ -138,6 +139,18 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
           : activity
       );
       setActivities(updatedActivities);
+    }
+  };
+
+  const completeRecurringTask = (selectedTask: Activity) => {
+    console.log('rec');
+  };
+
+  const handlePress = (selectedTask: Activity) => {
+    if (selectedTask.type === 'single task') {
+      completeSingleTask(selectedTask);
+    } else {
+      completeRecurringTask(selectedTask);
     }
   };
 
@@ -294,10 +307,10 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
           renderItem={({ item }) => (
             <TaskListItem
               task={item}
-              onTaskComplete={handleTaskComplete}
+              onPress={handlePress}
               onSwipe={handleSwipe}
               isCheckable
-              isTaskCompletionDisabled={isTaskCompletionDisabled}
+              isPressDisabled={isPressDisabled}
             />
           )}
           keyExtractor={(item) => item.id}

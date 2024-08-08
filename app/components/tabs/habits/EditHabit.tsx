@@ -7,7 +7,15 @@ import { getTokenValue, styled, Text, View } from 'tamagui';
 import { CURRENT_DATE } from '@/app/constants';
 import { Activity, NewActivityData } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
-import { toCleanedObject, toFormattedDateString, toTruncatedText } from '@/app/utils';
+import {
+  generateCompletionDates,
+  getCompletionDates,
+  mergeCompletionDates,
+  setCompletionDates,
+  toCleanedObject,
+  toFormattedDateString,
+  toTruncatedText,
+} from '@/app/utils';
 import { activitySchema } from '@/app/validationSchemas';
 import {
   DateTimePickerAndroid,
@@ -29,9 +37,9 @@ import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import RemindersModalModule from '../modals/RemindersModalModule';
 import TextModalModule from '../modals/TextModalModule';
+import RippleButton from '../RippleButton';
 import FrequencyBadge from './FrequencyBadge';
 import FrequencyListModule from './FrequencyListModule';
-import RippleButton from '../RippleButton';
 
 interface Props {
   activities: Activity[];
@@ -110,11 +118,31 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
     });
   };
 
-  const onSubmit: SubmitHandler<NewActivityData> = (data) => {
+  const onSubmit: SubmitHandler<NewActivityData> = async (data) => {
     const updatedHabit: Activity = {
       ...selectedHabit,
       ...data,
     };
+
+    // Retrieve existing completion dates from local storage
+    const existingCompletionDates = await getCompletionDates(selectedHabit.id);
+
+    // Generate new completion dates based on the updated data
+    const newCompletionDates = generateCompletionDates(
+      data.startDate!,
+      data.frequency,
+      data.endDate
+    );
+
+    // Merge existing completion dates with new ones, ensuring no duplicates
+    const mergedCompletionDates = mergeCompletionDates(
+      existingCompletionDates,
+      newCompletionDates
+    );
+
+    // Update the local storage with the merged completion dates
+    await setCompletionDates(selectedHabit.id, mergedCompletionDates);
+
     const updatedActivities = activities.map((activity) =>
       activity.id === selectedHabit.id ? toCleanedObject(updatedHabit) : activity
     );

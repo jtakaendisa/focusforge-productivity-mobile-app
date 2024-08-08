@@ -1,6 +1,7 @@
-import { format, parse } from 'date-fns';
+import { format, parse, addDays, endOfMonth, startOfDay } from 'date-fns';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { Activity } from '../entities';
+import { Activity, CompletionDate, Frequency } from '../entities';
 import { CURRENT_DATE } from '../constants';
 
 interface DateGroupedTasks {
@@ -86,3 +87,94 @@ export const toCleanedObject = <T extends { [key: string]: any }>(obj: T): T => 
   }
   return cleanedObj;
 };
+
+export const generateCompletionDates = (
+  startDate: Date,
+  frequency: Frequency,
+  endDate?: Date
+) => {
+  const dates: CompletionDate[] = [];
+  let currentDate = startDate;
+  const currentDateLimit = endDate ? endDate : endOfMonth(new Date());
+
+  switch (frequency.type) {
+    case 'daily':
+      while (currentDate <= currentDateLimit) {
+        dates.push({ date: toFormattedDateString(currentDate), isCompleted: false });
+        currentDate = addDays(currentDate, 1);
+      }
+      break;
+
+    case 'specific':
+      const daysOfWeek = frequency.isRepeatedOn || [];
+      while (currentDate <= currentDateLimit) {
+        if (
+          daysOfWeek.includes(
+            currentDate.toLocaleDateString('en-US', { weekday: 'long' })
+          )
+        ) {
+          dates.push({ date: toFormattedDateString(currentDate), isCompleted: false });
+        }
+        currentDate = addDays(currentDate, 1);
+      }
+      break;
+
+    case 'repeats':
+      const interval = frequency.isRepeatedEvery || 1;
+      while (currentDate <= currentDateLimit) {
+        dates.push({ date: toFormattedDateString(currentDate), isCompleted: false });
+        currentDate = addDays(currentDate, interval);
+      }
+      break;
+  }
+
+  return dates;
+};
+
+export const mergeCompletionDates = (
+  existingCompletionDates: CompletionDate[],
+  newCompletionDates: CompletionDate[]
+) => {
+  // Create a map from completionDates to preserve the completion status
+  const dateMap: { [key: string]: CompletionDate } = {};
+
+  // Add existing dates to the map
+  existingCompletionDates.forEach((dateObj) => {
+    dateMap[dateObj.date] = dateObj;
+  });
+
+  // Add new dates to the map, preserving existing completion status
+  newCompletionDates.forEach((dateObj) => {
+    if (!dateMap[dateObj.date]) {
+      dateMap[dateObj.date] = dateObj;
+    }
+  });
+
+  // Convert the map back to an array
+  return Object.values(dateMap);
+};
+
+export const getCompletionDates = async (
+  activityId: string
+): Promise<CompletionDate[]> => {
+  try {
+    const dates = await AsyncStorage.getItem(`completionDates_${activityId}`);
+    return dates ? JSON.parse(dates) : [];
+  } catch (error) {
+    console.error('Failed to retrieve completion dates:', error);
+    return [];
+  }
+};
+
+export const setCompletionDates = async (
+  activityId: string,
+  dates: CompletionDate[]
+) => {
+  try {
+    await AsyncStorage.setItem(`completionDates_${activityId}`, JSON.stringify(dates));
+  } catch (error) {
+    console.error('Failed to save completion dates:', error);
+  }
+};
+
+export const setDateToMidnight = (date: Date): Date => startOfDay(date);
