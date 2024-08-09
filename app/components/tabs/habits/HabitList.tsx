@@ -12,7 +12,6 @@ import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
 import ActivityOptionsModal from './ActivityOptionsModal';
 import HabitListItem from './HabitListItem';
-import { getCompletionDates } from '@/app/utils';
 
 interface Props {
   isSearchBarOpen: boolean;

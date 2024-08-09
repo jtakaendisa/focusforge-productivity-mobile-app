@@ -154,26 +154,28 @@ export const mergeCompletionDates = (
   return Object.values(dateMap);
 };
 
-export const getCompletionDates = async (
-  activityId: string
-): Promise<CompletionDate[]> => {
+export const getCompletionDatesFromStorage = async (): Promise<
+  Record<string, CompletionDate[]>
+> => {
   try {
-    const dates = await AsyncStorage.getItem(`completionDates_${activityId}`);
-    return dates ? JSON.parse(dates) : [];
+    const data = await AsyncStorage.getItem('completionDatesMap');
+    return data ? JSON.parse(data) : {};
   } catch (error) {
-    console.error('Failed to retrieve completion dates:', error);
-    return [];
+    console.error('Failed to retrieve completion dates map:', error);
+    return {};
   }
 };
 
-export const setCompletionDates = async (
-  activityId: string,
-  dates: CompletionDate[]
+export const setCompletionDatesInStorage = async (
+  completionDatesMap: Record<string, CompletionDate[]>
 ) => {
   try {
-    await AsyncStorage.setItem(`completionDates_${activityId}`, JSON.stringify(dates));
+    await AsyncStorage.setItem(
+      'completionDatesMap',
+      JSON.stringify(completionDatesMap)
+    );
   } catch (error) {
-    console.error('Failed to save completion dates:', error);
+    console.error('Failed to save completion dates map:', error);
   }
 };
 

@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Stack } from 'expo-router';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { User } from 'firebase/auth';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { getTokenValue, TamaguiProvider, View } from 'tamagui';
 
-import { useAuthStore } from './store';
-import { authStateChangeListener, formatAuthUserData } from './services/auth';
-import config from '../tamagui.config';
 import { LogBox } from 'react-native';
+import config from '../tamagui.config';
+import { authStateChangeListener, formatAuthUserData } from './services/auth';
+import { useAuthStore } from './store';
 
 LogBox.ignoreAllLogs(true); // Ignore all logs (warnings and errors)
 

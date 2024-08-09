@@ -2,9 +2,14 @@ import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CURRENT_DATE } from '@/app/constants';
-import { Activity, Priority } from '@/app/entities';
+import { Activity, CompletionDatesMap, Priority } from '@/app/entities';
 import { useActivityStore, useSearchStore } from '@/app/store';
-import { setDateToMidnight, toFormattedDateString } from '@/app/utils';
+import {
+  getCompletionDatesFromStorage,
+  setCompletionDatesInStorage,
+  setDateToMidnight,
+  toFormattedDateString,
+} from '@/app/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Swipeable } from 'react-native-gesture-handler';
 import { styled, View } from 'tamagui';
@@ -62,6 +67,22 @@ const filterRecurringActivitiesByDate = (
   return filtered;
 };
 
+const getIsCompleted = (
+  activity: Activity,
+  completionDatesMap: CompletionDatesMap,
+  selectedDate: Date
+) => {
+  if (activity.type === 'single task') {
+    return activity.isCompleted;
+  } else {
+    const completionDates = completionDatesMap[activity.id];
+    return (
+      completionDates?.find((cd) => cd.date === toFormattedDateString(selectedDate))
+        ?.isCompleted || false
+    );
+  }
+};
+
 const ActivityList = ({ isSearchBarOpen }: Props) => {
   const selectedDate = useActivityStore((s) => s.selectedDate);
   const activities = useActivityStore((s) => s.activities);
@@ -75,6 +96,7 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
   const [activitiesDueToday, setActivitiesDueToday] = useState<Activity[]>([]);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
   const [carriedOverPendingTasks, setCarriedOverPendingTasks] = useState(false);
+  const [completionDatesMap, setCompletionDatesMap] = useState<CompletionDatesMap>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
   const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
@@ -142,15 +164,31 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
     }
   };
 
-  const completeRecurringTask = (selectedTask: Activity) => {
-    console.log('rec');
+  const completeRecurringActivity = async (selectedActivity: Activity) => {
+    const { id } = selectedActivity;
+
+    const completionDates = completionDatesMap[id];
+
+    const updatedCompletionDates = completionDates.map((item) =>
+      item.date === toFormattedDateString(selectedDate)
+        ? { ...item, isCompleted: !item.isCompleted }
+        : item
+    );
+
+    const updatedCompletionDatesMap = {
+      ...completionDatesMap,
+      [id]: updatedCompletionDates,
+    };
+
+    await setCompletionDatesInStorage(updatedCompletionDatesMap);
+    setCompletionDatesMap(updatedCompletionDatesMap);
   };
 
-  const handlePress = (selectedTask: Activity) => {
-    if (selectedTask.type === 'single task') {
-      completeSingleTask(selectedTask);
+  const handlePress = (selectedActivity: Activity) => {
+    if (selectedActivity.type === 'single task') {
+      completeSingleTask(selectedActivity);
     } else {
-      completeRecurringTask(selectedTask);
+      completeRecurringActivity(selectedActivity);
     }
   };
 
@@ -183,11 +221,22 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
     activityOptionsRef.current?.close();
   };
 
+  const getTaskCompletionStatus = (task: Activity) =>
+    getIsCompleted(task, completionDatesMap, selectedDate);
+
   const toggleDeleteModal = () => setIsDeleteModalOpen((prev) => !prev);
 
   const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
 
   const toggleChecklistModal = () => setIsChecklistModalOpen((prev) => !prev);
+
+  useEffect(() => {
+    const fetchCompletionDatesMap = async () => {
+      const completionDatesMap = await getCompletionDatesFromStorage();
+      setCompletionDatesMap(completionDatesMap);
+    };
+    fetchCompletionDatesMap();
+  }, []);
 
   useEffect(() => {
     const updatedActivities = carryOverTasks(activities);
@@ -307,13 +356,15 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
           renderItem={({ item }) => (
             <TaskListItem
               task={item}
+              isCompleted={getTaskCompletionStatus(item)}
+              isPressDisabled={isPressDisabled}
+              isCheckable
               onPress={handlePress}
               onSwipe={handleSwipe}
-              isCheckable
-              isPressDisabled={isPressDisabled}
             />
           )}
           keyExtractor={(item) => item.id}
+          extraData={completionDatesMap}
           estimatedItemSize={72}
           showsVerticalScrollIndicator={false}
         />

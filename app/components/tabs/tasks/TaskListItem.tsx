@@ -11,16 +11,17 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 
-import { Activity, ChecklistItem } from '@/app/entities';
-import { toTruncatedText } from '@/app/utils';
+import { Activity, ChecklistItem, CompletionDatesMap } from '@/app/entities';
+import { toFormattedDateString, toTruncatedText } from '@/app/utils';
 import CategoryIcon from '../CategoryIcon';
 import CircularCheckbox from '../CircularCheckbox';
+import RippleButton from '../RippleButton';
 import TaskItemLeftActions from './TaskItemLeftActions';
 import TaskItemRightActions from './TaskItemRightActions';
-import RippleButton from '../RippleButton';
 
 interface Props {
   task: Activity;
+  isCompleted?: boolean;
   isCheckable?: boolean;
   isPressDisabled?: boolean;
   onPress?: (task: Activity) => void;
@@ -35,13 +36,14 @@ interface Props {
 
 const TaskListItem = ({
   task,
+  isCompleted,
   isCheckable,
   isPressDisabled,
   onPress,
   onSwipe,
   onShowOptions,
 }: Props) => {
-  const { type, title, isCompleted, note, category, checklist } = task;
+  const { type, title, note, category, checklist } = task;
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
@@ -88,7 +90,7 @@ const TaskListItem = ({
   }, [isCompleted]);
 
   return (
-    <RippleButton onPress={handlePress}>
+    <RippleButton disabled={isPressDisabled} onPress={handlePress}>
       <AnimatedContainer entering={FadeIn} exiting={FadeOut}>
         <Swipeable
           ref={swipeableRef}

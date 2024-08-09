@@ -35,6 +35,8 @@ const TaskList = ({ isSearchBarOpen }: Props) => {
   const listRef = useRef<FlashList<string | Activity> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
+  const isPressDisabled = taskFilter === 'single task' ? true : false;
+
   const singleTasks = useMemo(() => {
     const filteredTasks = activities.filter(
       (activity) => activity.type === 'single task'
@@ -162,6 +164,7 @@ const TaskList = ({ isSearchBarOpen }: Props) => {
             ) : (
               <TaskListItem
                 task={item}
+                isPressDisabled={isPressDisabled}
                 onSwipe={handleSwipe}
                 onShowOptions={toggleActivityOptionsModal}
               />

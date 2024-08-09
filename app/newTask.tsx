@@ -44,7 +44,8 @@ import { Activity, NewActivityData } from './entities';
 import { useActivityStore } from './store';
 import {
   generateCompletionDates,
-  setCompletionDates,
+  getCompletionDatesFromStorage,
+  setCompletionDatesInStorage,
   toCleanedObject,
   toFormattedDateString,
   toTruncatedText,
@@ -167,15 +168,21 @@ const NewTaskScreen = () => {
     };
 
     if (isRecurring) {
-      // Generate and save completion dates to localStorage
+      // Retrieve the current completion dates map from storage
+      const currentCompletionDatesMap = await getCompletionDatesFromStorage();
+
+      // Generate completion dates
       const initialCompletionDates = generateCompletionDates(
         data.startDate!,
         data.frequency,
         data.endDate
       );
 
-      // Save the initial completion dates to local storage
-      await setCompletionDates(newTask.id, initialCompletionDates);
+      // Update the map with the new activity
+      currentCompletionDatesMap[newTask.id] = initialCompletionDates;
+
+      // Store the updated map back to local storage
+      await setCompletionDatesInStorage(currentCompletionDatesMap);
     }
 
     setActivities([...activities, toCleanedObject(newTask)]);

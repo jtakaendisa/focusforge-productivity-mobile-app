@@ -7,10 +7,18 @@ interface Props {
   rippleColor?: string;
   fade?: boolean;
   flex?: boolean;
+  disabled?: boolean;
   onPress: () => void;
 }
 
-const RippleButton = ({ children, rippleColor, fade, flex, onPress }: Props) => {
+const RippleButton = ({
+  children,
+  rippleColor,
+  fade,
+  flex,
+  disabled,
+  onPress,
+}: Props) => {
   const customGray2 = getTokenValue('$customGray2');
 
   return (
@@ -21,6 +29,7 @@ const RippleButton = ({ children, rippleColor, fade, flex, onPress }: Props) => 
         color: rippleColor || customGray2,
         borderless: false,
       }}
+      disabled={disabled}
     >
       {({ pressed }) => (
         <View

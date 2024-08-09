@@ -8,9 +8,9 @@ import { Activity, NewActivityData } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
 import {
   generateCompletionDates,
-  getCompletionDates,
+  getCompletionDatesFromStorage,
   mergeCompletionDates,
-  setCompletionDates,
+  setCompletionDatesInStorage,
   toCleanedObject,
   toFormattedDateString,
   toTruncatedText,
@@ -154,8 +154,11 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
     };
 
     if (isRecurring) {
-      // Retrieve existing completion dates from local storage
-      const existingCompletionDates = await getCompletionDates(selectedTask.id);
+      // Retrieve the current completion dates map from storage
+      const currentCompletionDatesMap = await getCompletionDatesFromStorage();
+
+      // Retrieve existing completion dates for the selected habit
+      const existingCompletionDates = currentCompletionDatesMap[selectedTask.id];
 
       // Generate new completion dates based on the updated data
       const newCompletionDates = generateCompletionDates(
@@ -170,8 +173,11 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
         newCompletionDates
       );
 
-      // Update the local storage with the merged completion dates
-      await setCompletionDates(selectedTask.id, mergedCompletionDates);
+      // Update the map with the new activity
+      currentCompletionDatesMap[selectedTask.id] = mergedCompletionDates;
+
+      // Store the updated map back to local storage
+      await setCompletionDatesInStorage(currentCompletionDatesMap);
     }
 
     const updatedActivities = activities.map((activity) =>

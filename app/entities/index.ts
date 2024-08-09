@@ -61,8 +61,6 @@ export interface Activity {
   priority: Priority;
   frequency: Frequency;
   isCompleted: boolean;
-  currentStreak?: number;
-  bestStreak?: number;
   note?: string;
   startDate?: Date;
   endDate?: Date;
@@ -74,4 +72,17 @@ export interface Activity {
 export interface CompletionDate {
   date: string;
   isCompleted: boolean;
+}
+
+export interface CompletionDatesMap {
+  [activityId: string]: CompletionDate[];
+}
+
+export interface StreakData {
+  currentStreak: number;
+  bestStreak: number;
+}
+
+export interface StreaksMap {
+  [habitId: string]: StreakData;
 }

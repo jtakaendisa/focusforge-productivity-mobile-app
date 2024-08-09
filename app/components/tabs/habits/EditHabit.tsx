@@ -9,9 +9,9 @@ import { Activity, NewActivityData } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
 import {
   generateCompletionDates,
-  getCompletionDates,
+  getCompletionDatesFromStorage,
   mergeCompletionDates,
-  setCompletionDates,
+  setCompletionDatesInStorage,
   toCleanedObject,
   toFormattedDateString,
   toTruncatedText,
@@ -124,8 +124,11 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
       ...data,
     };
 
-    // Retrieve existing completion dates from local storage
-    const existingCompletionDates = await getCompletionDates(selectedHabit.id);
+    // Retrieve the current completion dates map from storage
+    const currentCompletionDatesMap = await getCompletionDatesFromStorage();
+
+    // Retrieve existing completion dates for the selected habit
+    const existingCompletionDates = currentCompletionDatesMap[selectedHabit.id];
 
     // Generate new completion dates based on the updated data
     const newCompletionDates = generateCompletionDates(
@@ -140,8 +143,11 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
       newCompletionDates
     );
 
-    // Update the local storage with the merged completion dates
-    await setCompletionDates(selectedHabit.id, mergedCompletionDates);
+    // Update the map with the new activity
+    currentCompletionDatesMap[selectedHabit.id] = mergedCompletionDates;
+
+    // Store the updated map back to local storage
+    await setCompletionDatesInStorage(currentCompletionDatesMap);
 
     const updatedActivities = activities.map((activity) =>
       activity.id === selectedHabit.id ? toCleanedObject(updatedHabit) : activity
