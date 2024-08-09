@@ -4,7 +4,12 @@ import { router } from 'expo-router';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { View, styled } from 'tamagui';
 
-import { Activity, HabitActiveTab } from '@/app/entities';
+import {
+  Activity,
+  CompletionDate,
+  CompletionDatesMap,
+  HabitActiveTab,
+} from '@/app/entities';
 import { useActivityStore, useSearchStore } from '@/app/store';
 import { Swipeable } from 'react-native-gesture-handler';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
@@ -12,6 +17,10 @@ import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
 import ActivityOptionsModal from './ActivityOptionsModal';
 import HabitListItem from './HabitListItem';
+import {
+  getCompletionDatesFromStorage,
+  setCompletionDatesInStorage,
+} from '@/app/utils';
 
 interface Props {
   isSearchBarOpen: boolean;
@@ -27,6 +36,7 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
 
   const [habits, setHabits] = useState<Activity[]>([]);
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
+  const [completionDatesMap, setCompletionDatesMap] = useState<CompletionDatesMap>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const listRef = useRef<FlashList<Activity> | null>(null);
@@ -78,6 +88,26 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
     swipeableRef.current?.close();
   };
 
+  const handleComplete = async (
+    id: string,
+    updatedCompletionDates: CompletionDate[]
+  ) => {
+    const updatedCompletionDatesMap = {
+      ...completionDatesMap,
+      [id]: updatedCompletionDates,
+    };
+    await setCompletionDatesInStorage(updatedCompletionDatesMap);
+    setCompletionDatesMap(updatedCompletionDatesMap);
+  };
+
+  useEffect(() => {
+    const fetchCompletionDatesMap = async () => {
+      const completionDatesMap = await getCompletionDatesFromStorage();
+      setCompletionDatesMap(completionDatesMap);
+    };
+    fetchCompletionDatesMap();
+  }, []);
+
   useEffect(() => {
     setHabits(allHabits);
   }, [allHabits]);
@@ -125,13 +155,16 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
           renderItem={({ item }) => (
             <HabitListItem
               habit={item}
+              completionDates={completionDatesMap[item.id]}
               onShowOptions={toggleActivityOptionsModal}
               onNavigate={navigateToHabitDetailsScreen}
               onSwipe={handleSwipe}
+              onComplete={handleComplete}
             />
           )}
           ItemSeparatorComponent={ItemSeparator}
           keyExtractor={(item) => item.id}
+          extraData={completionDatesMap}
           estimatedItemSize={180}
         />
       )}

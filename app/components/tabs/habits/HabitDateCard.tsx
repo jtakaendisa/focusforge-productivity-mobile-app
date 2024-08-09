@@ -1,52 +1,39 @@
-import { useEffect } from 'react';
-import { useSharedValue, withTiming } from 'react-native-reanimated';
-import { styled, View, Text } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
-import { DATE_CARD_HEIGHT } from '@/app/constants';
-import { toFormattedDateString } from '@/app/utils';
+import { CURRENT_DATE, DATE_CARD_HEIGHT } from '@/app/constants';
 
 interface Props {
   day: {
     weekday: string;
     date: number;
+    originalDay: Date;
+    isPressable: boolean;
+    isCompleted: boolean;
   };
+  onComplete: (selectedDate: Date) => void;
 }
 
-const HabitDateCard = ({ day }: Props) => {
-  const { date, weekday } = day;
+const HabitDateCard = ({ day, onComplete }: Props) => {
+  const { date, weekday, originalDay, isPressable, isCompleted } = day;
 
-  const isSelected = useSharedValue(0);
+  const backgroundColor = isPressable
+    ? isCompleted
+      ? 'green'
+      : '$customGray2'
+    : '$customGray2';
+  const borderColor = isPressable ? (isCompleted ? 'green' : 'gray') : 'transparent';
 
-  // const white = getTokens().color.$white.val;
-  // const textGray = getTokens().color.$gray1.val;
-  // const lightGray = getTokens().color.$gray2.val;
-  // const darkGray = getTokens().color.$gray3.val;
-  // const lightRed = getTokens().color.$red1.val;
-  // const darkRed = getTokens().color.$red3.val;
-
-  // const textColorAnimation = useAnimatedStyle(() => ({
-  //   color: interpolateColor(isSelected.value, [0, 1], [textGray, white]),
-  // }));
-
-  // const weekdayBackgroundAnimation = useAnimatedStyle(() => ({
-  //   backgroundColor: interpolateColor(isSelected.value, [0, 1], [darkGray, lightRed]),
-  // }));
-
-  // const dateBackgroundAnimation = useAnimatedStyle(() => ({
-  //   backgroundColor: interpolateColor(isSelected.value, [0, 1], [lightGray, darkRed]),
-  // }));
-
-  //   useEffect(() => {
-  //     isSelected.value =
-  //       toFormattedDateString(selectedDate) === toFormattedDateString(date)
-  //         ? withTiming(1)
-  //         : withTiming(0);
-  //   }, [date, selectedDate]);
+  const handleComplete = () => onComplete(originalDay);
 
   return (
     <Container>
       <WeekdayText>{weekday}</WeekdayText>
-      <DateContainer>
+      <DateContainer
+        backgroundColor={backgroundColor}
+        borderColor={borderColor}
+        disabled={!isPressable || originalDay > CURRENT_DATE}
+        onPress={handleComplete}
+      >
         <DateText>{date}</DateText>
       </DateContainer>
     </Container>
@@ -64,12 +51,10 @@ const Container = styled(View, {
 const DateContainer = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
-  bottom: 0,
   width: 36,
   height: 36,
   borderRadius: 14,
   borderWidth: 2,
-  borderColor: 'green',
 });
 
 const WeekdayText = styled(Text, {

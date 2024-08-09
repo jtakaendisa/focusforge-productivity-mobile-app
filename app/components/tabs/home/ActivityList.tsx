@@ -39,12 +39,12 @@ const filterRecurringActivitiesByDate = (
   date: Date
 ) => {
   const filtered = recurringActivities.filter((activity) => {
-    const startDate = activity.startDate!;
-    const endDate = activity?.endDate || null;
+    const startDate = setDateToMidnight(activity.startDate!);
+    const endDate = activity.endDate ? setDateToMidnight(activity.endDate) : null;
 
     // Check if the activity is within the date range
-    if (endDate && date > setDateToMidnight(endDate)) return false;
-    if (date < setDateToMidnight(startDate)) return false;
+    if (endDate && date > endDate) return false;
+    if (date < startDate) return false;
 
     // Check activity frequency
     switch (activity.frequency.type) {

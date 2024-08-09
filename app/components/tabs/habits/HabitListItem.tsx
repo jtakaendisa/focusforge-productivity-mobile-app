@@ -4,8 +4,13 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 
 import { CURRENT_DATE } from '@/app/constants';
-import { Activity, HabitActiveTab } from '@/app/entities';
-import { toTruncatedText } from '@/app/utils';
+import {
+  Activity,
+  CompletionDate,
+  CompletionDatesMap,
+  HabitActiveTab,
+} from '@/app/entities';
+import { toFormattedDateString, toTruncatedText } from '@/app/utils';
 import { Swipeable } from 'react-native-gesture-handler';
 import BarChartSvg from '../../icons/BarChartSvg';
 import CalendarSvg from '../../icons/CalendarSvg';
@@ -21,6 +26,7 @@ import RippleButton from '../RippleButton';
 
 interface Props {
   habit: Activity;
+  completionDates: CompletionDate[];
   onShowOptions: (habit: Activity) => void;
   onNavigate: (activeTab: HabitActiveTab, habitId: string) => void;
   onSwipe: (
@@ -28,31 +34,55 @@ interface Props {
     habit: Activity,
     swipeableRef: MutableRefObject<Swipeable | null>
   ) => void;
+  onComplete: (id: string, updatedCompletionDates: CompletionDate[]) => void;
 }
 
 const SVG_SIZE = 18;
 
-const HabitListItem = ({ habit, onShowOptions, onNavigate, onSwipe }: Props) => {
+const HabitListItem = ({
+  habit,
+  completionDates,
+  onShowOptions,
+  onNavigate,
+  onSwipe,
+  onComplete,
+}: Props) => {
   const { id, title, category, frequency, endDate } = habit;
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const days = useMemo(() => {
     const daysOfWeek = eachDayOfInterval({
-      start: startOfWeek(CURRENT_DATE, { weekStartsOn: 0 }), // Week starts on Sunday
-      end: endOfWeek(CURRENT_DATE, { weekStartsOn: 0 }), // Week ends on Saturday
+      start: startOfWeek(CURRENT_DATE, { weekStartsOn: 1 }),
+      end: endOfWeek(CURRENT_DATE, { weekStartsOn: 1 }),
     });
 
     const dayObjects = daysOfWeek.map((day) => ({
       weekday: format(day, 'eee'),
       date: day.getDate(),
+      originalDay: day,
+      isPressable: !!completionDates.find(
+        (cd) => cd.date === toFormattedDateString(day)
+      ),
+      isCompleted: !!completionDates.find(
+        (cd) => cd.date === toFormattedDateString(day)
+      )?.isCompleted,
     }));
 
     return dayObjects;
-  }, [CURRENT_DATE, endDate]);
+  }, [CURRENT_DATE, completionDates]);
 
   const handleSwipe = (direction: 'left' | 'right') =>
     onSwipe(direction, habit, swipeableRef);
+
+  const handleComplete = (selectedDate: Date) => {
+    const updatedCompletionDates = completionDates.map((cd) =>
+      cd.date === toFormattedDateString(selectedDate)
+        ? { ...cd, isCompleted: !cd.isCompleted }
+        : cd
+    );
+    onComplete(id, updatedCompletionDates);
+  };
 
   const handleNavigateToCalendarTab = () => onNavigate('calendar', id);
 
@@ -88,7 +118,7 @@ const HabitListItem = ({ habit, onShowOptions, onNavigate, onSwipe }: Props) => 
           </DetailsRow>
           <CalendarRow>
             {days.map((day) => (
-              <HabitDateCard key={day.date} day={day} />
+              <HabitDateCard key={day.date} day={day} onComplete={handleComplete} />
             ))}
           </CalendarRow>
           <BottomRow>

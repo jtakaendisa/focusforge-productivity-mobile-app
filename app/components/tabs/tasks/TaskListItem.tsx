@@ -11,8 +11,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 
-import { Activity, ChecklistItem, CompletionDatesMap } from '@/app/entities';
-import { toFormattedDateString, toTruncatedText } from '@/app/utils';
+import { Activity, ChecklistItem } from '@/app/entities';
+import { toTruncatedText } from '@/app/utils';
 import CategoryIcon from '../CategoryIcon';
 import CircularCheckbox from '../CircularCheckbox';
 import RippleButton from '../RippleButton';
