@@ -24,12 +24,18 @@ const tokens = createTokens({
     customGray7: '#dddddd',
     customGray8: '#d3d1d1',
     customGreen1: '#2A8844',
+    customGreen2: '#43B368',
+    customGreen3: '#223D2A',
     customRed1: '#C73A57',
     customRed2: '#C33756',
     customRed3: '#962C42',
     customRed4: '#652533',
     customRed5: '#31181E',
     customRed6: 'rgba(150, 44, 66, 0.25)',
+    customRed7: '#F04B5F',
+    customRed8: '#4F2529',
+    customYellow1: '#FAB632',
+    customYellow2: '#4F3F1E',
   },
 });
 

@@ -1,6 +1,7 @@
 import { styled, Text, View } from 'tamagui';
 
 import { CURRENT_DATE, DATE_CARD_HEIGHT } from '@/app/constants';
+import { setDateToMidnight, toFormattedDateString } from '@/app/utils';
 
 interface Props {
   day: {
@@ -16,12 +17,39 @@ interface Props {
 const HabitDateCard = ({ day, onComplete }: Props) => {
   const { date, weekday, originalDay, isPressable, isCompleted } = day;
 
+  const startOfOriginalDay = setDateToMidnight(originalDay);
+  const startOfCurrentDate = setDateToMidnight(CURRENT_DATE);
+
+  const isToday =
+    toFormattedDateString(startOfOriginalDay) ===
+    toFormattedDateString(startOfCurrentDate);
+
+  const isPassedDeadline = startOfOriginalDay < startOfCurrentDate;
+
+  const isDisabled =
+    !isPressable ||
+    startOfOriginalDay < startOfCurrentDate ||
+    startOfOriginalDay > startOfCurrentDate;
+
   const backgroundColor = isPressable
     ? isCompleted
-      ? 'green'
+      ? '$customGreen3'
+      : isToday
+      ? '$customYellow2'
+      : isPassedDeadline
+      ? '$customRed8'
       : '$customGray2'
     : '$customGray2';
-  const borderColor = isPressable ? (isCompleted ? 'green' : 'gray') : 'transparent';
+
+  const borderColor = isPressable
+    ? isCompleted
+      ? '$customGreen2'
+      : isToday
+      ? '$customYellow1'
+      : isPassedDeadline
+      ? '$customRed7'
+      : '$customGray1'
+    : 'transparent';
 
   const handleComplete = () => onComplete(originalDay);
 
@@ -29,9 +57,10 @@ const HabitDateCard = ({ day, onComplete }: Props) => {
     <Container>
       <WeekdayText>{weekday}</WeekdayText>
       <DateContainer
+        animation="fast"
         backgroundColor={backgroundColor}
         borderColor={borderColor}
-        disabled={!isPressable || originalDay > CURRENT_DATE}
+        disabled={isDisabled}
         onPress={handleComplete}
       >
         <DateText>{date}</DateText>
