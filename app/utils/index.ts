@@ -179,4 +179,44 @@ export const setCompletionDatesInStorage = async (
   }
 };
 
-export const setDateToMidnight = (date: Date): Date => startOfDay(date);
+export const setDateToMidnight = (date: Date) => startOfDay(date);
+
+export const calculateStreaks = (completionDates: CompletionDate[]) => {
+  let currentStreak = 0;
+  let bestStreak = 0;
+  let tempStreak = 0;
+  let foundCurrentStreak = false;
+
+  // Traverse the array from the end to the beginning
+  for (let i = completionDates.length - 1; i >= 0; i--) {
+    const completionDate = completionDates[i];
+    const date = parse(completionDate.date, 'dd MMM yyyy', new Date());
+
+    // Only consider dates on or before the current date
+    if (setDateToMidnight(date) > setDateToMidnight(CURRENT_DATE)) {
+      continue;
+    }
+
+    if (completionDate.isCompleted) {
+      tempStreak++;
+      if (!foundCurrentStreak) {
+        currentStreak = tempStreak;
+        foundCurrentStreak = true;
+      }
+      bestStreak = Math.max(bestStreak, tempStreak);
+    } else {
+      if (foundCurrentStreak) {
+        currentStreak = 0;
+        foundCurrentStreak = false;
+      }
+      tempStreak = 0;
+    }
+  }
+
+  // If the last date is a streak, make sure currentStreak is set properly
+  if (foundCurrentStreak) {
+    currentStreak = tempStreak;
+  }
+
+  return { currentStreak, bestStreak };
+};

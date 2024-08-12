@@ -82,7 +82,3 @@ export interface StreakData {
   currentStreak: number;
   bestStreak: number;
 }
-
-export interface StreaksMap {
-  [habitId: string]: StreakData;
-}

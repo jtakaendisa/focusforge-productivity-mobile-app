@@ -4,12 +4,7 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 
 import { CURRENT_DATE } from '@/app/constants';
-import {
-  Activity,
-  CompletionDate,
-  CompletionDatesMap,
-  HabitActiveTab,
-} from '@/app/entities';
+import { Activity, CompletionDate, HabitActiveTab } from '@/app/entities';
 import { toFormattedDateString, toTruncatedText } from '@/app/utils';
 import { Swipeable } from 'react-native-gesture-handler';
 import BarChartSvg from '../../icons/BarChartSvg';
@@ -18,11 +13,11 @@ import CheckCircleSvg from '../../icons/CheckCircleSvg';
 import EllipsisVerticalSvg from '../../icons/EllipsisVerticalSvg';
 import LinkSvg from '../../icons/LinkSvg';
 import CategoryIcon from '../CategoryIcon';
+import RippleButton from '../RippleButton';
 import FrequencyBadge from './FrequencyBadge';
 import HabitDateCard from './HabitDateCard';
 import HabitItemLeftActions from './HabitItemLeftActions';
 import HabitItemRightActions from './HabitItemRightActions';
-import RippleButton from '../RippleButton';
 
 interface Props {
   habit: Activity;
