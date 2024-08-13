@@ -10,7 +10,7 @@ import { Text, View, styled } from 'tamagui';
 
 import Dot from './components/tabs/habits/Dot';
 import NewHabitListItem from './components/tabs/habits/NewHabitListItem';
-import { CURRENT_DATE, SCREEN_WIDTH } from './constants';
+import { SCREEN_WIDTH } from './constants';
 import { Activity, NewActivityData } from './entities';
 import { useActivityStore } from './store';
 import {
@@ -50,7 +50,7 @@ const NewHabitScreen = () => {
     defaultValues: {
       title: '',
       category: 'Task',
-      startDate: CURRENT_DATE,
+      startDate: new Date(),
       priority: 'Normal',
       frequency: {
         type: 'daily',

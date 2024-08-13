@@ -1,4 +1,4 @@
-import { CURRENT_DATE, SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { SearchRoute } from '@/app/entities';
 import { useSearchStore } from '@/app/store';
 import { format } from 'date-fns';
@@ -14,7 +14,7 @@ const searchImages: Record<SearchRoute, any> = {
 
 const searchPlaceholders = {
   home: {
-    heading: format(CURRENT_DATE, 'dd MMMM yyyy'),
+    heading: format(new Date(), 'dd MMMM yyyy'),
     subtext: 'No results found in due activities',
   },
   habits: {

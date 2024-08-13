@@ -14,6 +14,7 @@ import { useActivityStore, useSearchStore } from '@/app/store';
 import {
   getCompletionDatesFromStorage,
   setCompletionDatesInStorage,
+  toFormattedDateString,
 } from '@/app/utils';
 import { Swipeable } from 'react-native-gesture-handler';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
@@ -21,6 +22,7 @@ import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
 import ActivityOptionsModal from './ActivityOptionsModal';
 import HabitListItem from './HabitListItem';
+import { format, parse } from 'date-fns';
 
 interface Props {
   isSearchBarOpen: boolean;
@@ -143,111 +145,6 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
       );
     }
   }, [isSearchBarOpen, allHabits, selectedCategories]);
-
-  // const dummyDailyCompletionDates = [
-  //   { date: '19 Jul 2024', isCompleted: false },
-  //   { date: '20 Jul 2024', isCompleted: false },
-  //   { date: '21 Jul 2024', isCompleted: true },
-  //   { date: '22 Jul 2024', isCompleted: false },
-  //   { date: '23 Jul 2024', isCompleted: false },
-  //   { date: '24 Jul 2024', isCompleted: false },
-  //   { date: '25 Jul 2024', isCompleted: false },
-  //   { date: '26 Jul 2024', isCompleted: false },
-  //   { date: '27 Jul 2024', isCompleted: false },
-  //   { date: '28 Jul 2024', isCompleted: false },
-  //   { date: '29 Jul 2024', isCompleted: false },
-  //   { date: '30 Jul 2024', isCompleted: false },
-  //   { date: '31 Jul 2024', isCompleted: false },
-  //   { date: '01 Aug 2024', isCompleted: true },
-  //   { date: '02 Aug 2024', isCompleted: true },
-  //   { date: '03 Aug 2024', isCompleted: true },
-  //   { date: '04 Aug 2024', isCompleted: true },
-  //   { date: '05 Aug 2024', isCompleted: false },
-  //   { date: '06 Aug 2024', isCompleted: false },
-  //   { date: '07 Aug 2024', isCompleted: false },
-  //   { date: '08 Aug 2024', isCompleted: false },
-  //   { date: '09 Aug 2024', isCompleted: true },
-  //   { date: '10 Aug 2024', isCompleted: true },
-  //   { date: '11 Aug 2024', isCompleted: true },
-  //   { date: '12 Aug 2024', isCompleted: false },
-  //   { date: '13 Aug 2024', isCompleted: false },
-  //   { date: '14 Aug 2024', isCompleted: false },
-  //   { date: '15 Aug 2024', isCompleted: false },
-  // ];
-
-  // const calculateStreaks = (completionDates: CompletionDate[]) => {
-  //   const timeZone = 'Africa/Harare';
-
-  //   let currentStreak = 0;
-  //   let bestStreak = 0;
-  //   let tempStreak = 0;
-  //   let foundCurrentStreak = false;
-  //   let beginTallying = false;
-
-  // Traverse the array from the end to the beginning
-  // for (let i = completionDates.length - 1; i >= 0; i--) {
-  //   const completionDate = completionDates[i];
-  //   const previousCompletionDate = completionDates[i - 1];
-  //   const date = parse(completionDate.date, 'dd MMM yyyy', new UTCDate());
-
-  // Only consider dates on or before the current date
-  // if (isAfter(date, setDateToMidnight(new UTCDate()))) {
-  // console.log({ completionDate }, { date });
-  //   continue;
-  // }
-
-  // if (!beginTallying) {
-  //   // Check is previous entry was completed, if not, currentStreak remains set to 0
-
-  //   if (!previousCompletionDate.isCompleted) {
-  //     foundCurrentStreak = true;
-  //   }
-  //   beginTallying = true;
-  // }
-
-  // if (completionDate.isCompleted) {
-  //   tempStreak++;
-
-  //   if(!foundCurrentStreak) {
-  //     currentStreak = tempStreak
-
-  //     const previousCompletionDate
-  //   }
-
-  //   if (tempStreak > bestStreak) {
-  //     bestStreak = tempStreak;
-  //   }
-  // } else {
-  //   tempStreak = 0;
-  // }
-
-  // if (completionDate.isCompleted) {
-  //   tempStreak++;
-  //   if (!foundCurrentStreak) {
-  //     currentStreak = tempStreak;
-  //     foundCurrentStreak = true;
-  //   } else {
-  //     currentStreak = tempStreak;
-  //   }
-  //   if (tempStreak > bestStreak) {
-  //     bestStreak = tempStreak;
-  //   }
-  // } else {
-  //   if (foundCurrentStreak) {
-  //     tempStreak = 0;
-  //     foundCurrentStreak = false;
-  //   }
-  // }
-
-  // // Ensure currentStreak is set correctly if no interruption was found
-  // if (foundCurrentStreak && tempStreak > 0) {
-  //   currentStreak = tempStreak;
-  // }
-  //   }
-  //   return { currentStreak, bestStreak };
-  // };
-
-  // console.log(calculateStreaks(dummyDailyCompletionDates));
 
   return (
     <Container isContentCentered={isListEmpty}>

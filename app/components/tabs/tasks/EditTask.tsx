@@ -3,7 +3,6 @@ import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
-import { CURRENT_DATE } from '@/app/constants';
 import { Activity, NewActivityData } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
 import {
@@ -119,7 +118,7 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
       } else {
         if (isRecurring) {
           if (
-            toFormattedDateString(selectedDate) !== toFormattedDateString(CURRENT_DATE)
+            toFormattedDateString(selectedDate) !== toFormattedDateString(new Date())
           ) {
             setEndDateRef.current?.(selectedDate);
           } else {
@@ -137,7 +136,7 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
       value: new Date(),
       onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
-      minimumDate: CURRENT_DATE,
+      minimumDate: new Date(),
     });
   };
 
@@ -258,7 +257,7 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
                     <LabelText>
                       {startDate &&
                         (toFormattedDateString(startDate) ===
-                        toFormattedDateString(CURRENT_DATE)
+                        toFormattedDateString(new Date())
                           ? 'Today'
                           : toFormattedDateString(startDate))}
                     </LabelText>
@@ -300,7 +299,7 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
                     <LabelText>
                       {endDate
                         ? toFormattedDateString(endDate) ===
-                          toFormattedDateString(CURRENT_DATE)
+                          toFormattedDateString(new Date())
                           ? 'Today'
                           : toFormattedDateString(endDate)
                         : '---'}

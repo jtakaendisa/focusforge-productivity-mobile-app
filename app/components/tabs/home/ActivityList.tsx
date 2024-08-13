@@ -1,7 +1,6 @@
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
-import { CURRENT_DATE } from '@/app/constants';
 import { Activity, CompletionDatesMap, Priority } from '@/app/entities';
 import { useActivityStore, useSearchStore } from '@/app/store';
 import {
@@ -29,8 +28,8 @@ const carryOverTasks = (activities: Activity[]) =>
     activity.type === 'single task' &&
     activity.isCarriedOver &&
     !activity.isCompleted &&
-    new Date(activity.endDate!) < CURRENT_DATE
-      ? { ...activity, endDate: CURRENT_DATE }
+    new Date(activity.endDate!) < new Date()
+      ? { ...activity, endDate: new Date() }
       : activity
   );
 
@@ -124,7 +123,7 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
   }, [carriedOverPendingTasks, activities, selectedDate]);
 
   const isListEmpty = !activitiesDueToday.length;
-  const isPressDisabled = selectedDate > CURRENT_DATE;
+  const isPressDisabled = selectedDate > new Date();
 
   const completeSingleTask = (selectedTask: Activity) => {
     const hasChecklist = !!selectedTask.checklist?.length;

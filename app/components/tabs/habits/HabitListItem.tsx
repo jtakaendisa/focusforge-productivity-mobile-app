@@ -3,9 +3,8 @@ import { MutableRefObject, useMemo, useRef } from 'react';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 
-import { CURRENT_DATE } from '@/app/constants';
 import { Activity, CompletionDate, HabitActiveTab } from '@/app/entities';
-import { toFormattedDateString, toTruncatedText } from '@/app/utils';
+import { calculateStreaks, toFormattedDateString, toTruncatedText } from '@/app/utils';
 import { Swipeable } from 'react-native-gesture-handler';
 import BarChartSvg from '../../icons/BarChartSvg';
 import CalendarSvg from '../../icons/CalendarSvg';
@@ -42,14 +41,16 @@ const HabitListItem = ({
   onSwipe,
   onComplete,
 }: Props) => {
-  const { id, title, category, frequency, endDate } = habit;
+  const { id, title, category, frequency } = habit;
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const days = useMemo(() => {
+    const currentDate = new Date();
+
     const daysOfWeek = eachDayOfInterval({
-      start: startOfWeek(CURRENT_DATE, { weekStartsOn: 1 }),
-      end: endOfWeek(CURRENT_DATE, { weekStartsOn: 1 }),
+      start: startOfWeek(currentDate, { weekStartsOn: 1 }),
+      end: endOfWeek(currentDate, { weekStartsOn: 1 }),
     });
 
     const dayObjects = daysOfWeek.map((day) => ({
@@ -65,7 +66,20 @@ const HabitListItem = ({
     }));
 
     return dayObjects;
-  }, [CURRENT_DATE, completionDates]);
+  }, [completionDates]);
+
+  const { currentStreak, completionPercentage } = useMemo(() => {
+    const { currentStreak } = calculateStreaks(completionDates);
+
+    const daysCompleted = completionDates.reduce(
+      (total, entry) => (entry.isCompleted ? total + 1 : total),
+      0
+    );
+    const totalDays = completionDates.length;
+    const completionPercentage = Math.round((daysCompleted / totalDays) * 100);
+
+    return { currentStreak, completionPercentage };
+  }, [completionDates]);
 
   const handleSwipe = (direction: 'left' | 'right') =>
     onSwipe(direction, habit, swipeableRef);
@@ -120,11 +134,11 @@ const HabitListItem = ({
             <StatsContainer>
               <Stat>
                 <LinkSvg size={SVG_SIZE} fill={customRed1} />
-                <StatText>0</StatText>
+                <StatText>{currentStreak}</StatText>
               </Stat>
               <Stat>
                 <CheckCircleSvg size={SVG_SIZE} fill={customRed1} variant="outline" />
-                <StatText>15%</StatText>
+                <StatText>{completionPercentage}%</StatText>
               </Stat>
             </StatsContainer>
             <ActionsContainer>

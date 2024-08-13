@@ -1,6 +1,6 @@
 import { styled, Text, View } from 'tamagui';
 
-import { CURRENT_DATE, DATE_CARD_HEIGHT } from '@/app/constants';
+import { DATE_CARD_HEIGHT } from '@/app/constants';
 import { setDateToMidnight, toFormattedDateString } from '@/app/utils';
 
 interface Props {
@@ -18,7 +18,7 @@ const HabitDateCard = ({ day, onComplete }: Props) => {
   const { date, weekday, originalDay, isPressable, isCompleted } = day;
 
   const startOfOriginalDay = setDateToMidnight(originalDay);
-  const startOfCurrentDate = setDateToMidnight(CURRENT_DATE);
+  const startOfCurrentDate = setDateToMidnight(new Date());
 
   const isToday =
     toFormattedDateString(startOfOriginalDay) ===

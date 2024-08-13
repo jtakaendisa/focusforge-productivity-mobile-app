@@ -7,7 +7,6 @@ import uuid from 'react-native-uuid';
 import { styled, View, Text, getTokenValue } from 'tamagui';
 
 import { Reminder } from '@/app/entities';
-import { CURRENT_DATE } from '@/app/constants';
 import { toFormattedTimeString } from '@/app/utils';
 import ReminderButton from '../habits/ReminderButton';
 import RippleButton from '../RippleButton';
@@ -21,7 +20,7 @@ const NewReminderModalModule = ({ closeModal, onAdd }: Props) => {
   const [newReminder, setNewReminder] = useState<Reminder>({
     id: uuid.v4() as string,
     type: 'notification',
-    time: CURRENT_DATE,
+    time: new Date(),
   });
 
   const { type, time } = newReminder;

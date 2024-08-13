@@ -1,8 +1,7 @@
-import { format, parse, addDays, endOfMonth, startOfDay } from 'date-fns';
+import { format, parse, addDays, endOfMonth, startOfDay, parseISO } from 'date-fns';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Activity, CompletionDate, Frequency } from '../entities';
-import { CURRENT_DATE } from '../constants';
 
 interface DateGroupedTasks {
   [key: string]: Activity[];
@@ -26,15 +25,21 @@ export const toFormattedTimeString = (date: Date) => {
   return format(date, 'HH:mm');
 };
 
+export const createUTCDate = (date: Date) => {
+  const formattedDate = format(date, 'yyyy-MM-dd');
+  return parseISO(`${formattedDate}T00:00:00Z`);
+};
+
 export const toFormattedSectionTitle = (date: string) => {
-  const yesterday = new Date(CURRENT_DATE);
-  yesterday.setDate(CURRENT_DATE.getDate() - 1);
-  const tomorrow = new Date(CURRENT_DATE);
-  tomorrow.setDate(CURRENT_DATE.getDate() + 1);
+  const currentDate = new Date();
+  const yesterday = new Date();
+  const tomorrow = new Date();
+  yesterday.setDate(currentDate.getDate() - 1);
+  tomorrow.setDate(currentDate.getDate() + 1);
 
   if (date === toFormattedDateString(yesterday)) {
     return 'Yesterday';
-  } else if (date === toFormattedDateString(CURRENT_DATE)) {
+  } else if (date === toFormattedDateString(currentDate)) {
     return 'Today';
   } else if (date === toFormattedDateString(tomorrow)) {
     return 'Tomorrow';
@@ -182,41 +187,51 @@ export const setCompletionDatesInStorage = async (
 export const setDateToMidnight = (date: Date) => startOfDay(date);
 
 export const calculateStreaks = (completionDates: CompletionDate[]) => {
+  const currentDate = new Date();
+
   let currentStreak = 0;
   let bestStreak = 0;
   let tempStreak = 0;
+  let beginTally = false;
   let foundCurrentStreak = false;
 
   // Traverse the array from the end to the beginning
   for (let i = completionDates.length - 1; i >= 0; i--) {
     const completionDate = completionDates[i];
-    const date = parse(completionDate.date, 'dd MMM yyyy', new Date());
+    const date = parse(completionDate.date, 'dd MMM yyyy', currentDate);
 
     // Only consider dates on or before the current date
-    if (setDateToMidnight(date) > setDateToMidnight(CURRENT_DATE)) {
+    if (date > currentDate) {
       continue;
+    }
+
+    if (!beginTally) {
+      const previousCompletionDate = completionDates[i - 1];
+
+      if (!previousCompletionDate.isCompleted) {
+        currentStreak = completionDate.isCompleted ? 1 : 0;
+        foundCurrentStreak = true;
+      }
+
+      beginTally = true;
     }
 
     if (completionDate.isCompleted) {
       tempStreak++;
+
       if (!foundCurrentStreak) {
         currentStreak = tempStreak;
-        foundCurrentStreak = true;
       }
-      bestStreak = Math.max(bestStreak, tempStreak);
+
+      if (tempStreak > bestStreak) {
+        bestStreak = tempStreak;
+      }
     } else {
-      if (foundCurrentStreak) {
-        currentStreak = 0;
-        foundCurrentStreak = false;
-      }
       tempStreak = 0;
+
+      if (completionDate.date !== toFormattedDateString(currentDate))
+        foundCurrentStreak = true;
     }
   }
-
-  // If the last date is a streak, make sure currentStreak is set properly
-  if (foundCurrentStreak) {
-    currentStreak = tempStreak;
-  }
-
   return { currentStreak, bestStreak };
 };

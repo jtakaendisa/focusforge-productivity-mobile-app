@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 import { Text, View, getTokenValue, styled } from 'tamagui';
 
-import { CURRENT_DATE, SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { toFormattedDateString } from '@/app/utils';
 import BellSvg from '../../icons/BellSvg';
 import CalendarEndSvg from '../../icons/CalendarEndSvg';
@@ -47,9 +47,7 @@ const DurationListModule = ({ control }: Props) => {
       if (mode === 'start') {
         setStartDateRef.current?.(selectedDate);
       } else {
-        if (
-          toFormattedDateString(selectedDate) !== toFormattedDateString(CURRENT_DATE)
-        ) {
+        if (toFormattedDateString(selectedDate) !== toFormattedDateString(new Date())) {
           setEndDateRef.current?.(selectedDate);
         } else {
           setEndDateRef.current?.();
@@ -63,7 +61,7 @@ const DurationListModule = ({ control }: Props) => {
       value: new Date(),
       onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
-      minimumDate: CURRENT_DATE,
+      minimumDate: new Date(),
     });
   };
 
@@ -102,7 +100,7 @@ const DurationListModule = ({ control }: Props) => {
                   <LabelText>
                     {startDate &&
                       (toFormattedDateString(startDate) ===
-                      toFormattedDateString(CURRENT_DATE)
+                      toFormattedDateString(new Date())
                         ? 'Today'
                         : toFormattedDateString(startDate))}
                   </LabelText>
@@ -138,7 +136,7 @@ const DurationListModule = ({ control }: Props) => {
                     <LabelText>
                       {endDate
                         ? toFormattedDateString(endDate) ===
-                          toFormattedDateString(CURRENT_DATE)
+                          toFormattedDateString(new Date())
                           ? 'Today'
                           : toFormattedDateString(endDate)
                         : '---'}

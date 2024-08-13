@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { getTokenValue, styled, Text, View } from 'tamagui';
 
-import { CURRENT_DATE } from '@/app/constants';
 import { Activity, NewActivityData } from '@/app/entities';
 import { useActivityStore } from '@/app/store';
 import {
@@ -98,9 +97,7 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
       if (mode === 'start') {
         setStartDateRef.current?.(selectedDate);
       } else {
-        if (
-          toFormattedDateString(selectedDate) !== toFormattedDateString(CURRENT_DATE)
-        ) {
+        if (toFormattedDateString(selectedDate) !== toFormattedDateString(new Date())) {
           setEndDateRef.current?.(selectedDate);
         } else {
           setEndDateRef.current?.();
@@ -114,7 +111,7 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
       value: new Date(),
       onChange: (e, date) => handleDateSelect(e, date, mode),
       is24Hour: true,
-      minimumDate: CURRENT_DATE,
+      minimumDate: new Date(),
     });
   };
 
@@ -267,7 +264,7 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
                   <LabelText>
                     {startDate &&
                       (toFormattedDateString(startDate) ===
-                      toFormattedDateString(CURRENT_DATE)
+                      toFormattedDateString(new Date())
                         ? 'Today'
                         : toFormattedDateString(startDate))}
                   </LabelText>
@@ -303,7 +300,7 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
                     <LabelText>
                       {endDate
                         ? toFormattedDateString(endDate) ===
-                          toFormattedDateString(CURRENT_DATE)
+                          toFormattedDateString(new Date())
                           ? 'Today'
                           : toFormattedDateString(endDate)
                         : '---'}

@@ -1,13 +1,10 @@
 import { create } from 'zustand';
 
-import { CURRENT_DATE } from '../constants';
 import {
   Activity,
   ActivityFilter,
   AuthUser,
   Category,
-  CompletionDatesMap,
-  StreaksMap,
   TaskFilter,
   Theme,
 } from '../entities';
@@ -205,7 +202,7 @@ const useAuthStore = create<AuthStore>((set) => ({
 
 const useActivityStore = create<ActivityStore>((set) => ({
   activities: dummyActivities,
-  selectedDate: CURRENT_DATE,
+  selectedDate: new Date(),
   setActivities: (activities) => set((state) => ({ ...state, activities })),
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
 }));
