@@ -27,9 +27,7 @@ const HabitDateCard = ({ day, onComplete }: Props) => {
   const isPassedDeadline = startOfOriginalDay < startOfCurrentDate;
 
   const isDisabled =
-    !isPressable ||
-    startOfOriginalDay < startOfCurrentDate ||
-    startOfOriginalDay > startOfCurrentDate;
+    !isPressable || startOfOriginalDay.getTime() !== startOfCurrentDate.getTime();
 
   const backgroundColor = isPressable
     ? isCompleted

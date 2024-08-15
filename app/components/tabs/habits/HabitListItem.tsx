@@ -28,7 +28,7 @@ interface Props {
     habit: Activity,
     swipeableRef: MutableRefObject<Swipeable | null>
   ) => void;
-  onComplete: (id: string, updatedCompletionDates: CompletionDate[]) => void;
+  onComplete: (selectedDate: Date, habitId: string) => void;
 }
 
 const SVG_SIZE = 18;
@@ -53,17 +53,19 @@ const HabitListItem = ({
       end: endOfWeek(currentDate, { weekStartsOn: 1 }),
     });
 
-    const dayObjects = daysOfWeek.map((day) => ({
-      weekday: format(day, 'eee'),
-      date: day.getDate(),
-      originalDay: day,
-      isPressable: !!completionDates.find(
-        (cd) => cd.date === toFormattedDateString(day)
-      ),
-      isCompleted: !!completionDates.find(
-        (cd) => cd.date === toFormattedDateString(day)
-      )?.isCompleted,
-    }));
+    const dayObjects = daysOfWeek.map((day) => {
+      const completionDate = completionDates.find(
+        (entry) => entry.date === toFormattedDateString(day)
+      );
+
+      return {
+        weekday: format(day, 'eee'),
+        date: day.getDate(),
+        originalDay: day,
+        isPressable: !!completionDate,
+        isCompleted: !!completionDate?.isCompleted,
+      };
+    });
 
     return dayObjects;
   }, [completionDates]);
@@ -84,14 +86,7 @@ const HabitListItem = ({
   const handleSwipe = (direction: 'left' | 'right') =>
     onSwipe(direction, habit, swipeableRef);
 
-  const handleComplete = (selectedDate: Date) => {
-    const updatedCompletionDates = completionDates.map((cd) =>
-      cd.date === toFormattedDateString(selectedDate)
-        ? { ...cd, isCompleted: !cd.isCompleted }
-        : cd
-    );
-    onComplete(id, updatedCompletionDates);
-  };
+  const handleComplete = (selectedDate: Date) => onComplete(selectedDate, id);
 
   const handleNavigateToCalendarTab = () => onNavigate('calendar', id);
 

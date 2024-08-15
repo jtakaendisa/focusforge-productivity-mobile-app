@@ -7,6 +7,7 @@ import TabBar from './components/tabs/habits/TabBar';
 import EditTask from './components/tabs/tasks/EditTask';
 import { Activity, TaskActiveTab } from './entities';
 import { useActivityStore } from './store';
+import ActivityCalendar from './components/tabs/ActivityCalendar';
 
 type SearchParams = {
   activeTab: TaskActiveTab;
@@ -42,7 +43,7 @@ const TaskDetailsScreen = () => {
       {isRecurring && (
         <TabBar mode="task" activeTab={activeTab} onSelect={handleSelectTab} />
       )}
-      {activeTab === 'calendar' && <Text>Calendar</Text>}
+      {activeTab === 'calendar' && <ActivityCalendar selectedActivity={selectedTask} />}
       {activeTab === 'edit' && (
         <EditTask
           activities={activities}

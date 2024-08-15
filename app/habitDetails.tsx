@@ -4,12 +4,17 @@ import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styled, Text, View } from 'tamagui';
 
+import ActivityCalendar from './components/tabs/ActivityCalendar';
 import EditHabit from './components/tabs/habits/EditHabit';
-import HabitCalendar from './components/tabs/habits/HabitCalendar';
 import HabitStatistics from './components/tabs/habits/HabitStatistics';
 import TabBar from './components/tabs/habits/TabBar';
-import { Activity, HabitActiveTab } from './entities';
+import { Activity, CompletionDatesMap, HabitActiveTab } from './entities';
 import { useActivityStore } from './store';
+import {
+  getCompletionDatesFromStorage,
+  setCompletionDatesInStorage,
+  toFormattedDateString,
+} from './utils';
 
 type SearchParams = {
   activeTab: HabitActiveTab;
@@ -23,8 +28,29 @@ const HabitDetailsScreen = () => {
 
   const [activeTab, setActiveTab] = useState(activeTabParam);
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
+  const [completionDatesMap, setCompletionDatesMap] =
+    useState<CompletionDatesMap | null>(null);
 
   const handleSelectTab = (activeTab: HabitActiveTab) => setActiveTab(activeTab);
+
+  const handleComplete = async (selectedDate?: string) => {
+    if (!selectedDate?.length || !completionDatesMap || !selectedHabit) return;
+
+    const formattedDate = toFormattedDateString(new Date(selectedDate));
+
+    const updatedCompletionDates = completionDatesMap[selectedHabit.id].map((entry) =>
+      entry.date === formattedDate
+        ? { ...entry, isCompleted: !entry.isCompleted }
+        : entry
+    );
+
+    const updatedCompletionDatesMap = {
+      ...completionDatesMap,
+      [selectedHabit.id]: updatedCompletionDates,
+    };
+    await setCompletionDatesInStorage(updatedCompletionDatesMap);
+    setCompletionDatesMap(updatedCompletionDatesMap);
+  };
 
   useEffect(() => {
     const selectedHabit = activities.find((activity) => activity.id === habitId);
@@ -33,7 +59,15 @@ const HabitDetailsScreen = () => {
     }
   }, [activities, habitId]);
 
-  if (!selectedHabit) return null;
+  useEffect(() => {
+    const fetchCompletionDatesMap = async () => {
+      const completionDatesMap = await getCompletionDatesFromStorage();
+      setCompletionDatesMap(completionDatesMap);
+    };
+    fetchCompletionDatesMap();
+  }, []);
+
+  if (!selectedHabit || !completionDatesMap) return null;
 
   return (
     <Container>
@@ -41,7 +75,12 @@ const HabitDetailsScreen = () => {
         <LabelTextLarge>Habit Details</LabelTextLarge>
       </ScreenLabel>
       <TabBar mode="habit" activeTab={activeTab} onSelect={handleSelectTab} />
-      {activeTab === 'calendar' && <HabitCalendar selectedHabit={selectedHabit} />}
+      {activeTab === 'calendar' && (
+        <ActivityCalendar
+          completionDates={completionDatesMap[selectedHabit.id]}
+          onComplete={handleComplete}
+        />
+      )}
       {activeTab === 'statistics' && <HabitStatistics selectedHabit={selectedHabit} />}
       {activeTab === 'edit' && (
         <EditHabit activities={activities} selectedHabit={selectedHabit} />
@@ -53,7 +92,6 @@ const HabitDetailsScreen = () => {
 
 const Container = styled(SafeAreaView, {
   flex: 1,
-  backgroundColor: '$customBlack1',
 });
 
 const ScreenLabel = styled(View, {

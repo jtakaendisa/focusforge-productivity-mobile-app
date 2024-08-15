@@ -4,12 +4,7 @@ import { router } from 'expo-router';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { View, styled } from 'tamagui';
 
-import {
-  Activity,
-  CompletionDate,
-  CompletionDatesMap,
-  HabitActiveTab,
-} from '@/app/entities';
+import { Activity, CompletionDatesMap, HabitActiveTab } from '@/app/entities';
 import { useActivityStore, useSearchStore } from '@/app/store';
 import {
   getCompletionDatesFromStorage,
@@ -22,7 +17,6 @@ import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
 import ActivityOptionsModal from './ActivityOptionsModal';
 import HabitListItem from './HabitListItem';
-import { format, parse } from 'date-fns';
 
 interface Props {
   isSearchBarOpen: boolean;
@@ -38,7 +32,8 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
 
   const [habits, setHabits] = useState<Activity[]>([]);
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
-  const [completionDatesMap, setCompletionDatesMap] = useState<CompletionDatesMap>({});
+  const [completionDatesMap, setCompletionDatesMap] =
+    useState<CompletionDatesMap | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const listRef = useRef<FlashList<Activity> | null>(null);
@@ -90,13 +85,18 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
     swipeableRef.current?.close();
   };
 
-  const handleComplete = async (
-    id: string,
-    updatedCompletionDates: CompletionDate[]
-  ) => {
+  const handleComplete = async (selectedDate: Date, habitId: string) => {
+    if (!completionDatesMap) return;
+
+    const updatedCompletionDates = completionDatesMap[habitId].map((entry) =>
+      entry.date === toFormattedDateString(selectedDate)
+        ? { ...entry, isCompleted: !entry.isCompleted }
+        : entry
+    );
+
     const updatedCompletionDatesMap = {
       ...completionDatesMap,
-      [id]: updatedCompletionDates,
+      [habitId]: updatedCompletionDates,
     };
     await setCompletionDatesInStorage(updatedCompletionDatesMap);
     setCompletionDatesMap(updatedCompletionDatesMap);
@@ -145,6 +145,8 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
       );
     }
   }, [isSearchBarOpen, allHabits, selectedCategories]);
+
+  if (!completionDatesMap) return null;
 
   return (
     <Container isContentCentered={isListEmpty}>
