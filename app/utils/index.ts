@@ -1,4 +1,13 @@
-import { format, parse, addDays, endOfMonth, startOfDay, parseISO } from 'date-fns';
+import {
+  format,
+  parse,
+  addDays,
+  endOfMonth,
+  startOfDay,
+  parseISO,
+  isBefore,
+  isEqual,
+} from 'date-fns';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Activity, CompletionDate, Frequency } from '../entities';
@@ -234,4 +243,29 @@ export const calculateStreaks = (completionDates: CompletionDate[]) => {
     }
   }
   return { currentStreak, bestStreak };
+};
+
+export const calculateHabitScore = (completionDates: CompletionDate[]) => {
+  const currentDate = new Date();
+
+  // Parse date strings into Date objects
+  const parseDate = (dateString: string) =>
+    parse(dateString, 'dd MMM yyyy', new Date());
+
+  // Filter entries up to the current date
+  const entriesUpToNow = completionDates
+    .map((entry) => ({ ...entry, parsedDate: parseDate(entry.date) }))
+    .filter(
+      (entry) =>
+        isBefore(entry.parsedDate, currentDate) ||
+        isEqual(entry.parsedDate, currentDate)
+    );
+
+  const totalEntriesUpToNow = entriesUpToNow.length;
+
+  const completedEntriesUpToNow = entriesUpToNow.filter(
+    (entry) => entry.isCompleted
+  ).length;
+
+  return completedEntriesUpToNow / totalEntriesUpToNow;
 };

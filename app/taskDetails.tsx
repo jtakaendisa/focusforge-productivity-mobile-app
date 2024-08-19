@@ -5,9 +5,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { styled, Text, View } from 'tamagui';
 import TabBar from './components/tabs/habits/TabBar';
 import EditTask from './components/tabs/tasks/EditTask';
-import { Activity, TaskActiveTab } from './entities';
+import { Activity, CompletionDatesMap, TaskActiveTab } from './entities';
 import { useActivityStore } from './store';
 import ActivityCalendar from './components/tabs/ActivityCalendar';
+import {
+  getCompletionDatesFromStorage,
+  setCompletionDatesInStorage,
+  toFormattedDateString,
+} from './utils';
 
 type SearchParams = {
   activeTab: TaskActiveTab;
@@ -21,10 +26,39 @@ const TaskDetailsScreen = () => {
 
   const [activeTab, setActiveTab] = useState(activeTabParam);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
+  const [completionDatesMap, setCompletionDatesMap] =
+    useState<CompletionDatesMap | null>(null);
 
   const isRecurring = selectedTask?.type === 'recurring task';
 
   const handleSelectTab = (activeTab: TaskActiveTab) => setActiveTab(activeTab);
+
+  const handleComplete = async (selectedDate?: string) => {
+    if (!selectedDate?.length || !completionDatesMap || !selectedTask) return;
+
+    const formattedDate = toFormattedDateString(new Date(selectedDate));
+
+    const updatedCompletionDates = completionDatesMap[selectedTask.id].map((entry) =>
+      entry.date === formattedDate
+        ? { ...entry, isCompleted: !entry.isCompleted }
+        : entry
+    );
+
+    const updatedCompletionDatesMap = {
+      ...completionDatesMap,
+      [selectedTask.id]: updatedCompletionDates,
+    };
+    await setCompletionDatesInStorage(updatedCompletionDatesMap);
+    setCompletionDatesMap(updatedCompletionDatesMap);
+  };
+
+  useEffect(() => {
+    const fetchCompletionDatesMap = async () => {
+      const completionDatesMap = await getCompletionDatesFromStorage();
+      setCompletionDatesMap(completionDatesMap);
+    };
+    fetchCompletionDatesMap();
+  }, []);
 
   useEffect(() => {
     const selectedTask = activities.find((activity) => activity.id === taskId);
@@ -33,7 +67,7 @@ const TaskDetailsScreen = () => {
     }
   }, [activities, taskId]);
 
-  if (!selectedTask) return null;
+  if (!selectedTask || !completionDatesMap) return null;
 
   return (
     <Container>
@@ -43,7 +77,13 @@ const TaskDetailsScreen = () => {
       {isRecurring && (
         <TabBar mode="task" activeTab={activeTab} onSelect={handleSelectTab} />
       )}
-      {activeTab === 'calendar' && <ActivityCalendar selectedActivity={selectedTask} />}
+      {activeTab === 'calendar' && (
+        <ActivityCalendar
+          completionDates={completionDatesMap[selectedTask.id]}
+          selectedActivity={selectedTask}
+          onComplete={handleComplete}
+        />
+      )}
       {activeTab === 'edit' && (
         <EditTask
           activities={activities}

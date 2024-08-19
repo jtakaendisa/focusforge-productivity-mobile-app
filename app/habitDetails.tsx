@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styled, Text, View } from 'tamagui';
 
@@ -11,6 +11,7 @@ import TabBar from './components/tabs/habits/TabBar';
 import { Activity, CompletionDatesMap, HabitActiveTab } from './entities';
 import { useActivityStore } from './store';
 import {
+  calculateStreaks,
   getCompletionDatesFromStorage,
   setCompletionDatesInStorage,
   toFormattedDateString,
@@ -30,6 +31,14 @@ const HabitDetailsScreen = () => {
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
   const [completionDatesMap, setCompletionDatesMap] =
     useState<CompletionDatesMap | null>(null);
+
+  const { currentStreak, bestStreak } = useMemo(() => {
+    if (selectedHabit && completionDatesMap) {
+      return calculateStreaks(completionDatesMap[selectedHabit.id]);
+    } else {
+      return { currentStreak: 0, bestStreak: 0 };
+    }
+  }, [selectedHabit, completionDatesMap]);
 
   const handleSelectTab = (activeTab: HabitActiveTab) => setActiveTab(activeTab);
 
@@ -72,16 +81,24 @@ const HabitDetailsScreen = () => {
   return (
     <Container>
       <ScreenLabel>
-        <LabelTextLarge>Habit Details</LabelTextLarge>
+        <LabelTextLarge>{selectedHabit.title}</LabelTextLarge>
       </ScreenLabel>
       <TabBar mode="habit" activeTab={activeTab} onSelect={handleSelectTab} />
       {activeTab === 'calendar' && (
         <ActivityCalendar
           completionDates={completionDatesMap[selectedHabit.id]}
+          selectedActivity={selectedHabit}
+          currentStreak={currentStreak}
           onComplete={handleComplete}
         />
       )}
-      {activeTab === 'statistics' && <HabitStatistics selectedHabit={selectedHabit} />}
+      {activeTab === 'statistics' && (
+        <HabitStatistics
+          completionDates={completionDatesMap[selectedHabit.id]}
+          currentStreak={currentStreak}
+          bestStreak={bestStreak}
+        />
+      )}
       {activeTab === 'edit' && (
         <EditHabit activities={activities} selectedHabit={selectedHabit} />
       )}

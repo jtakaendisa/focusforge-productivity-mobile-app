@@ -186,6 +186,26 @@ const dummyActivities: Activity[] = [
     title: 'Test ST 0',
     type: 'single task',
   },
+  {
+    category: 'Study',
+    endDate: new Date('2024-10-31'),
+    frequency: { type: 'daily' },
+    id: '395506e0-2051-4d8d-a7d2-6f9d95050de3',
+    isCarriedOver: false,
+    isCompleted: false,
+    note: 'Non-fiction, 1 hr session',
+    priority: 'Normal',
+    reminders: [
+      {
+        id: '8fd68936-697f-48b0-bdf7-d40416135215',
+        time: new Date('2024-08-16T07:00:00.000Z'),
+        type: 'notification',
+      },
+    ],
+    startDate: new Date('2024-08-16'),
+    title: 'Read a book',
+    type: 'recurring task',
+  },
 ];
 
 const useAppStore = create<AppStore>((set) => ({

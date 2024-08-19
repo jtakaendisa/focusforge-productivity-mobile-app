@@ -1,12 +1,13 @@
-import { Calendar } from 'react-native-calendars';
-import CustomCalendarTitle from './CustomCalendarTitle';
-import CalendarArrowIcon from './CalendarArrowIcon';
+import { CompletionDate } from '@/app/entities';
 import { toFormattedDateString } from '@/app/utils';
-import CustomCalendarDay from './CustomCalendarDay';
 import { startOfDay } from 'date-fns';
+import { StyleSheet } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 import { Theme } from 'react-native-calendars/src/types';
 import { getTokenValue } from 'tamagui';
-import { CompletionDate } from '@/app/entities';
+import CalendarArrowIcon from './CalendarArrowIcon';
+import CustomCalendarDay from './CustomCalendarDay';
+import CustomCalendarTitle from './CustomCalendarTitle';
 
 interface Props {
   completionDates: CompletionDate[];
@@ -50,8 +51,16 @@ const CustomCalendar = ({ completionDates, onComplete }: Props) => {
         },
         calendarBackground: 'transparent',
       }}
+      style={styles.calendar}
     />
   );
 };
+
+const styles = StyleSheet.create({
+  calendar: {
+    marginTop: 12,
+    marginBottom: 36,
+  },
+});
 
 export default CustomCalendar;
