@@ -7,6 +7,12 @@ import {
   parseISO,
   isBefore,
   isEqual,
+  endOfWeek,
+  endOfYear,
+  isWithinInterval,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
 } from 'date-fns';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -245,12 +251,10 @@ export const calculateStreaks = (completionDates: CompletionDate[]) => {
   return { currentStreak, bestStreak };
 };
 
+const parseDate = (dateString: string) => parse(dateString, 'dd MMM yyyy', new Date());
+
 export const calculateHabitScore = (completionDates: CompletionDate[]) => {
   const currentDate = new Date();
-
-  // Parse date strings into Date objects
-  const parseDate = (dateString: string) =>
-    parse(dateString, 'dd MMM yyyy', new Date());
 
   // Filter entries up to the current date
   const entriesUpToNow = completionDates
@@ -268,4 +272,46 @@ export const calculateHabitScore = (completionDates: CompletionDate[]) => {
   ).length;
 
   return completedEntriesUpToNow / totalEntriesUpToNow;
+};
+
+export const calculateHabitCompletionMetrics = (
+  completionDates: CompletionDate[],
+  currentDate = new Date()
+) => {
+  // Parse dates
+  const entries = completionDates.map((entry) => ({
+    ...entry,
+    parsedDate: parseDate(entry.date),
+  }));
+
+  // Define date ranges
+  const startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 });
+  const endOfCurrentWeek = endOfWeek(currentDate, { weekStartsOn: 1 });
+
+  const startOfCurrentMonth = startOfMonth(currentDate);
+  const endOfCurrentMonth = endOfMonth(currentDate);
+
+  const startOfCurrentYear = startOfYear(currentDate);
+  const endOfCurrentYear = endOfYear(currentDate);
+
+  // Filter function
+  const filterEntries = (startDate: Date, endDate: Date) =>
+    entries.filter((entry) =>
+      isWithinInterval(entry.parsedDate, { start: startDate, end: endDate })
+    );
+
+  // Get metrics
+  return {
+    week: filterEntries(startOfCurrentWeek, endOfCurrentWeek).filter(
+      (entry) => entry.isCompleted
+    ).length,
+    month: filterEntries(startOfCurrentMonth, endOfCurrentMonth).filter(
+      (entry) => entry.isCompleted
+    ).length,
+    year: filterEntries(startOfCurrentYear, endOfCurrentYear).filter(
+      (entry) => entry.isCompleted
+    ).length,
+
+    allTime: entries.filter((entry) => entry.isCompleted).length,
+  };
 };

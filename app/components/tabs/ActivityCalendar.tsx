@@ -54,7 +54,7 @@ const Container = styled(View, {
 
 const PanelText = styled(Text, {
   textAlign: 'center',
-  color: 'gray',
+  color: '$customGray1',
   marginTop: 20,
 });
 

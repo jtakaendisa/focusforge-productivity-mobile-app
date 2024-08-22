@@ -35,7 +35,7 @@ const StatContainer = styled(View, {
 });
 
 const HeadingText = styled(Text, {
-  color: 'gray',
+  color: '$customGray1',
 });
 
 const ValueText = styled(Text, {

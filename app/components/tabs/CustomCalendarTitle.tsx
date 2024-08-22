@@ -42,7 +42,7 @@ const MonthText = styled(Text, {
 
 const YearText = styled(Text, {
   fontSize: 17,
-  color: 'gray',
+  color: '$customGray1',
 });
 
 export default CustomCalendarTitle;
