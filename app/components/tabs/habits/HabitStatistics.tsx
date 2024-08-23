@@ -11,6 +11,7 @@ import CircularProgressBar from './CircularProgressBar';
 import CompletionMetricsInfoPanelModule from './CompletionMetricsInfoPanelModule';
 import CustomPieChart from './CustomPieChart';
 import StreakInfoPanelModule from './StreakInfoPanelModule';
+import StreakChallengeInfoPanelModule from './StreakChallengeInfoPanelModule';
 
 interface Props {
   completionDates: CompletionDate[];
@@ -49,7 +50,9 @@ const HabitStatistics = ({ completionDates, currentStreak, bestStreak }: Props) 
       <ActivityInfoPanel
         icon={<MedalSvg fill={customRed2} variant="outline" />}
         title="Streak challenge"
-      ></ActivityInfoPanel>
+      >
+        <StreakChallengeInfoPanelModule currentStreak={currentStreak} />
+      </ActivityInfoPanel>
     </ScrollView>
   );
 };
