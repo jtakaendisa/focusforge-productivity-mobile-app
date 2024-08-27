@@ -251,7 +251,8 @@ export const calculateStreaks = (completionDates: CompletionDate[]) => {
   return { currentStreak, bestStreak };
 };
 
-const parseDate = (dateString: string) => parse(dateString, 'dd MMM yyyy', new Date());
+export const parseDate = (dateString: string) =>
+  parse(dateString, 'dd MMM yyyy', new Date());
 
 export const calculateHabitScore = (completionDates: CompletionDate[]) => {
   const currentDate = new Date();

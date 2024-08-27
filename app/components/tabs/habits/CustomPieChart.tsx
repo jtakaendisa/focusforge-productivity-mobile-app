@@ -136,7 +136,6 @@ const Circle = styled(View, {
   width: 12,
   height: 12,
   borderRadius: 6,
-  backgroundColor: 'purple',
 });
 
 const AnimatedRotatableContainer = Animated.createAnimatedComponent(RotatableContainer);

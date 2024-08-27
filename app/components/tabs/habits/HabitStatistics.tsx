@@ -12,6 +12,7 @@ import CompletionMetricsInfoPanelModule from './CompletionMetricsInfoPanelModule
 import CustomPieChart from './CustomPieChart';
 import StreakInfoPanelModule from './StreakInfoPanelModule';
 import StreakChallengeInfoPanelModule from './StreakChallengeInfoPanelModule';
+import CustomBarGraph from './CustomBarGraph';
 
 interface Props {
   completionDates: CompletionDate[];
@@ -40,7 +41,9 @@ const HabitStatistics = ({ completionDates, currentStreak, bestStreak }: Props) 
       >
         <CompletionMetricsInfoPanelModule completionDates={completionDates} />
       </ActivityInfoPanel>
-      <ActivityInfoPanel></ActivityInfoPanel>
+      <ActivityInfoPanel>
+        <CustomBarGraph completionDates={completionDates} />
+      </ActivityInfoPanel>
       <ActivityInfoPanel
         icon={<PieChartSvg fill={customRed2} />}
         title="Success / Failure"

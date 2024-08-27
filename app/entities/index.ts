@@ -53,6 +53,8 @@ export type ActivityFilter = 'all' | 'habits' | 'tasks';
 
 export type ActivityType = 'habit' | 'single task' | 'recurring task';
 
+export type BarGraphFilter = 'month' | 'year';
+
 export interface Activity {
   id: string;
   type: ActivityType;
