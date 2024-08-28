@@ -14,6 +14,7 @@ import CategoryIcon from '../CategoryIcon';
 import FrequencyBadge from './FrequencyBadge';
 import HabitOptionIcon from './HabitOptionIcon';
 import RippleButton from '../RippleButton';
+import { categoryColorMap } from '@/app/constants';
 
 interface HabitProps {
   mode: 'habit';
@@ -74,7 +75,13 @@ const ActivityOptionsModal = ({
               <FrequencyBadge frequency={selectedActivity.frequency} />
             )}
           </DetailsContainer>
-          <CategoryContainer>
+          <CategoryContainer
+            backgroundColor={
+              categoryColorMap[
+                selectedActivity?.category ? selectedActivity.category : 'Task'
+              ]
+            }
+          >
             {selectedActivity?.category && (
               <CategoryIcon category={selectedActivity.category} fill={customBlack1} />
             )}
@@ -136,7 +143,6 @@ const CategoryContainer = styled(View, {
   alignItems: 'center',
   width: 36,
   height: 36,
-  backgroundColor: 'gray',
   borderRadius: 8,
 });
 

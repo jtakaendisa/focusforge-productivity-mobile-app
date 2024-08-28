@@ -1,8 +1,12 @@
 import { Control, Controller } from 'react-hook-form';
 import { View, Text, styled, ScrollView, getTokenValue } from 'tamagui';
 
-import { categoryArray } from '@/app/store';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '@/app/constants';
+import {
+  SCREEN_WIDTH,
+  SCREEN_HEIGHT,
+  categories,
+  categoryColorMap,
+} from '@/app/constants';
 import CategoryIcon from '../CategoryIcon';
 import { NewActivityData } from '@/app/entities';
 import RippleButton from '../RippleButton';
@@ -30,7 +34,7 @@ const CategoryModalModule = ({ control, closeModal }: Props) => {
             name="category"
             render={({ field: { onChange } }) => (
               <>
-                {categoryArray.map((category) => (
+                {categories.map((category) => (
                   <RippleButton
                     key={category}
                     onPress={() => {
@@ -39,7 +43,7 @@ const CategoryModalModule = ({ control, closeModal }: Props) => {
                     }}
                   >
                     <CategoryCard>
-                      <CategoryContainer>
+                      <CategoryContainer backgroundColor={categoryColorMap[category]}>
                         <CategoryIcon category={category} fill={customBlack1} />
                       </CategoryContainer>
                       <CategoryTitle>{category}</CategoryTitle>
@@ -97,7 +101,6 @@ const CategoryContainer = styled(View, {
   alignItems: 'center',
   width: 36,
   height: 36,
-  backgroundColor: '$customRed1',
   borderRadius: 8,
 });
 

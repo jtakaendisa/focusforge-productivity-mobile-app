@@ -5,6 +5,7 @@ import RippleButton from './RippleButton';
 import CircularCheckbox from './CircularCheckbox';
 import { useSharedValue } from 'react-native-reanimated';
 import { useEffect } from 'react';
+import { categoryColorMap } from '@/app/constants';
 
 interface Props {
   category: Category;
@@ -33,7 +34,7 @@ const SearchBarCategoryCard = ({
     <RippleButton onPress={handleSelect}>
       <Container isBordered={!isLastIndex}>
         <InnerRow>
-          <CategoryContainer>
+          <CategoryContainer backgroundColor={categoryColorMap[category]}>
             <CategoryIcon category={category} fill={customBlack1} />
           </CategoryContainer>
           <TitleText>{category}</TitleText>
@@ -74,7 +75,6 @@ const CategoryContainer = styled(View, {
   alignItems: 'center',
   width: 32,
   height: 32,
-  backgroundColor: 'gray',
   borderRadius: 8,
 });
 

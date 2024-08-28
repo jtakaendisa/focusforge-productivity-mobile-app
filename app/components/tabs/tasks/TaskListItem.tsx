@@ -18,6 +18,7 @@ import CircularCheckbox from '../CircularCheckbox';
 import RippleButton from '../RippleButton';
 import TaskItemLeftActions from './TaskItemLeftActions';
 import TaskItemRightActions from './TaskItemRightActions';
+import { categoryColorMap } from '@/app/constants';
 
 interface Props {
   task: Activity;
@@ -130,7 +131,7 @@ const TaskListItem = ({
                   <ProgressText>{generateProgressText(checklist)}</ProgressText>
                 )}
               </MetricsContainer>
-              <CategoryContainer>
+              <CategoryContainer backgroundColor={categoryColorMap[category]}>
                 <CategoryIcon category={category} fill={customBlack1} />
               </CategoryContainer>
             </InfoContainer>
@@ -195,7 +196,6 @@ const CategoryContainer = styled(View, {
   alignItems: 'center',
   width: 36,
   height: 36,
-  backgroundColor: 'gray',
   borderRadius: 8,
 });
 

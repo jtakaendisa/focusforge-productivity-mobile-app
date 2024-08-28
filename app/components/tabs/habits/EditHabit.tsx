@@ -39,6 +39,7 @@ import TextModalModule from '../modals/TextModalModule';
 import RippleButton from '../RippleButton';
 import FrequencyBadge from './FrequencyBadge';
 import FrequencyListModule from './FrequencyListModule';
+import { categoryColorMap } from '@/app/constants';
 
 interface Props {
   activities: Activity[];
@@ -198,7 +199,7 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
             <SquareGridSvg size={SVG_SIZE} fill={customRed1} />
             <OptionTitle>Category</OptionTitle>
           </OptionInfo>
-          <CategoryContainer>
+          <CategoryContainer backgroundColor={categoryColorMap[category]}>
             <CategoryIcon category={category} fill={customBlack1} />
           </CategoryContainer>
         </OptionContainer>
@@ -414,7 +415,6 @@ const CategoryContainer = styled(View, {
   alignItems: 'center',
   width: 36,
   height: 36,
-  backgroundColor: '$customRed1',
   borderRadius: 8,
 });
 

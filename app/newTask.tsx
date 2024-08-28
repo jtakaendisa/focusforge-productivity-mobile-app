@@ -51,6 +51,7 @@ import {
 } from './utils';
 import { activitySchema } from './validationSchemas';
 import RippleButton from './components/tabs/RippleButton';
+import { categoryColorMap } from './constants';
 
 type SearchParams = {
   isRecurring: string;
@@ -240,7 +241,7 @@ const NewTaskScreen = () => {
           </OptionInfo>
           <Row>
             <Text color="$customRed1">{category}</Text>
-            <CategoryContainer>
+            <CategoryContainer backgroundColor={categoryColorMap[category]}>
               <CategoryIcon category={category} fill={customBlack1} />
             </CategoryContainer>
           </Row>
@@ -550,7 +551,6 @@ const CategoryContainer = styled(View, {
   alignItems: 'center',
   width: 36,
   height: 36,
-  backgroundColor: '$customRed1',
   borderRadius: 8,
 });
 

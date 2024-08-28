@@ -2,9 +2,9 @@ import { SCREEN_HEIGHT } from '@/app/constants';
 import { Activity, Category } from '@/app/entities';
 import { FlashList } from '@shopify/flash-list';
 import { useEffect, useState } from 'react';
-import { getTokenValue, ScrollView, styled, Text, View } from 'tamagui';
-import SearchBarCategoryCard from '../SearchBarCategoryCard';
+import { ScrollView, styled, Text, View } from 'tamagui';
 import RippleButton from '../RippleButton';
+import SearchBarCategoryCard from '../SearchBarCategoryCard';
 
 interface Props {
   activities: (string | Activity)[];
@@ -30,8 +30,6 @@ const SearchBarCategoryModalModule = ({
 
     setUniqueCategories([...new Set(categories)]);
   }, [activities]);
-
-  const customRed1 = getTokenValue('$customRed1');
 
   return (
     <Container>
@@ -65,7 +63,7 @@ const SearchBarCategoryModalModule = ({
       </RippleButton>
       <RippleButton onPress={closeModal}>
         <Button>
-          <ButtonText color={customRed1}>Close</ButtonText>
+          <ButtonText color="$customRed1">Close</ButtonText>
         </Button>
       </RippleButton>
     </Container>

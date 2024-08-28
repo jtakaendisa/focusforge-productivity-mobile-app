@@ -1,8 +1,12 @@
 import { Control, Controller } from 'react-hook-form';
 import { View, Text, styled, getTokenValue } from 'tamagui';
 
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
-import { categoryArray } from '@/app/store';
+import {
+  categories,
+  categoryColorMap,
+  SCREEN_HEIGHT,
+  SCREEN_WIDTH,
+} from '@/app/constants';
 import CategoryIcon from '../CategoryIcon';
 import { NewActivityData } from '@/app/entities';
 
@@ -25,7 +29,7 @@ const CategoryListModule = ({ control, navigateForward }: Props) => {
           name="category"
           render={({ field: { onChange } }) => (
             <>
-              {categoryArray.map((category) => (
+              {categories.map((category) => (
                 <CategoryContainer
                   key={category}
                   onPress={() => {
@@ -36,7 +40,9 @@ const CategoryListModule = ({ control, navigateForward }: Props) => {
                   <CategoryCard>
                     <CategoryCardInnerRow>
                       <Text>{category}</Text>
-                      <CategoryIconContainer>
+                      <CategoryIconContainer
+                        backgroundColor={categoryColorMap[category]}
+                      >
                         <CategoryIcon category={category} fill={customBlack1} />
                       </CategoryIconContainer>
                     </CategoryCardInnerRow>
@@ -99,7 +105,6 @@ const CategoryIconContainer = styled(View, {
   alignItems: 'center',
   width: 36,
   height: 36,
-  backgroundColor: 'gray',
   borderRadius: 8,
 });
 

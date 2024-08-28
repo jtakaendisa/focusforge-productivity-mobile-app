@@ -49,6 +49,7 @@ import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import RemindersModalModule from '../modals/RemindersModalModule';
 import TextModalModule from '../modals/TextModalModule';
+import { categoryColorMap } from '@/app/constants';
 
 interface Props {
   activities: Activity[];
@@ -233,7 +234,7 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
           </OptionInfo>
           <Row>
             <Text color="$customRed1">{category}</Text>
-            <CategoryContainer>
+            <CategoryContainer backgroundColor={categoryColorMap[category]}>
               <CategoryIcon category={category} fill={customBlack1} />
             </CategoryContainer>
           </Row>
@@ -509,7 +510,6 @@ const CategoryContainer = styled(View, {
   alignItems: 'center',
   width: 36,
   height: 36,
-  backgroundColor: '$customRed1',
   borderRadius: 8,
 });
 

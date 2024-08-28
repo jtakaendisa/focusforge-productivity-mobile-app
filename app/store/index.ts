@@ -43,24 +43,6 @@ interface SearchStore {
   setFilteredActivities: (filteredActivities: (string | Activity)[]) => void;
 }
 
-export const categoryArray = [
-  'Task',
-  'Quit',
-  'Art',
-  'Meditation',
-  'Study',
-  'Sports',
-  'Recreation',
-  'Social',
-  'Finance',
-  'Health',
-  'Work',
-  'Nutrition',
-  'Home',
-  'Outdoor',
-  'Other',
-] as const;
-
 const dummyActivities: Activity[] = [
   {
     category: 'Health',

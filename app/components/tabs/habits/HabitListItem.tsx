@@ -17,6 +17,7 @@ import FrequencyBadge from './FrequencyBadge';
 import HabitDateCard from './HabitDateCard';
 import HabitItemLeftActions from './HabitItemLeftActions';
 import HabitItemRightActions from './HabitItemRightActions';
+import { categoryColorMap } from '@/app/constants';
 
 interface Props {
   habit: Activity;
@@ -116,7 +117,7 @@ const HabitListItem = ({
               <Title>{toTruncatedText(title, 38)}</Title>
               <FrequencyBadge frequency={frequency!} />
             </TitleContainer>
-            <CategoryContainer>
+            <CategoryContainer backgroundColor={categoryColorMap[category]}>
               <CategoryIcon category={category} fill={customBlack1} />
             </CategoryContainer>
           </DetailsRow>
@@ -188,7 +189,6 @@ const CategoryContainer = styled(View, {
   alignItems: 'center',
   width: 36,
   height: 36,
-  backgroundColor: 'gray',
   borderRadius: 8,
 });
 

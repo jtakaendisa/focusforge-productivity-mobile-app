@@ -1,6 +1,5 @@
 import { z } from 'zod';
-
-import { categoryArray } from './store';
+import { categories } from './constants';
 
 const emailSchema = z.string().email({ message: 'Invalid email address' });
 
@@ -28,7 +27,7 @@ const titleSchema = z
   .min(2, { message: 'Task description must be at least 2 characters long' })
   .max(80, { message: 'Task description must not exceed 80 characters' });
 
-export const categorySchema = z.enum(categoryArray);
+export const categorySchema = z.enum(categories);
 
 export const checklistItemSchema = z.object({
   id: z.string().min(1, { message: 'ID must be at least 1 characters long' }),
