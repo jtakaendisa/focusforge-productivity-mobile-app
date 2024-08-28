@@ -2,14 +2,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatedFlashList, FlashList, ViewToken } from '@shopify/flash-list';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 import { Text, View, styled } from 'tamagui';
 
+import { BackHandler } from 'react-native';
 import Dot from './components/tabs/habits/Dot';
 import NewHabitListItem from './components/tabs/habits/NewHabitListItem';
+import AbortActionModalModule from './components/tabs/modals/AbortActionModalModule';
+import ModalContainer from './components/tabs/modals/ModalContainer';
 import { SCREEN_WIDTH } from './constants';
 import { Activity, NewActivityData } from './entities';
 import { useActivityStore } from './store';
@@ -34,6 +37,7 @@ const NewHabitScreen = () => {
   const setActivities = useActivityStore((s) => s.setActivities);
 
   const [listIndex, setListIndex] = useState(0);
+  const [isAbortActionModalOpen, setIsAbortActionModalOpen] = useState(false);
 
   const listRef = useRef<FlashList<typeof listItems> | null>(null);
 
@@ -78,7 +82,7 @@ const NewHabitScreen = () => {
         animated: true,
       });
     } else {
-      router.replace(origin);
+      toggleAbortActionModal();
     }
   };
 
@@ -117,6 +121,27 @@ const NewHabitScreen = () => {
 
     setActivities([...activities, toCleanedObject(newHabit)]);
   };
+
+  const handleAbortAction = () => {
+    reset();
+    router.replace(origin);
+  };
+
+  const toggleAbortActionModal = useCallback(
+    () => setIsAbortActionModalOpen((prev) => !prev),
+    []
+  );
+
+  useEffect(() => {
+    const backAction = () => {
+      setIsAbortActionModalOpen(true);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, []);
 
   useEffect(() => {
     if (!isSubmitSuccessful) return;
@@ -166,6 +191,17 @@ const NewHabitScreen = () => {
           )}
         </Button>
       </ButtonsContainer>
+
+      <ModalContainer
+        isOpen={isAbortActionModalOpen}
+        closeModal={toggleAbortActionModal}
+      >
+        <AbortActionModalModule
+          onAbort={handleAbortAction}
+          closeModal={toggleAbortActionModal}
+        />
+      </ModalContainer>
+
       <StatusBar style="light" />
     </Container>
   );
@@ -173,7 +209,6 @@ const NewHabitScreen = () => {
 
 const Container = styled(SafeAreaView, {
   flex: 1,
-  backgroundColor: '$customBlack1',
 });
 
 const ButtonsContainer = styled(View, {
