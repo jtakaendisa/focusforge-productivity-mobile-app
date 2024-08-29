@@ -11,7 +11,16 @@ import { getTokenValue, TamaguiProvider, View } from 'tamagui';
 import { LogBox } from 'react-native';
 import config from '../tamagui.config';
 import { authStateChangeListener, formatAuthUserData } from './services/auth';
-import { useAuthStore } from './store';
+import { useActivityStore, useAuthStore } from './store';
+import { Activity, CompletionDatesMap } from './entities';
+import { isLastDayOfMonth } from 'date-fns';
+import {
+  getCompletionDatesFromStorage,
+  getLastUpdateDate,
+  setCompletionDatesInStorage,
+  setLastUpdateDate,
+  updateCompletionDatesForRecurringActivities,
+} from './utils';
 
 LogBox.ignoreAllLogs(true); // Ignore all logs (warnings and errors)
 
@@ -29,9 +38,13 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const activities = useActivityStore((s) => s.activities);
   const setAuthUser = useAuthStore((s) => s.setAuthUser);
 
   const [loadedAuth, setLoadedAuth] = useState(false);
+  const [completionDatesMap, setCompletionDatesMap] =
+    useState<CompletionDatesMap | null>(null);
+  const [loadedCompletionDates, setLoadedCompletionDates] = useState(false);
 
   const [loadedFonts, error] = useFonts({
     Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
@@ -44,7 +57,7 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
-    if (loadedFonts && loadedAuth) {
+    if (loadedFonts && loadedAuth && loadedCompletionDates) {
       SplashScreen.hideAsync();
     }
   }, [loadedFonts, loadedAuth]);
@@ -65,7 +78,43 @@ export default function RootLayout() {
     return unsubscribe;
   }, []);
 
-  if (!loadedFonts || !loadedAuth) {
+  useEffect(() => {
+    const fetchCompletionDatesMap = async () => {
+      const completionDatesMap = await getCompletionDatesFromStorage();
+      setCompletionDatesMap(completionDatesMap);
+    };
+    fetchCompletionDatesMap();
+  }, []);
+
+  useEffect(() => {
+    const handleCompletionDatesUpdate = async (
+      activities: Activity[],
+      completionDatesMap: CompletionDatesMap
+    ) => {
+      const lastUpdateDate = await getLastUpdateDate();
+      const currentDate = new Date();
+
+      if (
+        isLastDayOfMonth(currentDate) &&
+        (!lastUpdateDate || lastUpdateDate < currentDate)
+      ) {
+        const updatedCompletionDatesMap =
+          await updateCompletionDatesForRecurringActivities(
+            activities,
+            completionDatesMap
+          );
+        await setCompletionDatesInStorage(updatedCompletionDatesMap);
+        await setLastUpdateDate(currentDate);
+      }
+      setLoadedCompletionDates(true);
+    };
+
+    if (activities && completionDatesMap) {
+      handleCompletionDatesUpdate(activities, completionDatesMap);
+    }
+  }, [activities, completionDatesMap]);
+
+  if (!loadedFonts || !loadedAuth || !loadedCompletionDates) {
     return null;
   }
 

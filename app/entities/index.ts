@@ -51,9 +51,9 @@ export type TaskActiveTab = 'calendar' | 'edit';
 
 export type ActivityFilter = 'all' | 'habits' | 'tasks';
 
-export type ActivityType = 'habit' | 'single task' | 'recurring task';
-
 export type BarGraphFilter = 'month' | 'year';
+
+export type ActivityType = 'habit' | 'single task' | 'recurring task';
 
 export interface Activity {
   id: string;

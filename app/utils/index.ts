@@ -13,10 +13,12 @@ import {
   startOfMonth,
   startOfWeek,
   startOfYear,
+  isSameDay,
+  addMonths,
 } from 'date-fns';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { Activity, CompletionDate, Frequency } from '../entities';
+import { Activity, CompletionDate, CompletionDatesMap, Frequency } from '../entities';
 
 interface DateGroupedTasks {
   [key: string]: Activity[];
@@ -315,4 +317,42 @@ export const calculateHabitCompletionMetrics = (
 
     allTime: entries.filter((entry) => entry.isCompleted).length,
   };
+};
+
+export const isLastDayOfMonth = (date: Date): boolean => {
+  return isSameDay(date, endOfMonth(date));
+};
+
+export const getLastUpdateDate = async () => {
+  const lastUpdate = await AsyncStorage.getItem('lastCompletionDateUpdate');
+  return lastUpdate ? new Date(lastUpdate) : null;
+};
+
+export const setLastUpdateDate = async (date: Date) =>
+  await AsyncStorage.setItem('lastCompletionDateUpdate', date.toISOString());
+
+export const updateCompletionDatesForRecurringActivities = async (
+  activities: Activity[],
+  completionDatesMap: CompletionDatesMap
+) => {
+  const newCompletionDatesMap = { ...completionDatesMap };
+  const currentDate = new Date();
+  const nextMonthEnd = endOfMonth(addMonths(currentDate, 1));
+
+  activities.forEach((activity) => {
+    if (!activity.endDate && activity.type !== 'single task') {
+      const existingDates = newCompletionDatesMap[activity.id] || [];
+      const newDates = generateCompletionDates(
+        currentDate,
+        activity.frequency,
+        nextMonthEnd
+      );
+      newCompletionDatesMap[activity.id] = mergeCompletionDates(
+        existingDates,
+        newDates
+      );
+    }
+  });
+
+  return newCompletionDatesMap;
 };
