@@ -4,6 +4,8 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const DATE_CARD_HEIGHT = 66;
 
+const TIMER_LIST_ITEM_WIDTH = SCREEN_WIDTH / 4;
+
 const categories = [
   'Task',
   'Quit',
@@ -40,4 +42,11 @@ const categoryColorMap = {
   Other: '#A9A9A9',
 };
 
-export { SCREEN_WIDTH, SCREEN_HEIGHT, DATE_CARD_HEIGHT, categories, categoryColorMap };
+export {
+  SCREEN_WIDTH,
+  SCREEN_HEIGHT,
+  DATE_CARD_HEIGHT,
+  TIMER_LIST_ITEM_WIDTH,
+  categories,
+  categoryColorMap,
+};

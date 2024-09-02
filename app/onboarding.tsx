@@ -35,7 +35,7 @@ const OnboardingScreen = () => {
     }
   };
 
-  if (authUser) return <Redirect href="/(tabs)" />;
+  if (authUser) return <Redirect href="/(drawer)/(tabs)/" />;
 
   return (
     <Container>
