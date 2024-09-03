@@ -26,6 +26,7 @@ const tokens = createTokens({
     customGreen1: '#2A8844',
     customGreen2: '#43B368',
     customGreen3: '#223D2A',
+    customPurple1: '#413588',
     customRed1: '#C73A57',
     customRed2: '#C33756',
     customRed3: '#962C42',

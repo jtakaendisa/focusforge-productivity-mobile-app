@@ -129,8 +129,8 @@ const Container = styled(View, {
 const Circle = styled(View, {
   justifyContent: 'center',
   alignItems: 'center',
-  width: TIMER_LIST_ITEM_WIDTH,
-  height: TIMER_LIST_ITEM_WIDTH,
+  width: TIMER_LIST_ITEM_WIDTH * 0.8,
+  height: TIMER_LIST_ITEM_WIDTH * 0.8,
   borderRadius: TIMER_LIST_ITEM_WIDTH,
   borderWidth: 2,
 });

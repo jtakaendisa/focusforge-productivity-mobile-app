@@ -52617,73 +52617,80 @@
           "val": "#223D2A",
           "variable": ""
         },
+        "customPurple1": {
+          "isVar": true,
+          "key": "$customPurple1",
+          "name": "color-207",
+          "val": "#413588",
+          "variable": ""
+        },
         "customRed1": {
           "isVar": true,
           "key": "$customRed1",
-          "name": "color-207",
+          "name": "color-208",
           "val": "#C73A57",
           "variable": ""
         },
         "customRed2": {
           "isVar": true,
           "key": "$customRed2",
-          "name": "color-208",
+          "name": "color-209",
           "val": "#C33756",
           "variable": ""
         },
         "customRed3": {
           "isVar": true,
           "key": "$customRed3",
-          "name": "color-209",
+          "name": "color-210",
           "val": "#962C42",
           "variable": ""
         },
         "customRed4": {
           "isVar": true,
           "key": "$customRed4",
-          "name": "color-210",
+          "name": "color-211",
           "val": "#652533",
           "variable": ""
         },
         "customRed5": {
           "isVar": true,
           "key": "$customRed5",
-          "name": "color-211",
+          "name": "color-212",
           "val": "#31181E",
           "variable": ""
         },
         "customRed6": {
           "isVar": true,
           "key": "$customRed6",
-          "name": "color-212",
+          "name": "color-213",
           "val": "rgba(150, 44, 66, 0.25)",
           "variable": ""
         },
         "customRed7": {
           "isVar": true,
           "key": "$customRed7",
-          "name": "color-213",
+          "name": "color-214",
           "val": "#F04B5F",
           "variable": ""
         },
         "customRed8": {
           "isVar": true,
           "key": "$customRed8",
-          "name": "color-214",
+          "name": "color-215",
           "val": "#4F2529",
           "variable": ""
         },
         "customYellow1": {
           "isVar": true,
           "key": "$customYellow1",
-          "name": "color-215",
+          "name": "color-216",
           "val": "#FAB632",
           "variable": ""
         },
         "customYellow2": {
           "isVar": true,
           "key": "$customYellow2",
-          "name": "color-216",
+          "name": "color-217",
           "val": "#4F3F1E",
           "variable": ""
         }
@@ -54974,73 +54981,80 @@
         "val": "#223D2A",
         "variable": ""
       },
+      "$color.customPurple1": {
+        "isVar": true,
+        "key": "$customPurple1",
+        "name": "color-207",
+        "val": "#413588",
+        "variable": ""
+      },
       "$color.customRed1": {
         "isVar": true,
         "key": "$customRed1",
-        "name": "color-207",
+        "name": "color-208",
         "val": "#C73A57",
         "variable": ""
       },
       "$color.customRed2": {
         "isVar": true,
         "key": "$customRed2",
-        "name": "color-208",
+        "name": "color-209",
         "val": "#C33756",
         "variable": ""
       },
       "$color.customRed3": {
         "isVar": true,
         "key": "$customRed3",
-        "name": "color-209",
+        "name": "color-210",
         "val": "#962C42",
         "variable": ""
       },
       "$color.customRed4": {
         "isVar": true,
         "key": "$customRed4",
-        "name": "color-210",
+        "name": "color-211",
         "val": "#652533",
         "variable": ""
       },
       "$color.customRed5": {
         "isVar": true,
         "key": "$customRed5",
-        "name": "color-211",
+        "name": "color-212",
         "val": "#31181E",
         "variable": ""
       },
       "$color.customRed6": {
         "isVar": true,
         "key": "$customRed6",
-        "name": "color-212",
+        "name": "color-213",
         "val": "rgba(150, 44, 66, 0.25)",
         "variable": ""
       },
       "$color.customRed7": {
         "isVar": true,
         "key": "$customRed7",
-        "name": "color-213",
+        "name": "color-214",
         "val": "#F04B5F",
         "variable": ""
       },
       "$color.customRed8": {
         "isVar": true,
         "key": "$customRed8",
-        "name": "color-214",
+        "name": "color-215",
         "val": "#4F2529",
         "variable": ""
       },
       "$color.customYellow1": {
         "isVar": true,
         "key": "$customYellow1",
-        "name": "color-215",
+        "name": "color-216",
         "val": "#FAB632",
         "variable": ""
       },
       "$color.customYellow2": {
         "isVar": true,
         "key": "$customYellow2",
-        "name": "color-216",
+        "name": "color-217",
         "val": "#4F3F1E",
         "variable": ""
       },
