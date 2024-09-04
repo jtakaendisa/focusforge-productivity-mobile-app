@@ -5,6 +5,7 @@ import {
   ActivityFilter,
   AuthUser,
   Category,
+  CompletionDatesMap,
   TaskFilter,
   Theme,
 } from '../entities';
@@ -24,8 +25,10 @@ interface AuthStore {
 interface ActivityStore {
   activities: Activity[];
   selectedDate: Date;
+  completionDatesMap: CompletionDatesMap;
   setActivities: (activities: Activity[]) => void;
   setSelectedDate: (selectedDate: Date) => void;
+  setCompletionDatesMap: (completionDatesMap: CompletionDatesMap) => void;
 }
 
 interface SearchStore {
@@ -205,8 +208,11 @@ const useAuthStore = create<AuthStore>((set) => ({
 const useActivityStore = create<ActivityStore>((set) => ({
   activities: dummyActivities,
   selectedDate: new Date(),
+  completionDatesMap: {},
   setActivities: (activities) => set((state) => ({ ...state, activities })),
   setSelectedDate: (selectedDate) => set((state) => ({ ...state, selectedDate })),
+  setCompletionDatesMap: (completionDatesMap) =>
+    set((state) => ({ ...state, completionDatesMap })),
 }));
 
 const useSearchStore = create<SearchStore>((set) => ({

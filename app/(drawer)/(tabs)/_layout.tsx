@@ -1,18 +1,35 @@
-import { Redirect, Tabs } from 'expo-router';
+import { Redirect, Tabs, usePathname } from 'expo-router';
 import { getTokenValue } from 'tamagui';
 
 import CustomHeader from '@/app/components/tabs/CustomHeader';
 import CustomTabBarButton from '../../components/tabs/CustomTabBarButton';
 import { SCREEN_HEIGHT } from '../../constants';
-import { useAuthStore, useSearchStore } from '../../store';
+import { useActivityStore, useAuthStore, useSearchStore } from '../../store';
+import { TabRoute } from '@/app/entities';
+import { getCompletionDatesFromStorage } from '@/app/utils';
 
 const TabLayout = () => {
+  const pathname = (usePathname().substring(1) || 'home') as TabRoute;
+
   const authUser = useAuthStore((s) => s.authUser);
   const setisSearchBarOpen = useSearchStore((s) => s.setIsSearchBarOpen);
+  const setCompletionDatesMap = useActivityStore((s) => s.setCompletionDatesMap);
 
   const customGray3 = getTokenValue('$customGray3');
 
+  const fetchCompletionDatesMap = async () => {
+    const completionDatesMap = await getCompletionDatesFromStorage();
+    setCompletionDatesMap(completionDatesMap);
+  };
+
   const handleSearchBarClose = () => setisSearchBarOpen(false);
+
+  const handleTabPress = () => {
+    if (pathname === 'home' || pathname === 'habits') {
+      fetchCompletionDatesMap();
+    }
+    handleSearchBarClose();
+  };
 
   if (!authUser) {
     return <Redirect href="/(auth)" />;
@@ -31,7 +48,7 @@ const TabLayout = () => {
         tabBarButton: CustomTabBarButton,
       }}
       screenListeners={{
-        tabPress: handleSearchBarClose,
+        tabPress: handleTabPress,
       }}
     >
       <Tabs.Screen

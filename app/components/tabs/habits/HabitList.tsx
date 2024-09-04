@@ -24,16 +24,16 @@ interface Props {
 
 const HabitList = ({ isSearchBarOpen }: Props) => {
   const activities = useActivityStore((s) => s.activities);
+  const completionDatesMap = useActivityStore((s) => s.completionDatesMap);
   const setActivities = useActivityStore((s) => s.setActivities);
   const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
+  const setCompletionDatesMap = useActivityStore((s) => s.setCompletionDatesMap);
 
   const searchTerm = useSearchStore((s) => s.searchTerm);
   const selectedCategories = useSearchStore((s) => s.selectedCategories);
 
   const [habits, setHabits] = useState<Activity[]>([]);
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
-  const [completionDatesMap, setCompletionDatesMap] =
-    useState<CompletionDatesMap | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const listRef = useRef<FlashList<Activity> | null>(null);
@@ -101,14 +101,6 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
     await setCompletionDatesInStorage(updatedCompletionDatesMap);
     setCompletionDatesMap(updatedCompletionDatesMap);
   };
-
-  useEffect(() => {
-    const fetchCompletionDatesMap = async () => {
-      const completionDatesMap = await getCompletionDatesFromStorage();
-      setCompletionDatesMap(completionDatesMap);
-    };
-    fetchCompletionDatesMap();
-  }, []);
 
   useEffect(() => {
     setHabits(allHabits);

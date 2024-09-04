@@ -85,9 +85,10 @@ const getIsCompleted = (
 const ActivityList = ({ isSearchBarOpen }: Props) => {
   const selectedDate = useActivityStore((s) => s.selectedDate);
   const activities = useActivityStore((s) => s.activities);
+  const completionDatesMap = useActivityStore((s) => s.completionDatesMap);
   const setActivities = useActivityStore((s) => s.setActivities);
   const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
-
+  const setCompletionDatesMap = useActivityStore((s) => s.setCompletionDatesMap);
   const activityFilter = useSearchStore((s) => s.activityFilter);
   const searchTerm = useSearchStore((s) => s.searchTerm);
   const selectedCategories = useSearchStore((s) => s.selectedCategories);
@@ -95,7 +96,6 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
   const [activitiesDueToday, setActivitiesDueToday] = useState<Activity[]>([]);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
   const [carriedOverPendingTasks, setCarriedOverPendingTasks] = useState(false);
-  const [completionDatesMap, setCompletionDatesMap] = useState<CompletionDatesMap>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
   const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
@@ -228,14 +228,6 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
   const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
 
   const toggleChecklistModal = () => setIsChecklistModalOpen((prev) => !prev);
-
-  useEffect(() => {
-    const fetchCompletionDatesMap = async () => {
-      const completionDatesMap = await getCompletionDatesFromStorage();
-      setCompletionDatesMap(completionDatesMap);
-    };
-    fetchCompletionDatesMap();
-  }, []);
 
   useEffect(() => {
     const updatedActivities = carryOverTasks(activities);
