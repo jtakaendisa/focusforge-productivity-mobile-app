@@ -4,13 +4,9 @@ import { router } from 'expo-router';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { View, styled } from 'tamagui';
 
-import { Activity, CompletionDatesMap, HabitActiveTab } from '@/app/entities';
+import { Activity, HabitActiveTab } from '@/app/entities';
 import { useActivityStore, useSearchStore } from '@/app/store';
-import {
-  getCompletionDatesFromStorage,
-  setCompletionDatesInStorage,
-  toFormattedDateString,
-} from '@/app/utils';
+import { setCompletionDatesInStorage, toFormattedDateString } from '@/app/utils';
 import { Swipeable } from 'react-native-gesture-handler';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
 import DeleteModalModule from '../modals/DeleteModalModule';

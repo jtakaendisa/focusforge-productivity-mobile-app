@@ -1,7 +1,7 @@
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Activity, TaskActiveTab, TaskFilter } from '@/app/entities';
+import { Activity, TaskActiveTab } from '@/app/entities';
 import { useActivityStore, useSearchStore } from '@/app/store';
 import { toDateGroupedTasks, toFormattedSections } from '@/app/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';

@@ -4,7 +4,6 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { Activity, CompletionDatesMap, Priority } from '@/app/entities';
 import { useActivityStore, useSearchStore } from '@/app/store';
 import {
-  getCompletionDatesFromStorage,
   setCompletionDatesInStorage,
   setDateToMidnight,
   toFormattedDateString,
