@@ -1,25 +1,11 @@
-import { useEffect, useState } from 'react';
-import { TextInput, TouchableOpacity } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
-import {
-  Controller,
-  DeepRequired,
-  FieldErrorsImpl,
-  FieldValues,
-  GlobalError,
-  IsAny,
-  SubmitErrorHandler,
-  SubmitHandler,
-  useForm,
-} from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { StatusBar } from 'expo-status-bar';
+import { Controller, SubmitHandler } from 'react-hook-form';
+import { TextInput, TouchableOpacity } from 'react-native';
 import { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Text } from 'tamagui';
+import { z } from 'zod';
 
-import { signinSchema } from '../validationSchemas';
-import { signInAuthUser } from '../services/auth';
 import {
   AnimatedInputContainer,
   AnimatedLargeLight,
@@ -36,52 +22,23 @@ import {
   InputsContainer,
   LightsContainer,
 } from '../components/auth/styled';
+import useFormHandler from '../hooks/useFormHandler';
+import useMountAnimation from '../hooks/useMountAnimation';
+import { signInAuthUser } from '../services/auth';
+import { signinSchema } from '../validationSchemas';
 
 type SigninFormData = z.infer<typeof signinSchema>;
 
-type FieldErrors<T extends FieldValues = SigninFormData> = Partial<
-  FieldValues extends IsAny<FieldValues> ? any : FieldErrorsImpl<DeepRequired<T>>
-> & {
-  root?: Record<string, GlobalError> & GlobalError;
-};
-
 const SigninScreen = () => {
-  const [playAnimations, setPlayAnimations] = useState(true);
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const playAnimations = useMountAnimation();
 
-  const { control, handleSubmit, reset } = useForm<SigninFormData>({
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-    resolver: zodResolver(signinSchema),
+  const { control, errors, handleFormSubmit } = useFormHandler({
+    schema: signinSchema,
+    defaultValues: { email: '', password: '' },
+    onSubmit,
   });
 
-  const onSubmit: SubmitHandler<SigninFormData> = async (data) => {
-    const { email, password } = data;
-
-    setErrors({});
-
-    try {
-      await signInAuthUser(email, password);
-      reset();
-      router.replace('/(drawer)/(tabs)');
-    } catch (error) {
-      console.log('user sign in encountered an error', (error as Error).message);
-    }
-  };
-
-  const onError: SubmitErrorHandler<SigninFormData> = (errors) => {
-    setErrors(errors);
-  };
-
-  useEffect(() => {
-    if (playAnimations) {
-      setTimeout(() => {
-        setPlayAnimations(false);
-      }, 2100);
-    }
-  }, [playAnimations]);
+  const navigateToSignUpScreen = () => router.push('/signup');
 
   return (
     <Container>
@@ -157,7 +114,7 @@ const SigninScreen = () => {
                   ? FadeInDown.delay(400).duration(1000).springify()
                   : undefined
               }
-              onPress={handleSubmit(onSubmit, onError)}
+              onPress={handleFormSubmit}
             >
               <ButtonText>Login</ButtonText>
             </AnimatedSubmitButton>
@@ -179,7 +136,7 @@ const SigninScreen = () => {
             }
           >
             <Text color="black">Don't have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/signup')}>
+            <TouchableOpacity onPress={navigateToSignUpScreen}>
               <Text color="#2892c7">Sign up</Text>
             </TouchableOpacity>
           </AnimatedSignupContainer>
@@ -188,6 +145,13 @@ const SigninScreen = () => {
       <StatusBar style="light" />
     </Container>
   );
+};
+
+const onSubmit: SubmitHandler<SigninFormData> = async (data) => {
+  const { email, password } = data;
+
+  await signInAuthUser(email, password);
+  router.replace('/(drawer)/(tabs)');
 };
 
 export default SigninScreen;

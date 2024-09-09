@@ -1,21 +1,9 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
-import {
-  Controller,
-  DeepRequired,
-  FieldErrorsImpl,
-  FieldValues,
-  GlobalError,
-  IsAny,
-  SubmitErrorHandler,
-  SubmitHandler,
-  useForm,
-} from 'react-hook-form';
+import { Controller, SubmitHandler } from 'react-hook-form';
 import { TextInput, TouchableOpacity } from 'react-native';
 import { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { Text, useWindowDimensions } from 'tamagui';
+import { Text } from 'tamagui';
 import { z } from 'zod';
 
 import {
@@ -34,58 +22,23 @@ import {
   InputsContainer,
   LightsContainer,
 } from '../components/auth/styled';
+import useFormHandler from '../hooks/useFormHandler';
+import useMountAnimation from '../hooks/useMountAnimation';
 import { createAuthUser, createUserDocument } from '../services/auth';
 import { signupSchema } from '../validationSchemas';
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
-type FieldErrors<T extends FieldValues = SignupFormData> = Partial<
-  FieldValues extends IsAny<FieldValues> ? any : FieldErrorsImpl<DeepRequired<T>>
-> & {
-  root?: Record<string, GlobalError> & GlobalError;
-};
-
 const SignupScreen = () => {
-  const [playAnimations, setPlayAnimations] = useState(true);
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const playAnimations = useMountAnimation();
 
-  const { control, handleSubmit, reset } = useForm<SignupFormData>({
-    defaultValues: {
-      username: '',
-      email: '',
-      password: '',
-    },
-    resolver: zodResolver(signupSchema),
+  const { control, errors, handleFormSubmit } = useFormHandler({
+    schema: signupSchema,
+    defaultValues: { username: '', email: '', password: '' },
+    onSubmit,
   });
 
-  const onSubmit: SubmitHandler<SignupFormData> = async (data) => {
-    const { username, email, password } = data;
-
-    setErrors({});
-
-    try {
-      const user = await createAuthUser(email, password);
-      if (user) {
-        await createUserDocument(user, username);
-        reset();
-        router.replace('/(drawer)/(tabs)');
-      }
-    } catch (error) {
-      console.log('user creation encountered an error', (error as Error).message);
-    }
-  };
-
-  const onError: SubmitErrorHandler<SignupFormData> = (errors) => {
-    setErrors(errors);
-  };
-
-  useEffect(() => {
-    if (playAnimations) {
-      setTimeout(() => {
-        setPlayAnimations(false);
-      }, 2100);
-    }
-  }, [playAnimations]);
+  const navigateToSignInScreen = () => router.push('/');
 
   return (
     <Container>
@@ -183,7 +136,7 @@ const SignupScreen = () => {
                   ? FadeInDown.delay(600).duration(1000).springify()
                   : undefined
               }
-              onPress={handleSubmit(onSubmit, onError)}
+              onPress={handleFormSubmit}
             >
               <ButtonText>Create Account</ButtonText>
             </AnimatedSubmitButton>
@@ -205,7 +158,7 @@ const SignupScreen = () => {
             }
           >
             <Text color="black">Already have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/')}>
+            <TouchableOpacity onPress={navigateToSignInScreen}>
               <Text color="#2892c7">Sign in</Text>
             </TouchableOpacity>
           </AnimatedSignupContainer>
@@ -214,6 +167,16 @@ const SignupScreen = () => {
       <StatusBar style="light" />
     </Container>
   );
+};
+
+const onSubmit: SubmitHandler<SignupFormData> = async (data) => {
+  const { username, email, password } = data;
+
+  const user = await createAuthUser(email, password);
+  if (user) {
+    await createUserDocument(user, username);
+    router.replace('/(drawer)/(tabs)');
+  }
 };
 
 export default SignupScreen;
