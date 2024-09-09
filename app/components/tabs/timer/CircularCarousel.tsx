@@ -2,11 +2,15 @@ import { TIMER_LIST_ITEM_WIDTH } from '@/app/constants';
 import { memo, useEffect } from 'react';
 import { FlatList, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import Animated, {
+  runOnJS,
+  runOnUI,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import TimerListItem from './TimerListItem';
+import { ReanimatedScrollEvent } from 'react-native-reanimated/lib/typescript/reanimated2/hook/commonTypes';
 
 interface Props {
   containerHeight: number;
@@ -24,13 +28,18 @@ const CircularCarousel = ({
   const scrollX = useSharedValue(0);
   const opacity = useSharedValue(1);
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const contentOffsetX = event.nativeEvent.contentOffset.x;
-    scrollX.value = contentOffsetX;
-
-    const currentIndex = calculateCurrentIndex(contentOffsetX, TIMER_LIST_ITEM_WIDTH);
+  const changeTimerDuration = (offsetX: number) => {
+    const currentIndex = calculateCurrentIndex(offsetX, TIMER_LIST_ITEM_WIDTH);
     onSelect(currentIndex);
   };
+
+  const handleScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      const offsetX = event.contentOffset.x;
+      scrollX.value = offsetX;
+      runOnJS(changeTimerDuration)(offsetX);
+    },
+  });
 
   const opacityAnimation = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -42,7 +51,7 @@ const CircularCarousel = ({
 
   return (
     <Animated.View style={opacityAnimation}>
-      <FlatList
+      <Animated.FlatList
         data={timers}
         renderItem={({ item, index }) => (
           <TimerListItem timer={item} index={index} scrollX={scrollX} />

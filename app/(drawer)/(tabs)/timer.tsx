@@ -1,5 +1,5 @@
 import CircularCarousel from '@/app/components/tabs/timer/CircularCarousel';
-import { SCREEN_HEIGHT, SCREEN_WIDTH, TIMER_LIST_ITEM_WIDTH } from '@/app/constants';
+import { SCREEN_WIDTH, TIMER_LIST_ITEM_WIDTH } from '@/app/constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LayoutChangeEvent, Vibration } from 'react-native';
 import Animated, {

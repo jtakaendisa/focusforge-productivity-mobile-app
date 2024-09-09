@@ -51,7 +51,7 @@ const OnboardingCard = ({ item, index, x }: Props) => {
         <AnimatedCircle style={[{ backgroundColor }, circleAnimation]} />
       </CircleContainer>
       <AnimatedImageContainer style={lottieAnimation}>
-        <LottieImage source={animation} loop />
+        <LottieImage source={animation} autoPlay loop />
       </AnimatedImageContainer>
       <OnboardingText style={{ color: textColor }}>{text}</OnboardingText>
     </Container>
@@ -82,8 +82,6 @@ const Circle = styled(View, {
   borderRadius: SCREEN_WIDTH / 2,
 });
 
-const ImageContainer = styled(View);
-
 const LottieImage = styled(LottieView, {
   width: SCREEN_WIDTH * 0.9,
   height: SCREEN_WIDTH * 0.9,
@@ -97,7 +95,7 @@ const OnboardingText = styled(Text, {
   marginHorizontal: 20,
 });
 
-const AnimatedImageContainer = Animated.createAnimatedComponent(ImageContainer);
+const AnimatedImageContainer = Animated.createAnimatedComponent(View);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default OnboardingCard;
