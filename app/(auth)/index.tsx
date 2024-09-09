@@ -29,6 +29,15 @@ import { signinSchema } from '../validationSchemas';
 
 type SigninFormData = z.infer<typeof signinSchema>;
 
+const onSubmit: SubmitHandler<SigninFormData> = async (data) => {
+  const { email, password } = data;
+
+  await signInAuthUser(email, password);
+  router.replace('/(drawer)/(tabs)');
+};
+
+const navigateToSignUpScreen = () => router.push('/signup');
+
 const SigninScreen = () => {
   const playAnimations = useMountAnimation();
 
@@ -37,8 +46,6 @@ const SigninScreen = () => {
     defaultValues: { email: '', password: '' },
     onSubmit,
   });
-
-  const navigateToSignUpScreen = () => router.push('/signup');
 
   return (
     <Container>
@@ -145,13 +152,6 @@ const SigninScreen = () => {
       <StatusBar style="light" />
     </Container>
   );
-};
-
-const onSubmit: SubmitHandler<SigninFormData> = async (data) => {
-  const { email, password } = data;
-
-  await signInAuthUser(email, password);
-  router.replace('/(drawer)/(tabs)');
 };
 
 export default SigninScreen;

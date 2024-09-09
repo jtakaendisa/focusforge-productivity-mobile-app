@@ -29,6 +29,18 @@ import { signupSchema } from '../validationSchemas';
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
+const onSubmit: SubmitHandler<SignupFormData> = async (data) => {
+  const { username, email, password } = data;
+
+  const user = await createAuthUser(email, password);
+  if (user) {
+    await createUserDocument(user, username);
+    router.replace('/(drawer)/(tabs)');
+  }
+};
+
+const navigateToSignInScreen = () => router.push('/');
+
 const SignupScreen = () => {
   const playAnimations = useMountAnimation();
 
@@ -37,8 +49,6 @@ const SignupScreen = () => {
     defaultValues: { username: '', email: '', password: '' },
     onSubmit,
   });
-
-  const navigateToSignInScreen = () => router.push('/');
 
   return (
     <Container>
@@ -167,16 +177,6 @@ const SignupScreen = () => {
       <StatusBar style="light" />
     </Container>
   );
-};
-
-const onSubmit: SubmitHandler<SignupFormData> = async (data) => {
-  const { username, email, password } = data;
-
-  const user = await createAuthUser(email, password);
-  if (user) {
-    await createUserDocument(user, username);
-    router.replace('/(drawer)/(tabs)');
-  }
 };
 
 export default SignupScreen;

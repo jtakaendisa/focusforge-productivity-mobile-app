@@ -1,31 +1,46 @@
 import CircularCarousel from '@/app/components/tabs/timer/CircularCarousel';
 import { SCREEN_WIDTH, TIMER_LIST_ITEM_WIDTH } from '@/app/constants';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { LayoutChangeEvent, Vibration } from 'react-native';
+import useContainerHeight from '@/app/hooks/useContainerHeight';
+import useCustomColors from '@/app/hooks/useCustomColors';
+import useTimerCountdown from '@/app/hooks/useTimerCountdown';
+import { useCallback, useMemo, useState } from 'react';
 import Animated, {
-  cancelAnimation,
-  Easing,
   Extrapolation,
   FadeIn,
   FadeOut,
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useDerivedValue,
-  useSharedValue,
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { ReText } from 'react-native-redash';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
 const TimerScreen = () => {
-  const [containerHeight, setContainerHeight] = useState<number | null>(null);
   const [timerDuration, setTimerDuration] = useState(25);
-  const [isCountingDown, setIsCountingDown] = useState(false);
-  const [isCountdownPaused, setIsCountdownPaused] = useState(false);
 
-  const remainingTime = useSharedValue(0);
+  const { containerHeight, handleLayout } = useContainerHeight();
+
+  const {
+    remainingTime,
+    isCountdownPaused,
+    isCountingDown,
+    startCountdown,
+    pauseCountdown,
+    resumeCountdown,
+    resetCountdown,
+  } = useTimerCountdown(timerDuration);
+
+  const {
+    customGreen2,
+    customGreen3,
+    customPurple1,
+    customRed7,
+    customRed8,
+    customYellow1,
+    customYellow2,
+  } = useCustomColors();
 
   const timers = useMemo(() => [...Array(13).keys()].map((i) => i * 5).slice(1), []);
 
@@ -40,51 +55,6 @@ const TimerScreen = () => {
     const seconds = Math.floor(remainingTime.value % 60);
     return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   });
-
-  const startAnimation = () => {
-    Vibration.cancel();
-    toggleIsCountingDown();
-
-    remainingTime.value = withTiming(
-      0,
-      {
-        duration: remainingTime.value * 1000,
-        easing: Easing.linear,
-      },
-      (finished) => {
-        if (finished) {
-          runOnJS(Vibration.vibrate)();
-          runOnJS(toggleIsCountingDown)();
-          remainingTime.value = timerDuration * 60;
-        }
-      }
-    );
-  };
-
-  const pauseAnimation = () => {
-    toggleIsCountdownPaused();
-    toggleIsCountingDown();
-    cancelAnimation(remainingTime);
-  };
-
-  const resumeAnimation = () => {
-    toggleIsCountdownPaused();
-    startAnimation();
-  };
-
-  const resetAnimation = () => {
-    setIsCountdownPaused(false);
-    setIsCountingDown(false);
-    remainingTime.value = timerDuration * 60;
-  };
-
-  const customGreen2 = getTokenValue('$customGreen2');
-  const customGreen3 = getTokenValue('$customGreen3');
-  const customPurple1 = getTokenValue('$customPurple1');
-  const customRed7 = getTokenValue('$customRed7');
-  const customRed8 = getTokenValue('$customRed8');
-  const customYellow1 = getTokenValue('$customYellow1');
-  const customYellow2 = getTokenValue('$customYellow2');
 
   const startButtonAnimation = useAnimatedStyle(() => {
     const width =
@@ -197,19 +167,6 @@ const TimerScreen = () => {
     };
   });
 
-  const toggleIsCountingDown = () => setIsCountingDown((prev) => !prev);
-
-  const toggleIsCountdownPaused = () => setIsCountdownPaused((prev) => !prev);
-
-  const handleLayout = (event: LayoutChangeEvent) => {
-    const { height } = event.nativeEvent.layout;
-    setContainerHeight(height);
-  };
-
-  useEffect(() => {
-    remainingTime.value = timerDuration * 60;
-  }, [timerDuration]);
-
   return (
     <Container onLayout={handleLayout}>
       {!!containerHeight && (
@@ -239,7 +196,7 @@ const TimerScreen = () => {
           />
           <AnimatedResetButton
             bottom={containerHeight / 6}
-            onPress={resetAnimation}
+            onPress={resetCountdown}
             style={resetButtonAnimation}
           >
             <ButtonText>reset</ButtonText>
@@ -248,10 +205,10 @@ const TimerScreen = () => {
             bottom={containerHeight / 6}
             onPress={
               isCountingDown
-                ? pauseAnimation
+                ? pauseCountdown
                 : isCountdownPaused
-                ? resumeAnimation
-                : startAnimation
+                ? resumeCountdown
+                : startCountdown
             }
             style={startButtonAnimation}
           >

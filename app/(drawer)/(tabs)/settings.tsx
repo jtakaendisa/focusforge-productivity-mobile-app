@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getTokenValue, Image, styled, Text, View } from 'tamagui';
+import { Image, styled, Text, View } from 'tamagui';
 
 import ArrowRightFromBracketSvg from '@/app/components/icons/ArrowRightFromBracketSvg';
 import BellSvg from '@/app/components/icons/BellSvg';
@@ -7,6 +7,7 @@ import MoonStarsSvg from '@/app/components/icons/MoonStarsSvg';
 import PenToSquareSvg from '@/app/components/icons/PenToSquareSvg';
 import RippleButton from '@/app/components/tabs/RippleButton';
 import { useAuth } from '@/app/hooks/useAuth';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { useImagePicker } from '@/app/hooks/useImagePicker';
 import EditPhotoModalModule from '../../components/tabs/modals/EditPhotoModalModule';
 import ModalContainer from '../../components/tabs/modals/ModalContainer';
@@ -14,14 +15,14 @@ import Switch from '../../components/tabs/settings/Switch';
 import { SCREEN_HEIGHT } from '../../constants';
 
 const SettingsScreen = () => {
+  const [darkMode, setDarkMode] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(false);
+
   const { authUser, signOut } = useAuth();
   const { photoUri, isModalOpen, toggleModal, uploadImage, removeImage } =
     useImagePicker();
 
-  const [darkMode, setDarkMode] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(false);
-
-  const customRed1 = getTokenValue('$customRed1');
+  const { customRed1 } = useCustomColors();
 
   const handleCameraPress = () => uploadImage('camera');
 
