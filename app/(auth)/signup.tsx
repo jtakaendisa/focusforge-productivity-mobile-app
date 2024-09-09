@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { TextInput, TouchableOpacity } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 import {
   Controller,
   DeepRequired,
@@ -13,13 +13,11 @@ import {
   SubmitHandler,
   useForm,
 } from 'react-hook-form';
+import { TextInput, TouchableOpacity } from 'react-native';
+import { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { Text, useWindowDimensions } from 'tamagui';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Text, View, styled, useWindowDimensions } from 'tamagui';
-import { FadeInUp, FadeInDown } from 'react-native-reanimated';
 
-import { signupSchema } from '../validationSchemas';
-import { createAuthUser, createUserDocument } from '../services/auth';
 import {
   AnimatedInputContainer,
   AnimatedLargeLight,
@@ -36,6 +34,8 @@ import {
   InputsContainer,
   LightsContainer,
 } from '../components/auth/styled';
+import { createAuthUser, createUserDocument } from '../services/auth';
+import { signupSchema } from '../validationSchemas';
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
@@ -48,8 +48,6 @@ type FieldErrors<T extends FieldValues = SignupFormData> = Partial<
 const SignupScreen = () => {
   const [playAnimations, setPlayAnimations] = useState(true);
   const [errors, setErrors] = useState<FieldErrors>({});
-
-  const { height: SCREEN_HEIGHT } = useWindowDimensions();
 
   const { control, handleSubmit, reset } = useForm<SignupFormData>({
     defaultValues: {
@@ -70,7 +68,7 @@ const SignupScreen = () => {
       if (user) {
         await createUserDocument(user, username);
         reset();
-        router.replace('/(tabs)');
+        router.replace('/(drawer)/(tabs)');
       }
     } catch (error) {
       console.log('user creation encountered an error', (error as Error).message);

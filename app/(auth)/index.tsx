@@ -65,7 +65,7 @@ const SigninScreen = () => {
     try {
       await signInAuthUser(email, password);
       reset();
-      router.replace('/(tabs)');
+      router.replace('/(drawer)/(tabs)');
     } catch (error) {
       console.log('user sign in encountered an error', (error as Error).message);
     }
