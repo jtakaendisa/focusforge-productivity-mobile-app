@@ -51,7 +51,7 @@ const OnboardingCard = ({ item, index, x }: Props) => {
         <AnimatedCircle style={[{ backgroundColor }, circleAnimation]} />
       </CircleContainer>
       <AnimatedImageContainer style={lottieAnimation}>
-        <LottieImage source={animation} autoPlay loop />
+        <LottieImage source={animation} loop />
       </AnimatedImageContainer>
       <OnboardingText style={{ color: textColor }}>{text}</OnboardingText>
     </Container>

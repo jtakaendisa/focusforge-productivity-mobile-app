@@ -1,21 +1,22 @@
-import { useRef } from 'react';
-import { ViewToken } from 'react-native';
 import { Redirect } from 'expo-router';
-import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
-import { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import { useRef } from 'react';
+import { FlatList, ViewToken } from 'react-native';
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { styled, View } from 'tamagui';
 
-import { useAuthStore } from './store';
 import { data, OnboardingData } from '@/data';
-import { SCREEN_WIDTH } from './constants';
+import CustomButton from './components/onboarding/CustomButton';
 import OnboardingCard from './components/onboarding/OnboardingCard';
 import Pagination from './components/onboarding/Pagination';
-import CustomButton from './components/onboarding/CustomButton';
+import { useAuthStore } from './store';
 
 const OnboardingScreen = () => {
   const authUser = useAuthStore((s) => s.authUser);
 
-  const listRef = useRef<FlashList<OnboardingData> | null>(null);
+  const listRef = useRef<FlatList<OnboardingData> | null>(null);
   const listIndex = useSharedValue(0);
   const x = useSharedValue(0);
 
@@ -39,14 +40,13 @@ const OnboardingScreen = () => {
 
   return (
     <Container>
-      <AnimatedFlashList
+      <Animated.FlatList
         ref={listRef}
         data={data}
         renderItem={({ item, index }) => (
           <OnboardingCard item={item} index={index} x={x} />
         )}
         keyExtractor={(item) => item.id.toString()}
-        estimatedItemSize={SCREEN_WIDTH}
         onScroll={handleScroll}
         scrollEventThrottle={16}
         horizontal

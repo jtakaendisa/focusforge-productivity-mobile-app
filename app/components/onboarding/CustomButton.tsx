@@ -1,8 +1,7 @@
 import { MutableRefObject } from 'react';
-import { TouchableWithoutFeedback } from 'react-native';
+import { FlatList, TouchableWithoutFeedback } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FlashList } from '@shopify/flash-list';
 import Animated, {
   Easing,
   SharedValue,
@@ -16,7 +15,7 @@ import { OnboardingData } from '@/data';
 import { SCREEN_WIDTH } from '@/app/constants';
 
 interface Props {
-  listRef: MutableRefObject<FlashList<OnboardingData> | null>;
+  listRef: MutableRefObject<FlatList<OnboardingData> | null>;
   listIndex: SharedValue<number>;
   dataLength: number;
   x: SharedValue<number>;
