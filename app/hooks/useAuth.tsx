@@ -1,8 +1,16 @@
 import { router } from 'expo-router';
 import { useAuthStore } from '../store';
-import { signOutAuthUser } from '../services/auth';
+import {
+  authStateChangeListener,
+  formatAuthUserData,
+  signOutAuthUser,
+} from '../services/auth';
+import { useEffect, useState } from 'react';
+import { User } from 'firebase/auth';
 
 export const useAuth = () => {
+  const [loadedAuth, setLoadedAuth] = useState(false);
+
   const authUser = useAuthStore((s) => s.authUser);
   const setAuthUser = useAuthStore((s) => s.setAuthUser);
 
@@ -16,5 +24,21 @@ export const useAuth = () => {
     }
   };
 
-  return { authUser, signOut };
+  useEffect(() => {
+    const unsubscribe = authStateChangeListener(async (user: User) => {
+      try {
+        if (user) {
+          const formattedAuthUser = await formatAuthUserData(user);
+          setAuthUser(formattedAuthUser);
+        }
+        setLoadedAuth(true);
+      } catch (error) {
+        setAuthUser(null);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  return { loadedAuth, authUser, signOut };
 };

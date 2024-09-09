@@ -3,24 +3,15 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { User } from 'firebase/auth';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { getTokenValue, TamaguiProvider, View } from 'tamagui';
+import { TamaguiProvider, View } from 'tamagui';
 
 import { LogBox } from 'react-native';
 import config from '../tamagui.config';
-import { authStateChangeListener, formatAuthUserData } from './services/auth';
-import { useActivityStore, useAuthStore } from './store';
-import { Activity, CompletionDatesMap } from './entities';
-import { isLastDayOfMonth } from 'date-fns';
-import {
-  getCompletionDatesFromStorage,
-  getLastUpdateDate,
-  setCompletionDatesInStorage,
-  setLastUpdateDate,
-  updateCompletionDatesForRecurringActivities,
-} from './utils';
+import { useAuth } from './hooks/useAuth';
+import useCompletionDates from './hooks/useCompletionDates';
+import useCustomColors from './hooks/useCustomColors';
 
 LogBox.ignoreAllLogs(true); // Ignore all logs (warnings and errors)
 
@@ -38,13 +29,9 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const activities = useActivityStore((s) => s.activities);
-  const setAuthUser = useAuthStore((s) => s.setAuthUser);
+  const { loadedAuth } = useAuth();
 
-  const [loadedAuth, setLoadedAuth] = useState(false);
-  const [completionDatesMap, setCompletionDatesMap] =
-    useState<CompletionDatesMap | null>(null);
-  const [loadedCompletionDates, setLoadedCompletionDates] = useState(false);
+  const { loadedCompletionDates } = useCompletionDates();
 
   const [loadedFonts, error] = useFonts({
     Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
@@ -62,58 +49,6 @@ export default function RootLayout() {
     }
   }, [loadedFonts, loadedAuth]);
 
-  useEffect(() => {
-    const unsubscribe = authStateChangeListener(async (user: User) => {
-      try {
-        if (user) {
-          const formattedAuthUser = await formatAuthUserData(user);
-          setAuthUser(formattedAuthUser);
-        }
-        setLoadedAuth(true);
-      } catch (error) {
-        setAuthUser(null);
-      }
-    });
-
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    const fetchCompletionDatesMap = async () => {
-      const completionDatesMap = await getCompletionDatesFromStorage();
-      setCompletionDatesMap(completionDatesMap);
-    };
-    fetchCompletionDatesMap();
-  }, []);
-
-  useEffect(() => {
-    const handleCompletionDatesUpdate = async (
-      activities: Activity[],
-      completionDatesMap: CompletionDatesMap
-    ) => {
-      const lastUpdateDate = await getLastUpdateDate();
-      const currentDate = new Date();
-
-      if (
-        isLastDayOfMonth(currentDate) &&
-        (!lastUpdateDate || lastUpdateDate < currentDate)
-      ) {
-        const updatedCompletionDatesMap =
-          await updateCompletionDatesForRecurringActivities(
-            activities,
-            completionDatesMap
-          );
-        await setCompletionDatesInStorage(updatedCompletionDatesMap);
-        await setLastUpdateDate(currentDate);
-      }
-      setLoadedCompletionDates(true);
-    };
-
-    if (activities && completionDatesMap) {
-      handleCompletionDatesUpdate(activities, completionDatesMap);
-    }
-  }, [activities, completionDatesMap]);
-
   if (!loadedFonts || !loadedAuth || !loadedCompletionDates) {
     return null;
   }
@@ -122,7 +57,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const customBlack1 = getTokenValue('$customBlack1');
+  const { customBlack1 } = useCustomColors();
 
   return (
     <TamaguiProvider config={config}>

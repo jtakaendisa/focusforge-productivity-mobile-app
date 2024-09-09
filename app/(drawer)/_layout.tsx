@@ -1,10 +1,11 @@
 import { Drawer } from 'expo-router/drawer';
 
 import CustomDrawerContent from '../components/CustomDrawerContent';
-import { getTokenValue } from 'tamagui';
+import useCustomColors from '../hooks/useCustomColors';
 
 export default function Layout() {
-  const customBlack2 = getTokenValue('$customBlack2');
+  const { customBlack2 } = useCustomColors();
+
   return (
     <Drawer
       drawerContent={CustomDrawerContent}

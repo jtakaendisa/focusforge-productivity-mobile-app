@@ -1,24 +1,21 @@
 import {
-  format,
-  parse,
-  addDays,
   endOfMonth,
-  startOfDay,
-  parseISO,
-  isBefore,
-  isEqual,
   endOfWeek,
   endOfYear,
+  format,
+  isBefore,
+  isEqual,
+  isSameDay,
   isWithinInterval,
+  parse,
+  parseISO,
+  startOfDay,
   startOfMonth,
   startOfWeek,
   startOfYear,
-  isSameDay,
-  addMonths,
 } from 'date-fns';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { Activity, CompletionDate, CompletionDatesMap, Frequency } from '../entities';
+import { Activity, CompletionDate } from '../entities';
 
 interface DateGroupedTasks {
   [key: string]: Activity[];
@@ -108,97 +105,6 @@ export const toCleanedObject = <T extends { [key: string]: any }>(obj: T): T => 
     }
   }
   return cleanedObj;
-};
-
-export const generateCompletionDates = (
-  startDate: Date,
-  frequency: Frequency,
-  endDate?: Date
-) => {
-  const dates: CompletionDate[] = [];
-  let currentDate = startDate;
-  const currentDateLimit = endDate ? endDate : endOfMonth(new Date());
-
-  switch (frequency.type) {
-    case 'daily':
-      while (currentDate <= currentDateLimit) {
-        dates.push({ date: toFormattedDateString(currentDate), isCompleted: false });
-        currentDate = addDays(currentDate, 1);
-      }
-      break;
-
-    case 'specific':
-      const daysOfWeek = frequency.isRepeatedOn || [];
-      while (currentDate <= currentDateLimit) {
-        if (
-          daysOfWeek.includes(
-            currentDate.toLocaleDateString('en-US', { weekday: 'long' })
-          )
-        ) {
-          dates.push({ date: toFormattedDateString(currentDate), isCompleted: false });
-        }
-        currentDate = addDays(currentDate, 1);
-      }
-      break;
-
-    case 'repeats':
-      const interval = frequency.isRepeatedEvery || 1;
-      while (currentDate <= currentDateLimit) {
-        dates.push({ date: toFormattedDateString(currentDate), isCompleted: false });
-        currentDate = addDays(currentDate, interval);
-      }
-      break;
-  }
-
-  return dates;
-};
-
-export const mergeCompletionDates = (
-  existingCompletionDates: CompletionDate[],
-  newCompletionDates: CompletionDate[]
-) => {
-  // Create a map from completionDates to preserve the completion status
-  const dateMap: { [key: string]: CompletionDate } = {};
-
-  // Add existing dates to the map
-  existingCompletionDates.forEach((dateObj) => {
-    dateMap[dateObj.date] = dateObj;
-  });
-
-  // Add new dates to the map, preserving existing completion status
-  newCompletionDates.forEach((dateObj) => {
-    if (!dateMap[dateObj.date]) {
-      dateMap[dateObj.date] = dateObj;
-    }
-  });
-
-  // Convert the map back to an array
-  return Object.values(dateMap);
-};
-
-export const getCompletionDatesFromStorage = async (): Promise<
-  Record<string, CompletionDate[]>
-> => {
-  try {
-    const data = await AsyncStorage.getItem('completionDatesMap');
-    return data ? JSON.parse(data) : {};
-  } catch (error) {
-    console.error('Failed to retrieve completion dates map:', error);
-    return {};
-  }
-};
-
-export const setCompletionDatesInStorage = async (
-  completionDatesMap: Record<string, CompletionDate[]>
-) => {
-  try {
-    await AsyncStorage.setItem(
-      'completionDatesMap',
-      JSON.stringify(completionDatesMap)
-    );
-  } catch (error) {
-    console.error('Failed to save completion dates map:', error);
-  }
 };
 
 export const setDateToMidnight = (date: Date) => startOfDay(date);
@@ -321,38 +227,4 @@ export const calculateHabitCompletionMetrics = (
 
 export const isLastDayOfMonth = (date: Date): boolean => {
   return isSameDay(date, endOfMonth(date));
-};
-
-export const getLastUpdateDate = async () => {
-  const lastUpdate = await AsyncStorage.getItem('lastCompletionDateUpdate');
-  return lastUpdate ? new Date(lastUpdate) : null;
-};
-
-export const setLastUpdateDate = async (date: Date) =>
-  await AsyncStorage.setItem('lastCompletionDateUpdate', date.toISOString());
-
-export const updateCompletionDatesForRecurringActivities = async (
-  activities: Activity[],
-  completionDatesMap: CompletionDatesMap
-) => {
-  const newCompletionDatesMap = { ...completionDatesMap };
-  const currentDate = new Date();
-  const nextMonthEnd = endOfMonth(addMonths(currentDate, 1));
-
-  activities.forEach((activity) => {
-    if (!activity.endDate && activity.type !== 'single task') {
-      const existingDates = newCompletionDatesMap[activity.id] || [];
-      const newDates = generateCompletionDates(
-        currentDate,
-        activity.frequency,
-        nextMonthEnd
-      );
-      newCompletionDatesMap[activity.id] = mergeCompletionDates(
-        existingDates,
-        newDates
-      );
-    }
-  });
-
-  return newCompletionDatesMap;
 };

@@ -7,6 +7,7 @@ import { SCREEN_HEIGHT } from '../../constants';
 import { useActivityStore, useAuthStore, useSearchStore } from '../../store';
 import { TabRoute } from '@/app/entities';
 import { getCompletionDatesFromStorage } from '@/app/utils';
+import useCustomColors from '@/app/hooks/useCustomColors';
 
 const TabLayout = () => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
@@ -15,7 +16,7 @@ const TabLayout = () => {
   const setisSearchBarOpen = useSearchStore((s) => s.setIsSearchBarOpen);
   const setCompletionDatesMap = useActivityStore((s) => s.setCompletionDatesMap);
 
-  const customGray3 = getTokenValue('$customGray3');
+  const { customGray3 } = useCustomColors();
 
   const fetchCompletionDatesMap = async () => {
     const completionDatesMap = await getCompletionDatesFromStorage();
