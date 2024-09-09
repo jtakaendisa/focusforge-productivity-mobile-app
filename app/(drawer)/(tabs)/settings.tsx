@@ -1,5 +1,3 @@
-import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { getTokenValue, Image, styled, Text, View } from 'tamagui';
 
@@ -7,82 +5,31 @@ import ArrowRightFromBracketSvg from '@/app/components/icons/ArrowRightFromBrack
 import BellSvg from '@/app/components/icons/BellSvg';
 import MoonStarsSvg from '@/app/components/icons/MoonStarsSvg';
 import PenToSquareSvg from '@/app/components/icons/PenToSquareSvg';
+import RippleButton from '@/app/components/tabs/RippleButton';
+import { useAuth } from '@/app/hooks/useAuth';
+import { useImagePicker } from '@/app/hooks/useImagePicker';
 import EditPhotoModalModule from '../../components/tabs/modals/EditPhotoModalModule';
 import ModalContainer from '../../components/tabs/modals/ModalContainer';
 import Switch from '../../components/tabs/settings/Switch';
 import { SCREEN_HEIGHT } from '../../constants';
-import { signOutAuthUser } from '../../services/auth';
-import { useAuthStore } from '../../store';
-import RippleButton from '@/app/components/tabs/RippleButton';
 
 const SettingsScreen = () => {
-  const authUser = useAuthStore((s) => s.authUser);
-  const setAuthUser = useAuthStore((s) => s.setAuthUser);
+  const { authUser, signOut } = useAuth();
+  const { photoUri, isModalOpen, toggleModal, uploadImage, removeImage } =
+    useImagePicker();
 
   const [darkMode, setDarkMode] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
-  const [photoUri, setPhotoUri] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleSignOut = async () => {
-    try {
-      await signOutAuthUser();
-      setAuthUser(null);
-      router.replace('/(auth)');
-    } catch (error) {
-      console.log((error as Error).message);
-    }
-  };
-
-  const handleImageRemoval = () => {
-    setPhotoUri('');
-    toggleModal();
-  };
-
-  const uploadImage = async (mode: 'camera' | 'gallery') => {
-    try {
-      let result: ImagePicker.ImagePickerResult | null = null;
-
-      if (mode === 'camera') {
-        await ImagePicker.requestCameraPermissionsAsync();
-        result = await ImagePicker.launchCameraAsync({
-          cameraType: ImagePicker.CameraType.front,
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 1,
-        });
-      }
-
-      if (mode === 'gallery') {
-        result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 1,
-        });
-      }
-
-      if (result && !result.canceled) {
-        setPhotoUri(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.log((error as Error).message);
-    } finally {
-      toggleModal();
-    }
-  };
 
   const customRed1 = getTokenValue('$customRed1');
 
-  const handleCameraImageUpload = () => uploadImage('camera');
+  const handleCameraPress = () => uploadImage('camera');
 
-  const handleGalleryImageUpload = () => uploadImage('gallery');
+  const handleGalleryPress = () => uploadImage('gallery');
 
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
   const togglePushNotifications = () => setPushNotifications((prev) => !prev);
-
-  const toggleModal = () => setIsModalOpen((prev) => !prev);
 
   return (
     <Container>
@@ -109,7 +56,7 @@ const SettingsScreen = () => {
               <ButtonText>Edit Photo</ButtonText>
             </Button>
           </RippleButton>
-          <RippleButton onPress={handleSignOut}>
+          <RippleButton onPress={signOut}>
             <Button>
               <ArrowRightFromBracketSvg size={16} fill={customRed1} />
               <ButtonText>Sign Out</ButtonText>
@@ -141,9 +88,9 @@ const SettingsScreen = () => {
 
       <ModalContainer isOpen={isModalOpen} closeModal={toggleModal}>
         <EditPhotoModalModule
-          onCameraPress={handleCameraImageUpload}
-          onGalleryPress={handleGalleryImageUpload}
-          onRemovePress={handleImageRemoval}
+          onCameraPress={handleCameraPress}
+          onGalleryPress={handleGalleryPress}
+          onRemovePress={removeImage}
         />
       </ModalContainer>
     </Container>
