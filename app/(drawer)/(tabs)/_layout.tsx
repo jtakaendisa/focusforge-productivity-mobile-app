@@ -5,28 +5,26 @@ import { TabRoute } from '@/app/entities';
 import { useAuth } from '@/app/hooks/useAuth';
 import useCompletionDates from '@/app/hooks/useCompletionDates';
 import useCustomColors from '@/app/hooks/useCustomColors';
+import useSearchBarState from '@/app/hooks/useSearchBarState';
 import CustomTabBarButton from '../../components/tabs/CustomTabBarButton';
 import { SCREEN_HEIGHT } from '../../constants';
-import { useSearchStore } from '../../store';
 
 const TabLayout = () => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
-
-  const setisSearchBarOpen = useSearchStore((s) => s.setIsSearchBarOpen);
 
   const { authUser } = useAuth();
 
   const { fetchCompletionDatesMap } = useCompletionDates();
 
-  const { customGray3 } = useCustomColors();
+  const { handleSearchBarClose } = useSearchBarState();
 
-  const closeSearchBar = () => setisSearchBarOpen(false);
+  const { customGray3 } = useCustomColors();
 
   const handleTabPress = () => {
     if (pathname === 'home' || pathname === 'habits') {
       fetchCompletionDatesMap();
     }
-    closeSearchBar();
+    handleSearchBarClose();
   };
 
   if (!authUser) {
