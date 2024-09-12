@@ -19,14 +19,16 @@ const SettingsScreen = () => {
   const [pushNotifications, setPushNotifications] = useState(false);
 
   const { authUser, signOut } = useAuth();
-  const { photoUri, isModalOpen, toggleModal, uploadImage, removeImage } =
-    useImagePicker();
+  const {
+    photoUri,
+    isModalOpen,
+    toggleModal,
+    handleCameraPress,
+    handleGalleryPress,
+    removeImage,
+  } = useImagePicker();
 
   const { customRed1 } = useCustomColors();
-
-  const handleCameraPress = () => uploadImage('camera');
-
-  const handleGalleryPress = () => uploadImage('gallery');
 
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 

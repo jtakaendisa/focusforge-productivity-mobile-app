@@ -1,35 +1,32 @@
 import { Redirect, Tabs, usePathname } from 'expo-router';
-import { getTokenValue } from 'tamagui';
 
 import CustomHeader from '@/app/components/tabs/CustomHeader';
+import { TabRoute } from '@/app/entities';
+import { useAuth } from '@/app/hooks/useAuth';
+import useCompletionDates from '@/app/hooks/useCompletionDates';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import CustomTabBarButton from '../../components/tabs/CustomTabBarButton';
 import { SCREEN_HEIGHT } from '../../constants';
-import { useActivityStore, useAuthStore, useSearchStore } from '../../store';
-import { TabRoute } from '@/app/entities';
-import { getCompletionDatesFromStorage } from '@/app/utils';
-import useCustomColors from '@/app/hooks/useCustomColors';
+import { useSearchStore } from '../../store';
 
 const TabLayout = () => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
-  const authUser = useAuthStore((s) => s.authUser);
   const setisSearchBarOpen = useSearchStore((s) => s.setIsSearchBarOpen);
-  const setCompletionDatesMap = useActivityStore((s) => s.setCompletionDatesMap);
+
+  const { authUser } = useAuth();
+
+  const { fetchCompletionDatesMap } = useCompletionDates();
 
   const { customGray3 } = useCustomColors();
 
-  const fetchCompletionDatesMap = async () => {
-    const completionDatesMap = await getCompletionDatesFromStorage();
-    setCompletionDatesMap(completionDatesMap);
-  };
-
-  const handleSearchBarClose = () => setisSearchBarOpen(false);
+  const closeSearchBar = () => setisSearchBarOpen(false);
 
   const handleTabPress = () => {
     if (pathname === 'home' || pathname === 'habits') {
       fetchCompletionDatesMap();
     }
-    handleSearchBarClose();
+    closeSearchBar();
   };
 
   if (!authUser) {

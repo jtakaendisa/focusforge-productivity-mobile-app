@@ -12,9 +12,7 @@ import {
 
 interface AppStore {
   theme: Theme;
-  headerHeight: number;
   setTheme: (theme: Theme) => void;
-  setHeaderHeight: (headerHeight: number) => void;
 }
 
 interface AuthStore {
@@ -195,9 +193,7 @@ const dummyActivities: Activity[] = [
 
 const useAppStore = create<AppStore>((set) => ({
   theme: 'dark',
-  headerHeight: 0,
   setTheme: (theme) => set((state) => ({ ...state, theme })),
-  setHeaderHeight: (headerHeight) => set((state) => ({ ...state, headerHeight })),
 }));
 
 const useAuthStore = create<AuthStore>((set) => ({

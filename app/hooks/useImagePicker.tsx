@@ -45,11 +45,16 @@ export const useImagePicker = () => {
     }
   };
 
+  const handleCameraPress = () => uploadImage('camera');
+
+  const handleGalleryPress = () => uploadImage('gallery');
+
   return {
     photoUri,
     isModalOpen,
     toggleModal,
-    uploadImage,
+    handleCameraPress,
+    handleGalleryPress,
     removeImage,
   };
 };

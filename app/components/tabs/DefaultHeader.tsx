@@ -1,8 +1,9 @@
 import { TabRoute } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { useSearchStore } from '@/app/store';
 import { DrawerActions } from '@react-navigation/native';
 import { useNavigation, usePathname } from 'expo-router';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 import BarsSvg from '../icons/BarsSvg';
 import InfoCircleSvg from '../icons/InfoCircleSvg';
 import MagnifyingGlassSvg from '../icons/MagnifyingGlassSvg';
@@ -21,10 +22,11 @@ const DefaultHeader = ({ height, title }: Props) => {
 
   const setIsSearchBarOpen = useSearchStore((s) => s.setIsSearchBarOpen);
 
+  const { customGray1, customRed1 } = useCustomColors();
+
   const toggleDrawerMenu = () => navigation.dispatch(DrawerActions.toggleDrawer());
 
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
+  const openSearchBar = () => setIsSearchBarOpen(true);
 
   return (
     <Container height={height}>
@@ -45,7 +47,7 @@ const DefaultHeader = ({ height, title }: Props) => {
           </RippleButton>
         )}
         {pathname !== 'settings' && (
-          <RippleButton fade onPress={() => setIsSearchBarOpen(true)}>
+          <RippleButton fade onPress={openSearchBar}>
             <IconContainer width={height} height={height}>
               <MagnifyingGlassSvg size={SVG_SIZE} fill={customGray1} />
             </IconContainer>

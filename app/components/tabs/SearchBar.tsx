@@ -1,17 +1,13 @@
 import { SCREEN_WIDTH } from '@/app/constants';
-import { ActivityFilter, Category, TabRoute } from '@/app/entities';
-import { useSearchStore } from '@/app/store';
+import { TabRoute } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
+import useSearchBarAnimation from '@/app/hooks/useSearchBarAnimation';
+import useSearchBarModals from '@/app/hooks/useSearchBarModals';
+import useSearchBarState from '@/app/hooks/useSearchBarState';
 import { usePathname } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { StatusBar, TextInput } from 'react-native';
-import Animated, {
-  FadeIn,
-  FadeOut,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
-import { Text, View, getTokenValue, styled } from 'tamagui';
+import { TextInput } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Text, View, styled } from 'tamagui';
 import ArrowDownSvg from '../icons/ArrowDownSvg';
 import ArrowUpSvg from '../icons/ArrowUpSvg';
 import BinSvg from '../icons/BinSvg';
@@ -21,113 +17,52 @@ import SearchBarCategoryModalModule from './modals/SearchBarCategoryModalModule'
 import RippleButton from './RippleButton';
 
 interface Props {
-  height: number;
+  headerHeight: number;
+  statusBarHeight: number;
 }
 
-const animationConfig = {
-  duration: 350,
-};
-
-const SearchBar = ({ height }: Props) => {
+const SearchBar = ({ headerHeight, statusBarHeight }: Props) => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
-  const statusBarHeight = StatusBar.currentHeight;
+  const {
+    activityFilter,
+    filteredActivities,
+    localSearchTerm,
+    localSelectedCategories,
+    handleSearchTermChange,
+    handleCategorySelect,
+    handleCategoryClear,
+    handleActivityFilterSelect,
+    handleFilterReset,
+    handleSearchBarClose,
+  } = useSearchBarState();
 
-  const activityFilter = useSearchStore((s) => s.activityFilter);
-  const filteredActivities = useSearchStore((s) => s.filteredActivities);
-  const setIsSearchBarOpen = useSearchStore((s) => s.setIsSearchBarOpen);
-  const setSearchTerm = useSearchStore((s) => s.setSearchTerm);
-  const setActivityFilter = useSearchStore((s) => s.setActivityFilter);
-  const setSelectedCategories = useSearchStore((s) => s.setSelectedCategories);
-  const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
+  const {
+    isActivityFilterModalOpen,
+    isCategoryModalOpen,
+    toggleActivityFilterModal,
+    toggleCategoryModal,
+  } = useSearchBarModals();
 
-  const [localSearchTerm, setLocalSearchTerm] = useState('');
-  const [localSelectedCategories, setLocalSelectedCategories] = useState<Category[]>(
-    []
-  );
-  const [isActivityFilterModalOpen, setIsActivityFilterModalOpen] = useState(false);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const { heightAnimation, opacityAnimation } = useSearchBarAnimation(headerHeight);
 
-  const isSearchRowVisible = useSharedValue(0);
-
-  const handleActivityFilterSelect = (activityFilter: ActivityFilter) => {
-    setActivityFilter(activityFilter);
-    toggleActivityFilterModal();
-  };
-
-  const handleSearchTermChange = (text: string) => {
-    setLocalSearchTerm(text);
-    setSearchTerm(text);
-  };
-
-  const handleCategorySelect = (selectedCategory: Category) => {
-    const isCategoryAlreadySelected =
-      localSelectedCategories.includes(selectedCategory);
-
-    let updatedSelectedCategories: Category[] = [];
-
-    if (isCategoryAlreadySelected) {
-      updatedSelectedCategories = localSelectedCategories.filter(
-        (category) => category !== selectedCategory
-      );
-    } else {
-      updatedSelectedCategories = [...localSelectedCategories, selectedCategory];
-    }
-    setLocalSelectedCategories(updatedSelectedCategories);
-    setSelectedCategories(updatedSelectedCategories);
-  };
-
-  const handleCategoryClear = () => {
-    setLocalSelectedCategories([]);
-    setSelectedCategories([]);
-  };
-
-  const handleFilterReset = () => {
-    setLocalSearchTerm('');
-    handleCategoryClear();
-
-    setSearchTerm('');
-    setSelectedCategories([]);
-    setActivityFilter('all');
-  };
-
-  const handleSearchBarClose = () => {
-    handleFilterReset();
-    setFilteredActivities([]);
-    setIsSearchBarOpen(false);
-  };
-
-  const toggleActivityFilterModal = () => setIsActivityFilterModalOpen((prev) => !prev);
-
-  const toggleCategoryModal = () => setIsCategoryModalOpen((prev) => !prev);
-
-  const heightAnimation = useAnimatedStyle(() => ({
-    height: isSearchRowVisible.value
-      ? withTiming(height, animationConfig)
-      : withTiming(0, animationConfig),
-  }));
-
-  useEffect(() => {
-    isSearchRowVisible.value = 1;
-  }, []);
-
-  const customGray1 = getTokenValue('$customGray1');
+  const { customGray1 } = useCustomColors();
 
   return (
-    <AnimatedContainer height={height} entering={FadeIn} exiting={FadeOut}>
+    <AnimatedContainer height={headerHeight} entering={FadeIn} exiting={FadeOut}>
       <FilterRow>
         {pathname === 'home' && (
           <ActivityFilterContainer width={SCREEN_WIDTH / 3}>
             <FilterText textTransform="capitalize">{activityFilter}</FilterText>
             <RippleButton fade onPress={toggleActivityFilterModal}>
-              <IconContainer width={height * 0.75}>
+              <IconContainer width={headerHeight * 0.75}>
                 <ArrowDownSvg size={14} />
               </IconContainer>
             </RippleButton>
           </ActivityFilterContainer>
         )}
         <RippleButton flex onPress={toggleCategoryModal}>
-          <CategoryContainer height={height}>
+          <CategoryContainer height={headerHeight}>
             <FilterText color="$customGray1">
               {!!localSelectedCategories.length
                 ? `${localSelectedCategories.length} ${
@@ -148,14 +83,22 @@ const SearchBar = ({ height }: Props) => {
         />
         <ButtonContainer>
           <RippleButton fade onPress={handleFilterReset}>
-            <IconContainer width={height} height={height}>
+            <AnimatedIconContainer
+              style={opacityAnimation}
+              width={headerHeight}
+              height={headerHeight}
+            >
               <BinSvg size={22} fill={customGray1} variant="outline" />
-            </IconContainer>
+            </AnimatedIconContainer>
           </RippleButton>
           <RippleButton fade onPress={handleSearchBarClose}>
-            <IconContainer width={height} height={height}>
+            <AnimatedIconContainer
+              style={opacityAnimation}
+              width={headerHeight}
+              height={headerHeight}
+            >
               <ArrowUpSvg size={18} />
-            </IconContainer>
+            </AnimatedIconContainer>
           </RippleButton>
         </ButtonContainer>
       </AnimatedSearchRow>
@@ -169,7 +112,7 @@ const SearchBar = ({ height }: Props) => {
           <ActivityFilterModalModule
             onSelect={handleActivityFilterSelect}
             offsetTop={statusBarHeight}
-            width={SCREEN_WIDTH / 3 - height * 0.75}
+            width={SCREEN_WIDTH / 3 - headerHeight * 0.75}
           />
         )}
       </ModalContainer>
@@ -246,5 +189,6 @@ const ButtonContainer = styled(View, {
 
 const AnimatedContainer = Animated.createAnimatedComponent(Container);
 const AnimatedSearchRow = Animated.createAnimatedComponent(SearchRow);
+const AnimatedIconContainer = Animated.createAnimatedComponent(IconContainer);
 
 export default SearchBar;

@@ -1,11 +1,11 @@
-import { styled, View } from 'tamagui';
+import useHeaderHeight from '@/app/hooks/useHeaderHeight';
+import { useEffect } from 'react';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useEffect } from 'react';
-import { useAppStore } from '@/app/store';
+import { styled, View } from 'tamagui';
 
 interface Props {
   isExpanded: boolean;
@@ -16,7 +16,7 @@ const animationConfig = {
 };
 
 const SearchBarSpacer = ({ isExpanded }: Props) => {
-  const headerHeight = useAppStore((s) => s.headerHeight);
+  const { headerHeight } = useHeaderHeight();
 
   const sharedIsExpanded = useSharedValue(isExpanded ? 1 : 0);
 

@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Activity, CompletionDate, CompletionDatesMap, Frequency } from '../entities';
 import { useActivityStore } from '../store';
 import { isLastDayOfMonth, toFormattedDateString } from '../utils';
@@ -133,15 +133,17 @@ export const extendCompletionDates = async (
 
 const useCompletionDates = () => {
   const activities = useActivityStore((s) => s.activities);
-  const [completionDatesMap, setCompletionDatesMap] =
-    useState<CompletionDatesMap | null>(null);
+  const completionDatesMap = useActivityStore((s) => s.completionDatesMap);
+  const setCompletionDatesMap = useActivityStore((s) => s.setCompletionDatesMap);
+
   const [loadedCompletionDates, setLoadedCompletionDates] = useState(false);
 
+  const fetchCompletionDatesMap = useCallback(async () => {
+    const data = await getCompletionDatesFromStorage();
+    setCompletionDatesMap(data);
+  }, []);
+
   useEffect(() => {
-    const fetchCompletionDatesMap = async () => {
-      const data = await getCompletionDatesFromStorage();
-      setCompletionDatesMap(data);
-    };
     fetchCompletionDatesMap();
   }, []);
 
@@ -175,6 +177,7 @@ const useCompletionDates = () => {
   return {
     loadedCompletionDates,
     completionDatesMap,
+    fetchCompletionDatesMap,
   };
 };
 
