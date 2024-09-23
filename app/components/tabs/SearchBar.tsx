@@ -25,6 +25,13 @@ const SearchBar = ({ headerHeight, statusBarHeight }: Props) => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
   const {
+    isActivityFilterModalOpen,
+    isCategoryModalOpen,
+    toggleActivityFilterModal,
+    toggleCategoryModal,
+  } = useSearchBarModals();
+
+  const {
     activityFilter,
     filteredActivities,
     localSearchTerm,
@@ -35,14 +42,7 @@ const SearchBar = ({ headerHeight, statusBarHeight }: Props) => {
     handleActivityFilterSelect,
     handleFilterReset,
     handleSearchBarClose,
-  } = useSearchBarState();
-
-  const {
-    isActivityFilterModalOpen,
-    isCategoryModalOpen,
-    toggleActivityFilterModal,
-    toggleCategoryModal,
-  } = useSearchBarModals();
+  } = useSearchBarState(toggleActivityFilterModal);
 
   const { heightAnimation, opacityAnimation } = useSearchBarAnimation(headerHeight);
 

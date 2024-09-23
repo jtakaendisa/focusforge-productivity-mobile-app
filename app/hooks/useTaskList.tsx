@@ -1,10 +1,10 @@
-import { MutableRefObject, useMemo } from 'react';
-import { useActivityStore, useSearchStore } from '../store';
-import { Activity, TaskActiveTab } from '../entities';
-import { router } from 'expo-router';
-import { Swipeable } from 'react-native-gesture-handler';
-import { FlashList } from '@shopify/flash-list';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import { FlashList } from '@shopify/flash-list';
+import { router } from 'expo-router';
+import { MutableRefObject, useMemo } from 'react';
+import { Swipeable } from 'react-native-gesture-handler';
+import { Activity, TaskActiveTab } from '../entities';
+import { useActivityStore, useSearchStore } from '../store';
 
 const useTaskList = (
   listRef: MutableRefObject<FlashList<string | Activity> | null>,

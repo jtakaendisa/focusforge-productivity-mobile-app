@@ -1,10 +1,12 @@
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { useRef, useState } from 'react';
 
-import { Activity } from '@/app/entities';
+import { Activity, TabRoute } from '@/app/entities';
 import useActivityList from '@/app/hooks/useActivityList';
 import useListModals from '@/app/hooks/useListModals';
-import { useActivityStore, useSearchStore } from '@/app/store';
+import useSearchBarFilters from '@/app/hooks/useSearchBarFilters';
+import { useActivityStore } from '@/app/store';
+import { usePathname } from 'expo-router';
 import { styled, View } from 'tamagui';
 import ChecklistModalModule from '../modals/ChecklistModalModule';
 import DeleteModalModule from '../modals/DeleteModalModule';
@@ -18,12 +20,9 @@ interface Props {
 }
 
 const ActivityList = ({ isSearchBarOpen }: Props) => {
+  const pathname = (usePathname().substring(1) || 'home') as TabRoute;
+
   const selectedDate = useActivityStore((s) => s.selectedDate);
-  const setActivities = useActivityStore((s) => s.setActivities);
-  const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
-  const activityFilter = useSearchStore((s) => s.activityFilter);
-  const searchTerm = useSearchStore((s) => s.searchTerm);
-  const selectedCategories = useSearchStore((s) => s.selectedCategories);
 
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
 
@@ -58,102 +57,13 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
     toggleChecklistModal
   );
 
+  const filteredActivitiesDueToday = useSearchBarFilters(
+    isSearchBarOpen && pathname === 'home',
+    activitiesDueToday
+  );
+
   const isListEmpty = !activitiesDueToday.length;
   const isPressDisabled = selectedDate > new Date();
-
-  // useEffect(() => {
-  //   if (isSearchBarOpen) {
-  //     setFilteredActivities([
-  //       ...memoizedSingleTasksDueToday,
-  //       ...memoizedRecurringActivitiesDueToday,
-  //     ]);
-  //   }
-  // }, [
-  //   isSearchBarOpen,
-  //   memoizedSingleTasksDueToday,
-  //   memoizedRecurringActivitiesDueToday,
-  // ]);
-
-  // useEffect(() => {
-  //   if (!isSearchBarOpen) return;
-
-  //   const activitiesDueToday = [
-  //     ...memoizedSingleTasksDueToday,
-  //     ...memoizedRecurringActivitiesDueToday,
-  //   ];
-
-  //   if (!searchTerm.length) {
-  //     setActivitiesDueToday(activitiesDueToday);
-  //   } else {
-  //     setActivitiesDueToday(
-  //       activitiesDueToday.filter((activity) =>
-  //         activity.title.toLowerCase().includes(searchTerm.toLowerCase())
-  //       )
-  //     );
-  //   }
-  // }, [
-  //   isSearchBarOpen,
-  //   memoizedSingleTasksDueToday,
-  //   memoizedRecurringActivitiesDueToday,
-  //   searchTerm,
-  // ]);
-
-  // useEffect(() => {
-  //   if (!isSearchBarOpen) return;
-
-  //   const activitiesDueToday = [
-  //     ...memoizedSingleTasksDueToday,
-  //     ...memoizedRecurringActivitiesDueToday,
-  //   ];
-
-  //   if (!selectedCategories.length) {
-  //     setActivitiesDueToday(activitiesDueToday);
-  //   } else {
-  //     setActivitiesDueToday(
-  //       activitiesDueToday.filter((activity) =>
-  //         selectedCategories.includes(activity.category)
-  //       )
-  //     );
-  //   }
-  // }, [
-  //   isSearchBarOpen,
-  //   memoizedSingleTasksDueToday,
-  //   memoizedRecurringActivitiesDueToday,
-  //   selectedCategories,
-  // ]);
-
-  // useEffect(() => {
-  //   if (!isSearchBarOpen) return;
-
-  //   const activitiesDueToday = [
-  //     ...memoizedSingleTasksDueToday,
-  //     ...memoizedRecurringActivitiesDueToday,
-  //   ];
-
-  //   switch (activityFilter) {
-  //     case 'all':
-  //       setActivitiesDueToday(activitiesDueToday);
-  //       break;
-  //     case 'habits':
-  //       setActivitiesDueToday(
-  //         activitiesDueToday.filter((activity) => activity.type === 'habit')
-  //       );
-  //       break;
-  //     case 'tasks':
-  //       setActivitiesDueToday(
-  //         activitiesDueToday.filter(
-  //           (activity) =>
-  //             activity.type === 'single task' || activity.type === 'recurring task'
-  //         )
-  //       );
-  //       break;
-  //   }
-  // }, [
-  //   isSearchBarOpen,
-  //   memoizedSingleTasksDueToday,
-  //   memoizedRecurringActivitiesDueToday,
-  //   activityFilter,
-  // ]);
 
   return (
     <Container isContentCentered={isListEmpty}>
@@ -162,7 +72,7 @@ const ActivityList = ({ isSearchBarOpen }: Props) => {
       ) : (
         <AnimatedFlashList
           ref={listRef}
-          data={activitiesDueToday}
+          data={isSearchBarOpen ? filteredActivitiesDueToday : activitiesDueToday}
           renderItem={({ item }) => (
             <TaskListItem
               task={item}

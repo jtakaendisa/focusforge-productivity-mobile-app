@@ -35,13 +35,13 @@ interface SearchStore {
   activityFilter: ActivityFilter;
   taskFilter: TaskFilter;
   selectedCategories: Category[];
-  filteredActivities: (string | Activity)[];
+  filteredActivities: Activity[];
   setIsSearchBarOpen: (isSearchBarOpen: boolean) => void;
   setSearchTerm: (searchTerm: string) => void;
   setActivityFilter: (activityFilter: ActivityFilter) => void;
   setTaskFilter: (taskFilter: TaskFilter) => void;
   setSelectedCategories: (selectedCategories: Category[]) => void;
-  setFilteredActivities: (filteredActivities: (string | Activity)[]) => void;
+  setFilteredActivities: (filteredActivities: Activity[]) => void;
 }
 
 const dummyActivities: Activity[] = [

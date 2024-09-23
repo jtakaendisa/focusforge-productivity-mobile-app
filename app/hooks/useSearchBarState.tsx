@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { ActivityFilter, Category } from '@/app/entities';
 import { useSearchStore } from '@/app/store';
-import useSearchBarModals from './useSearchBarModals';
+import { useState } from 'react';
 
-const useSearchBarState = () => {
+const useSearchBarState = (toggleActivityFilterModal: () => void) => {
   const activityFilter = useSearchStore((s) => s.activityFilter);
   const filteredActivities = useSearchStore((s) => s.filteredActivities);
   const setSearchTerm = useSearchStore((s) => s.setSearchTerm);
@@ -16,8 +15,6 @@ const useSearchBarState = () => {
   const [localSelectedCategories, setLocalSelectedCategories] = useState<Category[]>(
     []
   );
-
-  const { toggleActivityFilterModal } = useSearchBarModals();
 
   const handleSearchTermChange = (text: string) => {
     setLocalSearchTerm(text);
@@ -46,8 +43,8 @@ const useSearchBarState = () => {
   };
 
   const handleFilterReset = () => {
-    setLocalSearchTerm('');
     handleCategoryClear();
+    setLocalSearchTerm('');
     setSearchTerm('');
     setActivityFilter('all');
   };

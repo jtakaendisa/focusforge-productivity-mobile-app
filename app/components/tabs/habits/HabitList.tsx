@@ -3,10 +3,11 @@ import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { useRef, useState } from 'react';
 import { View, styled } from 'tamagui';
 
-import { Activity } from '@/app/entities';
+import { Activity, TabRoute } from '@/app/entities';
 import useHabitList from '@/app/hooks/useHabitList';
 import useListModals from '@/app/hooks/useListModals';
-import { useActivityStore, useSearchStore } from '@/app/store';
+import useSearchBarFilters from '@/app/hooks/useSearchBarFilters';
+import { usePathname } from 'expo-router';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
 import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
@@ -18,11 +19,7 @@ interface Props {
 }
 
 const HabitList = ({ isSearchBarOpen }: Props) => {
-  const setActivities = useActivityStore((s) => s.setActivities);
-  const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
-
-  const searchTerm = useSearchStore((s) => s.searchTerm);
-  const selectedCategories = useSearchStore((s) => s.selectedCategories);
+  const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
 
@@ -43,39 +40,12 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
     handleComplete,
   } = useHabitList(listRef, activityOptionsRef, handleSelect, toggleDeleteModal);
 
+  const filteredHabits = useSearchBarFilters(
+    isSearchBarOpen && pathname === 'habits',
+    habits
+  );
+
   const isListEmpty = !habits.length;
-
-  // useEffect(() => {
-  //   if (isSearchBarOpen) {
-  //     setFilteredActivities(allHabits);
-  //   }
-  // }, [allHabits, isSearchBarOpen]);
-
-  // useEffect(() => {
-  //   if (!isSearchBarOpen) return;
-
-  //   if (!searchTerm.length) {
-  //     setHabits(allHabits);
-  //   } else {
-  //     setHabits(
-  //       allHabits.filter((habit) =>
-  //         habit.title.toLowerCase().includes(searchTerm.toLowerCase())
-  //       )
-  //     );
-  //   }
-  // }, [isSearchBarOpen, allHabits, searchTerm]);
-
-  // useEffect(() => {
-  //   if (!isSearchBarOpen) return;
-
-  //   if (!selectedCategories.length) {
-  //     setHabits(allHabits);
-  //   } else {
-  //     setHabits(
-  //       allHabits.filter((habit) => selectedCategories.includes(habit.category))
-  //     );
-  //   }
-  // }, [isSearchBarOpen, allHabits, selectedCategories]);
 
   return (
     <Container isContentCentered={isListEmpty}>
@@ -84,7 +54,7 @@ const HabitList = ({ isSearchBarOpen }: Props) => {
       ) : (
         <AnimatedFlashList
           ref={listRef}
-          data={habits}
+          data={isSearchBarOpen ? filteredHabits : habits}
           renderItem={({ item }) => (
             <HabitListItem
               habit={item}

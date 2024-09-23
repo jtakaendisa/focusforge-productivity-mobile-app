@@ -71,6 +71,10 @@ export interface Activity {
   isCarriedOver?: boolean;
 }
 
+export interface DateGroupedTasks {
+  [key: string]: Activity[];
+}
+
 export interface CompletionDate {
   date: string;
   isCompleted: boolean;

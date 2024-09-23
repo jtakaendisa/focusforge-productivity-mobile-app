@@ -15,11 +15,7 @@ import {
   startOfYear,
 } from 'date-fns';
 
-import { Activity, CompletionDate } from '../entities';
-
-interface DateGroupedTasks {
-  [key: string]: Activity[];
-}
+import { CompletionDate } from '../entities';
 
 export const toTruncatedText = (text: string, maxLength: number, altMode?: boolean) => {
   if (text.length <= maxLength) {
@@ -60,41 +56,6 @@ export const toFormattedSectionTitle = (date: string) => {
   } else {
     return date;
   }
-};
-
-export const toDateGroupedTasks = (tasks: Activity[]) => {
-  const groups: DateGroupedTasks = tasks.reduce((acc: DateGroupedTasks, task) => {
-    const dueDate = toFormattedDateString(task.endDate!);
-    if (!acc[dueDate]) {
-      acc[dueDate] = [];
-    }
-    acc[dueDate].push(task);
-    return acc;
-  }, {});
-
-  // Sort the keys (due dates) in ascending order
-  const sortedKeys = Object.keys(groups).sort((a, b) => {
-    const dateA = parse(a, 'dd MMM yyyy', new Date()); // Convert formatted date string to Date object
-    const dateB = parse(b, 'dd MMM yyyy', new Date());
-    return dateA.getTime() - dateB.getTime();
-  });
-
-  // Create a new object with sorted keys
-  const sortedGroups: DateGroupedTasks = {};
-  sortedKeys.forEach((key) => {
-    sortedGroups[key] = groups[key];
-  });
-
-  return sortedGroups;
-};
-
-export const toFormattedSections = (tasksByDueDate: DateGroupedTasks) => {
-  const sections: (string | Activity)[] = [];
-  Object.keys(tasksByDueDate).forEach((dueDate) => {
-    sections.push(dueDate);
-    sections.push(...tasksByDueDate[dueDate]);
-  });
-  return sections;
 };
 
 export const toCleanedObject = <T extends { [key: string]: any }>(obj: T): T => {
