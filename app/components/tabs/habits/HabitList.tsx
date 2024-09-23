@@ -1,13 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
-import { router } from 'expo-router';
-import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { View, styled } from 'tamagui';
 
-import { Activity, HabitActiveTab } from '@/app/entities';
+import { Activity } from '@/app/entities';
+import useHabitList from '@/app/hooks/useHabitList';
+import useListModals from '@/app/hooks/useListModals';
 import { useActivityStore, useSearchStore } from '@/app/store';
-import { setCompletionDatesInStorage, toFormattedDateString } from '@/app/utils';
-import { Swipeable } from 'react-native-gesture-handler';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
 import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
@@ -19,122 +18,64 @@ interface Props {
 }
 
 const HabitList = ({ isSearchBarOpen }: Props) => {
-  const activities = useActivityStore((s) => s.activities);
-  const completionDatesMap = useActivityStore((s) => s.completionDatesMap);
   const setActivities = useActivityStore((s) => s.setActivities);
   const setFilteredActivities = useSearchStore((s) => s.setFilteredActivities);
-  const setCompletionDatesMap = useActivityStore((s) => s.setCompletionDatesMap);
 
   const searchTerm = useSearchStore((s) => s.searchTerm);
   const selectedCategories = useSearchStore((s) => s.selectedCategories);
 
-  const [habits, setHabits] = useState<Activity[]>([]);
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const listRef = useRef<FlashList<Activity> | null>(null);
   const activityOptionsRef = useRef<BottomSheetModal | null>(null);
 
+  const handleSelect = (selectedHabit: Activity) => setSelectedHabit(selectedHabit);
+
+  const { isDeleteModalOpen, toggleDeleteModal, toggleActivityOptionsModal } =
+    useListModals(activityOptionsRef, handleSelect);
+
+  const {
+    habits,
+    completionDatesMap,
+    navigateToHabitDetailsScreen,
+    handleDelete,
+    handleSwipe,
+    handleComplete,
+  } = useHabitList(listRef, activityOptionsRef, handleSelect, toggleDeleteModal);
+
   const isListEmpty = !habits.length;
 
-  const allHabits = useMemo(
-    () => activities.filter((activity) => activity.type === 'habit'),
-    [activities]
-  );
+  // useEffect(() => {
+  //   if (isSearchBarOpen) {
+  //     setFilteredActivities(allHabits);
+  //   }
+  // }, [allHabits, isSearchBarOpen]);
 
-  const navigateToHabitDetailsScreen = (activeTab: HabitActiveTab, habitId: string) => {
-    if (!habitId.length) return;
+  // useEffect(() => {
+  //   if (!isSearchBarOpen) return;
 
-    activityOptionsRef.current?.dismiss();
-    router.push({
-      pathname: '/habitDetails',
-      params: { activeTab, habitId },
-    });
-  };
+  //   if (!searchTerm.length) {
+  //     setHabits(allHabits);
+  //   } else {
+  //     setHabits(
+  //       allHabits.filter((habit) =>
+  //         habit.title.toLowerCase().includes(searchTerm.toLowerCase())
+  //       )
+  //     );
+  //   }
+  // }, [isSearchBarOpen, allHabits, searchTerm]);
 
-  const toggleActivityOptionsModal = (habit: Activity) => {
-    setSelectedHabit(habit);
-    activityOptionsRef.current?.present();
-  };
+  // useEffect(() => {
+  //   if (!isSearchBarOpen) return;
 
-  const toggleDeleteModal = () => setIsDeleteModalOpen((prev) => !prev);
-
-  const handleDelete = (id: string) => {
-    const filteredActivities = activities.filter((activity) => activity.id !== id);
-    setActivities(filteredActivities);
-    listRef.current?.prepareForLayoutAnimationRender();
-    activityOptionsRef.current?.close();
-  };
-
-  const handleSwipe = (
-    direction: 'left' | 'right',
-    selectedHabit: Activity,
-    swipeableRef: MutableRefObject<Swipeable | null>
-  ) => {
-    setSelectedHabit(selectedHabit);
-
-    if (direction === 'left') {
-      navigateToHabitDetailsScreen('edit', selectedHabit.id);
-    } else {
-      toggleDeleteModal();
-    }
-    swipeableRef.current?.close();
-  };
-
-  const handleComplete = async (selectedDate: Date, habitId: string) => {
-    if (!completionDatesMap) return;
-
-    const updatedCompletionDates = completionDatesMap[habitId].map((entry) =>
-      entry.date === toFormattedDateString(selectedDate)
-        ? { ...entry, isCompleted: !entry.isCompleted }
-        : entry
-    );
-
-    const updatedCompletionDatesMap = {
-      ...completionDatesMap,
-      [habitId]: updatedCompletionDates,
-    };
-    await setCompletionDatesInStorage(updatedCompletionDatesMap);
-    setCompletionDatesMap(updatedCompletionDatesMap);
-  };
-
-  useEffect(() => {
-    setHabits(allHabits);
-  }, [allHabits]);
-
-  useEffect(() => {
-    if (isSearchBarOpen) {
-      setFilteredActivities(allHabits);
-    }
-  }, [allHabits, isSearchBarOpen]);
-
-  useEffect(() => {
-    if (!isSearchBarOpen) return;
-
-    if (!searchTerm.length) {
-      setHabits(allHabits);
-    } else {
-      setHabits(
-        allHabits.filter((habit) =>
-          habit.title.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    }
-  }, [isSearchBarOpen, allHabits, searchTerm]);
-
-  useEffect(() => {
-    if (!isSearchBarOpen) return;
-
-    if (!selectedCategories.length) {
-      setHabits(allHabits);
-    } else {
-      setHabits(
-        allHabits.filter((habit) => selectedCategories.includes(habit.category))
-      );
-    }
-  }, [isSearchBarOpen, allHabits, selectedCategories]);
-
-  if (!completionDatesMap) return null;
+  //   if (!selectedCategories.length) {
+  //     setHabits(allHabits);
+  //   } else {
+  //     setHabits(
+  //       allHabits.filter((habit) => selectedCategories.includes(habit.category))
+  //     );
+  //   }
+  // }, [isSearchBarOpen, allHabits, selectedCategories]);
 
   return (
     <Container isContentCentered={isListEmpty}>

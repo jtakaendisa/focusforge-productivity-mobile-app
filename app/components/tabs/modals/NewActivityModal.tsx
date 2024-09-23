@@ -1,17 +1,18 @@
-import { MutableRefObject } from 'react';
-import { router, usePathname } from 'expo-router';
 import {
-  BottomSheetModal,
   BottomSheetBackdrop,
-  BottomSheetView,
   BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { styled, View, Text, getTokenValue } from 'tamagui';
+import { router, usePathname } from 'expo-router';
+import { MutableRefObject } from 'react';
+import { styled, Text, View } from 'tamagui';
 
-import ActivityTypeIcon from './ActivityTypeIcon';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import ArrowRightSvg from '../../icons/ArrowRightSvg';
 import RippleButton from '../RippleButton';
+import ActivityTypeIcon from './ActivityTypeIcon';
 
 interface Props {
   newActivityModalRef: MutableRefObject<BottomSheetModalMethods | null>;
@@ -51,6 +52,8 @@ const options = [
 const NewActivityModal = ({ newActivityModalRef }: Props) => {
   const currentPath = usePathname();
 
+  const { customGray1, customGray3, customRed1 } = useCustomColors();
+
   const navigateToNewActivityScreen = (pathname: Pathname, isRecurring: boolean) => {
     newActivityModalRef.current?.dismiss();
 
@@ -63,10 +66,6 @@ const NewActivityModal = ({ newActivityModalRef }: Props) => {
       router.push({ pathname, params: { origin: currentPath } });
     }
   };
-
-  const customGray1 = getTokenValue('$customGray1');
-  const customGray3 = getTokenValue('$customGray3');
-  const customRed1 = getTokenValue('$customRed1');
 
   return (
     <BottomSheetModal

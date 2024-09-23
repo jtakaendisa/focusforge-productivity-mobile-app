@@ -3,16 +3,13 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styled, Text, View } from 'tamagui';
+import ActivityCalendar from './components/tabs/ActivityCalendar';
 import TabBar from './components/tabs/habits/TabBar';
 import EditTask from './components/tabs/tasks/EditTask';
-import { Activity, CompletionDatesMap, TaskActiveTab } from './entities';
+import { Activity, TaskActiveTab } from './entities';
+import useCompletionDates from './hooks/useCompletionDates';
 import { useActivityStore } from './store';
-import ActivityCalendar from './components/tabs/ActivityCalendar';
-import {
-  getCompletionDatesFromStorage,
-  setCompletionDatesInStorage,
-  toFormattedDateString,
-} from './utils';
+import { toFormattedDateString } from './utils';
 
 type SearchParams = {
   activeTab: TaskActiveTab;
@@ -26,8 +23,8 @@ const TaskDetailsScreen = () => {
 
   const [activeTab, setActiveTab] = useState(activeTabParam);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
-  const [completionDatesMap, setCompletionDatesMap] =
-    useState<CompletionDatesMap | null>(null);
+
+  const { completionDatesMap, setCompletionDatesInStorage } = useCompletionDates();
 
   const isRecurring = selectedTask?.type === 'recurring task';
 
@@ -49,16 +46,7 @@ const TaskDetailsScreen = () => {
       [selectedTask.id]: updatedCompletionDates,
     };
     await setCompletionDatesInStorage(updatedCompletionDatesMap);
-    setCompletionDatesMap(updatedCompletionDatesMap);
   };
-
-  useEffect(() => {
-    const fetchCompletionDatesMap = async () => {
-      const completionDatesMap = await getCompletionDatesFromStorage();
-      setCompletionDatesMap(completionDatesMap);
-    };
-    fetchCompletionDatesMap();
-  }, []);
 
   useEffect(() => {
     const selectedTask = activities.find((activity) => activity.id === taskId);
@@ -67,7 +55,7 @@ const TaskDetailsScreen = () => {
     }
   }, [activities, taskId]);
 
-  if (!selectedTask || !completionDatesMap) return null;
+  if (!selectedTask || !completionDatesMap[taskId]) return null;
 
   return (
     <Container>

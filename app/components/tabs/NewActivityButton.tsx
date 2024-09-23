@@ -1,5 +1,6 @@
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { LinearGradient } from 'expo-linear-gradient';
-import { View, getTokenValue, styled } from 'tamagui';
+import { View, styled } from 'tamagui';
 import PlusSvg from '../icons/PlusSvg';
 
 interface Props {
@@ -7,8 +8,7 @@ interface Props {
 }
 
 const NewActivityButton = ({ onPress }: Props) => {
-  const customRed2 = getTokenValue('$customRed2');
-  const customRed3 = getTokenValue('$customRed3');
+  const { customRed2, customRed3 } = useCustomColors();
 
   return (
     <Container onPress={onPress}>

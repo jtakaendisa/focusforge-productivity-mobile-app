@@ -30,7 +30,7 @@ const setCompletionDatesInStorage = async (
   }
 };
 
-export const generateCompletionDates = (
+const generateCompletionDates = (
   startDate: Date,
   frequency: Frequency,
   endDate?: Date
@@ -143,6 +143,14 @@ const useCompletionDates = () => {
     setCompletionDatesMap(data);
   }, []);
 
+  const updateCompletionDatesMap = useCallback(
+    async (completionDatesMap: Record<string, CompletionDate[]>) => {
+      await setCompletionDatesInStorage(completionDatesMap);
+      setCompletionDatesMap(completionDatesMap);
+    },
+    []
+  );
+
   useEffect(() => {
     fetchCompletionDatesMap();
   }, []);
@@ -178,6 +186,7 @@ const useCompletionDates = () => {
     loadedCompletionDates,
     completionDatesMap,
     fetchCompletionDatesMap,
+    updateCompletionDatesMap,
   };
 };
 

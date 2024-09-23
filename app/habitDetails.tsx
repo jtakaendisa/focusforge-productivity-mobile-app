@@ -8,14 +8,10 @@ import ActivityCalendar from './components/tabs/ActivityCalendar';
 import EditHabit from './components/tabs/habits/EditHabit';
 import HabitStatistics from './components/tabs/habits/HabitStatistics';
 import TabBar from './components/tabs/habits/TabBar';
-import { Activity, CompletionDatesMap, HabitActiveTab } from './entities';
+import { Activity, HabitActiveTab } from './entities';
+import useCompletionDates from './hooks/useCompletionDates';
 import { useActivityStore } from './store';
-import {
-  calculateStreaks,
-  getCompletionDatesFromStorage,
-  setCompletionDatesInStorage,
-  toFormattedDateString,
-} from './utils';
+import { calculateStreaks, toFormattedDateString } from './utils';
 
 type SearchParams = {
   activeTab: HabitActiveTab;
@@ -29,8 +25,8 @@ const HabitDetailsScreen = () => {
 
   const [activeTab, setActiveTab] = useState(activeTabParam);
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
-  const [completionDatesMap, setCompletionDatesMap] =
-    useState<CompletionDatesMap | null>(null);
+
+  const { completionDatesMap, setCompletionDatesInStorage } = useCompletionDates();
 
   const { currentStreak, bestStreak } = useMemo(() => {
     if (selectedHabit && completionDatesMap) {
@@ -58,7 +54,6 @@ const HabitDetailsScreen = () => {
       [selectedHabit.id]: updatedCompletionDates,
     };
     await setCompletionDatesInStorage(updatedCompletionDatesMap);
-    setCompletionDatesMap(updatedCompletionDatesMap);
   };
 
   useEffect(() => {
@@ -68,15 +63,7 @@ const HabitDetailsScreen = () => {
     }
   }, [activities, habitId]);
 
-  useEffect(() => {
-    const fetchCompletionDatesMap = async () => {
-      const completionDatesMap = await getCompletionDatesFromStorage();
-      setCompletionDatesMap(completionDatesMap);
-    };
-    fetchCompletionDatesMap();
-  }, []);
-
-  if (!selectedHabit || !completionDatesMap) return null;
+  if (!selectedHabit || !completionDatesMap[habitId]) return null;
 
   return (
     <Container>
