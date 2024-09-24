@@ -2,15 +2,16 @@ import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { getTokenValue, Image, styled, Text, View } from 'tamagui';
+import { Image, styled, Text, View } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { NewActivityData, Reminder } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import PlusCircleSvg from '../../icons/PlusCircleSvg';
 import ReminderListItem from '../habits/ReminderListItem';
+import RippleButton from '../RippleButton';
 import ModalContainer from './ModalContainer';
 import NewReminderModalModule from './NewReminderModalModule';
-import RippleButton from '../RippleButton';
 
 interface Props {
   control: Control<NewActivityData>;
@@ -19,6 +20,8 @@ interface Props {
 }
 
 const RemindersModalModule = ({ control, reminders, closeModal }: Props) => {
+  const { customRed1 } = useCustomColors();
+
   const [isNewReminderOpen, setIsNewReminderOpen] = useState(false);
 
   const listRef = useRef<FlashList<Reminder> | null>(null);
@@ -39,8 +42,6 @@ const RemindersModalModule = ({ control, reminders, closeModal }: Props) => {
   };
 
   const toggleNewReminderModal = () => setIsNewReminderOpen((prev) => !prev);
-
-  const customRed1 = getTokenValue('$customRed1');
 
   return (
     <Container>

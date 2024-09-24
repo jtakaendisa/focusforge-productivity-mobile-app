@@ -6,15 +6,16 @@ import {
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { MutableRefObject } from 'react';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
+import { categoryColorMap } from '@/app/constants';
 import { Activity, HabitActiveTab, TaskActiveTab } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { toTruncatedText } from '@/app/utils';
 import CategoryIcon from '../CategoryIcon';
+import RippleButton from '../RippleButton';
 import FrequencyBadge from './FrequencyBadge';
 import HabitOptionIcon from './HabitOptionIcon';
-import RippleButton from '../RippleButton';
-import { categoryColorMap } from '@/app/constants';
 
 interface HabitProps {
   mode: 'habit';
@@ -45,15 +46,12 @@ const ActivityOptionsModal = ({
   onDelete,
   onNavigate,
 }: Props) => {
+  const { customBlack1, customGray1, customGray3, customRed1 } = useCustomColors();
+
   const options =
     mode === 'habit'
       ? (['calendar', 'statistics', 'edit', 'delete'] as const)
       : (['calendar', 'edit', 'delete'] as const);
-
-  const customBlack1 = getTokenValue('$customBlack1');
-  const customGray1 = getTokenValue('$customGray1');
-  const customGray3 = getTokenValue('$customGray3');
-  const customRed1 = getTokenValue('$customRed1');
 
   return (
     <BottomSheetModal

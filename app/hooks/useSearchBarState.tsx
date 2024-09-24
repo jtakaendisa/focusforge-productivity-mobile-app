@@ -2,7 +2,7 @@ import { ActivityFilter, Category } from '@/app/entities';
 import { useSearchStore } from '@/app/store';
 import { useState } from 'react';
 
-const useSearchBarState = (toggleActivityFilterModal: () => void) => {
+const useSearchBarState = (toggleActivityFilterModal?: () => void) => {
   const activityFilter = useSearchStore((s) => s.activityFilter);
   const filteredActivities = useSearchStore((s) => s.filteredActivities);
   const setSearchTerm = useSearchStore((s) => s.setSearchTerm);
@@ -39,7 +39,7 @@ const useSearchBarState = (toggleActivityFilterModal: () => void) => {
 
   const handleActivityFilterSelect = (activityFilter: ActivityFilter) => {
     setActivityFilter(activityFilter);
-    toggleActivityFilterModal();
+    toggleActivityFilterModal?.();
   };
 
   const handleFilterReset = () => {

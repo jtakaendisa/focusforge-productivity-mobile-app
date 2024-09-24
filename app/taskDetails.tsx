@@ -24,7 +24,7 @@ const TaskDetailsScreen = () => {
   const [activeTab, setActiveTab] = useState(activeTabParam);
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
 
-  const { completionDatesMap, setCompletionDatesInStorage } = useCompletionDates();
+  const { completionDatesMap, updateCompletionDatesMap } = useCompletionDates();
 
   const isRecurring = selectedTask?.type === 'recurring task';
 
@@ -45,7 +45,7 @@ const TaskDetailsScreen = () => {
       ...completionDatesMap,
       [selectedTask.id]: updatedCompletionDates,
     };
-    await setCompletionDatesInStorage(updatedCompletionDatesMap);
+    await updateCompletionDatesMap(updatedCompletionDatesMap);
   };
 
   useEffect(() => {

@@ -1,7 +1,8 @@
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
 import { ChecklistItem as ChecklistItemType } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { toTruncatedText } from '@/app/utils';
 import BinSvg from '../../icons/BinSvg';
 import RippleButton from '../RippleButton';
@@ -15,7 +16,7 @@ interface Props {
 const ChecklistItem = ({ listItem, isLastIndex, onDelete }: Props) => {
   const { id, title } = listItem;
 
-  const customRed1 = getTokenValue('$customRed1');
+  const { customRed1 } = useCustomColors();
 
   const handleDeleteItem = () => onDelete(id);
 

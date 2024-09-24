@@ -1,4 +1,5 @@
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import useCustomColors from '@/app/hooks/useCustomColors';
+import { styled, Text, View } from 'tamagui';
 import BinSvg from '../../icons/BinSvg';
 import CameraSvg from '../../icons/CameraSvg';
 import GallerySvg from '../../icons/GallerySvg';
@@ -15,8 +16,7 @@ const EditPhotoModalModule = ({
   onGalleryPress,
   onRemovePress,
 }: Props) => {
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
+  const { customGray1, customRed1 } = useCustomColors();
 
   return (
     <Container>

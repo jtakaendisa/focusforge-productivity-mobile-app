@@ -1,6 +1,7 @@
 import { styled, Text, View } from 'tamagui';
 
 import { DATE_CARD_HEIGHT } from '@/app/constants';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { setDateToMidnight, toFormattedDateString } from '@/app/utils';
 
 interface Props {
@@ -17,6 +18,17 @@ interface Props {
 const HabitDateCard = ({ day, onComplete }: Props) => {
   const { date, weekday, originalDay, isPressable, isCompleted } = day;
 
+  const {
+    customGreen3,
+    customYellow2,
+    customRed8,
+    customGray2,
+    customGreen2,
+    customYellow1,
+    customRed7,
+    customGray1,
+  } = useCustomColors();
+
   const startOfOriginalDay = setDateToMidnight(originalDay);
   const startOfCurrentDate = setDateToMidnight(new Date());
 
@@ -31,22 +43,22 @@ const HabitDateCard = ({ day, onComplete }: Props) => {
 
   const backgroundColor = isPressable
     ? isCompleted
-      ? '$customGreen3'
+      ? customGreen3
       : isToday
-      ? '$customYellow2'
+      ? customYellow2
       : isPassedDeadline
-      ? '$customRed8'
-      : '$customGray2'
-    : '$customGray2';
+      ? customRed8
+      : customGray2
+    : customGray2;
 
   const borderColor = isPressable
     ? isCompleted
-      ? '$customGreen2'
+      ? customGreen2
       : isToday
-      ? '$customYellow1'
+      ? customYellow1
       : isPassedDeadline
-      ? '$customRed7'
-      : '$customGray1'
+      ? customRed7
+      : customGray1
     : 'transparent';
 
   const handleComplete = () => onComplete(originalDay);

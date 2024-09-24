@@ -1,23 +1,22 @@
-import {
-  DateTimePickerAndroid,
-  DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Control, Controller } from 'react-hook-form';
-import { Text, View, getTokenValue, styled } from 'tamagui';
+import { Text, View, styled } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
+import { NewActivityData } from '@/app/entities';
+import useActivityModals from '@/app/hooks/useActivityModals';
+import useCustomColors from '@/app/hooks/useCustomColors';
+import useDatePicker from '@/app/hooks/useDatePicker';
 import { toFormattedDateString } from '@/app/utils';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import BellSvg from '../../icons/BellSvg';
+import BinSvg from '../../icons/BinSvg';
 import CalendarEndSvg from '../../icons/CalendarEndSvg';
 import CalendarStartSvg from '../../icons/CalendarStartSvg';
 import FlagSvg from '../../icons/FlagSvg';
 import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import RemindersModalModule from '../modals/RemindersModalModule';
-import { NewActivityData } from '@/app/entities';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import BinSvg from '../../icons/BinSvg';
 import RippleButton from '../RippleButton';
 
 interface Props {
@@ -27,56 +26,25 @@ interface Props {
 const SVG_SIZE = 22;
 
 const DurationListModule = ({ control }: Props) => {
-  const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
-  const [isRemindersModalOpen, setIsRemindersModalOpen] = useState(false);
+  const {
+    isRemindersModalOpen,
+    isPriorityModalOpen,
+    toggleRemindersModal,
+    togglePriorityModal,
+  } = useActivityModals();
+
+  const { customGray1, customRed1 } = useCustomColors();
 
   const setStartDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setEndDateRef = useRef<((...event: any[]) => void) | null>(null);
+
+  const { handleStartDateSelect, handleEndDateSelect, handleEndDateClear } =
+    useDatePicker(setStartDateRef, setEndDateRef, true);
 
   const currentPriority = control?._getWatch('priority');
   const startDate = control?._getWatch('startDate');
   const endDate = control?._getWatch('endDate');
   const reminders = control?._getWatch('reminders');
-
-  const handleDateSelect = (
-    event: DateTimePickerEvent,
-    selectedDate: Date | undefined,
-    mode: 'start' | 'end'
-  ) => {
-    if (selectedDate) {
-      if (mode === 'start') {
-        setStartDateRef.current?.(selectedDate);
-      } else {
-        if (toFormattedDateString(selectedDate) !== toFormattedDateString(new Date())) {
-          setEndDateRef.current?.(selectedDate);
-        } else {
-          setEndDateRef.current?.();
-        }
-      }
-    }
-  };
-
-  const showDatePicker = (mode: 'start' | 'end') => {
-    DateTimePickerAndroid.open({
-      value: new Date(),
-      onChange: (e, date) => handleDateSelect(e, date, mode),
-      is24Hour: true,
-      minimumDate: new Date(),
-    });
-  };
-
-  const handleStartDateSelect = () => showDatePicker('start');
-
-  const handleEndDateSelect = () => showDatePicker('end');
-
-  const handleEndDateClear = () => setEndDateRef.current?.();
-
-  const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
-
-  const toggleRemindersModal = () => setIsRemindersModalOpen((prev) => !prev);
-
-  const customRed1 = getTokenValue('$customRed1');
-  const customGray1 = getTokenValue('$customGray1');
 
   return (
     <Container>

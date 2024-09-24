@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { TextInput, View } from 'react-native';
 import uuid from 'react-native-uuid';
-import { getTokenValue, styled } from 'tamagui';
+import { styled } from 'tamagui';
 
 import { ChecklistItem } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import PlusSvg from '../../icons/PlusSvg';
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 const CreateTaskItem = ({ setChecklist }: Props) => {
   const [title, setTitle] = useState('');
 
-  const customRed1 = getTokenValue('$customRed1');
+  const { customRed1 } = useCustomColors();
 
   const handleSubmit = () => {
     if (!title.length) return;

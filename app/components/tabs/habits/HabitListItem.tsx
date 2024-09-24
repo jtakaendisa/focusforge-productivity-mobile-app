@@ -1,9 +1,11 @@
 import { eachDayOfInterval, endOfWeek, format, startOfWeek } from 'date-fns';
 import { MutableRefObject, useMemo, useRef } from 'react';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { Text, View, getTokenValue, styled } from 'tamagui';
+import { Text, View, styled } from 'tamagui';
 
+import { categoryColorMap } from '@/app/constants';
 import { Activity, CompletionDate, HabitActiveTab } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { calculateStreaks, toFormattedDateString, toTruncatedText } from '@/app/utils';
 import { Swipeable } from 'react-native-gesture-handler';
 import BarChartSvg from '../../icons/BarChartSvg';
@@ -17,7 +19,6 @@ import FrequencyBadge from './FrequencyBadge';
 import HabitDateCard from './HabitDateCard';
 import HabitItemLeftActions from './HabitItemLeftActions';
 import HabitItemRightActions from './HabitItemRightActions';
-import { categoryColorMap } from '@/app/constants';
 
 interface Props {
   habit: Activity;
@@ -43,6 +44,8 @@ const HabitListItem = ({
   onComplete,
 }: Props) => {
   const { id, title, category, frequency } = habit;
+
+  const { customBlack1, customGray1, customRed1 } = useCustomColors();
 
   const swipeableRef = useRef<Swipeable | null>(null);
 
@@ -94,10 +97,6 @@ const HabitListItem = ({
   const handleNavigateToStatisticsTab = () => onNavigate('statistics', id);
 
   const handleShowOptions = () => onShowOptions(habit);
-
-  const customBlack1 = getTokenValue('$customBlack1');
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
 
   return (
     <AnimatedContainer entering={FadeIn} exiting={FadeOut}>

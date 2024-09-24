@@ -8,7 +8,6 @@ import useTaskList from '@/app/hooks/useTaskList';
 import { toFormattedDateString } from '@/app/utils';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { parse } from 'date-fns';
-import { usePathname } from 'expo-router';
 import { styled, View } from 'tamagui';
 import ActivityOptionsModal from '../habits/ActivityOptionsModal';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
@@ -18,6 +17,7 @@ import TaskListItem from './TaskListItem';
 import TaskSectionHeader from './TaskSectionHeader';
 
 interface Props {
+  pathname: TabRoute;
   isSearchBarOpen: boolean;
 }
 
@@ -65,9 +65,7 @@ const formatTasks = (taskFilter: TaskFilter, tasks: Activity[]) => {
   }
 };
 
-const TaskList = ({ isSearchBarOpen }: Props) => {
-  const pathname = (usePathname().substring(1) || 'home') as TabRoute;
-
+const TaskList = ({ pathname, isSearchBarOpen }: Props) => {
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);
 
   const listRef = useRef<FlashList<string | Activity> | null>(null);

@@ -5,9 +5,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
 import { DATE_CARD_HEIGHT } from '@/app/constants';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { toFormattedDateString } from '@/app/utils';
 
 interface Props {
@@ -22,13 +23,10 @@ interface Props {
 const DateCard = ({ day, selectedDate, onPress }: Props) => {
   const { date, weekday } = day;
 
-  const isSelected = useSharedValue(0);
+  const { customGray1, customGray2, customGray3, customRed1, customRed3 } =
+    useCustomColors();
 
-  const customGray1 = getTokenValue('$customGray1');
-  const customGray2 = getTokenValue('$customGray2');
-  const customGray3 = getTokenValue('$customGray3');
-  const customRed1 = getTokenValue('$customRed1');
-  const customRed3 = getTokenValue('$customRed3');
+  const isSelected = useSharedValue(0);
 
   const handlePress = () => onPress(date);
 

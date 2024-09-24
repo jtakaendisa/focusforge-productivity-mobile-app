@@ -1,6 +1,7 @@
-import { getTokenValue, ScrollView } from 'tamagui';
+import { ScrollView } from 'tamagui';
 
 import { CompletionDate } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import CheckCircleSvg from '../../icons/CheckCircleSvg';
 import LinkSvg from '../../icons/LinkSvg';
 import MedalSvg from '../../icons/MedalSvg';
@@ -9,10 +10,10 @@ import TrophySvg from '../../icons/TrophySvg';
 import ActivityInfoPanel from '../ActivityInfoPanel';
 import CircularProgressBar from './CircularProgressBar';
 import CompletionMetricsInfoPanelModule from './CompletionMetricsInfoPanelModule';
-import CustomPieChart from './CustomPieChart';
-import StreakInfoPanelModule from './StreakInfoPanelModule';
-import StreakChallengeInfoPanelModule from './StreakChallengeInfoPanelModule';
 import CustomBarGraph from './CustomBarGraph';
+import CustomPieChart from './CustomPieChart';
+import StreakChallengeInfoPanelModule from './StreakChallengeInfoPanelModule';
+import StreakInfoPanelModule from './StreakInfoPanelModule';
 
 interface Props {
   completionDates: CompletionDate[];
@@ -21,7 +22,7 @@ interface Props {
 }
 
 const HabitStatistics = ({ completionDates, currentStreak, bestStreak }: Props) => {
-  const customRed2 = getTokenValue('$customRed2');
+  const { customRed2 } = useCustomColors();
 
   return (
     <ScrollView>

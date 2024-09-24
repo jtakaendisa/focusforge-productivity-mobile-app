@@ -1,3 +1,4 @@
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { useEffect } from 'react';
 import Animated, {
   interpolateColor,
@@ -5,7 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { View, getTokenValue, styled } from 'tamagui';
+import { View, styled } from 'tamagui';
 
 interface Props {
   listItem: number;
@@ -13,9 +14,9 @@ interface Props {
 }
 
 const Dot = ({ listItem, listIndex }: Props) => {
-  const isFilled = useSharedValue(listItem <= listIndex ? 1 : 0);
+  const { customRed1 } = useCustomColors();
 
-  const customRed1 = getTokenValue('$customRed1');
+  const isFilled = useSharedValue(listItem <= listIndex ? 1 : 0);
 
   const backgroundColorAnimation = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(

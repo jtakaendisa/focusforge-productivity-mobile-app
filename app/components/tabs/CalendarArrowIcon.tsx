@@ -1,4 +1,4 @@
-import { getTokenValue } from 'tamagui';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import ArrowLeftSvg from '../icons/ArrowLeftSvg';
 import ArrowRightSvg from '../icons/ArrowRightSvg';
 
@@ -9,7 +9,7 @@ interface Props {
 const SVG_SZIE = 16;
 
 const CalendarArrowIcon = ({ direction }: Props) => {
-  const customRed2 = getTokenValue('$customRed2');
+  const { customRed2 } = useCustomColors();
 
   if (direction === 'left') {
     return <ArrowLeftSvg size={SVG_SZIE} fill={customRed2} />;

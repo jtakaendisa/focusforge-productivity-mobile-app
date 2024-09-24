@@ -26,7 +26,7 @@ const HabitDetailsScreen = () => {
   const [activeTab, setActiveTab] = useState(activeTabParam);
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
 
-  const { completionDatesMap, setCompletionDatesInStorage } = useCompletionDates();
+  const { completionDatesMap, updateCompletionDatesMap } = useCompletionDates();
 
   const { currentStreak, bestStreak } = useMemo(() => {
     if (selectedHabit && completionDatesMap) {
@@ -53,7 +53,7 @@ const HabitDetailsScreen = () => {
       ...completionDatesMap,
       [selectedHabit.id]: updatedCompletionDates,
     };
-    await setCompletionDatesInStorage(updatedCompletionDatesMap);
+    await updateCompletionDatesMap(updatedCompletionDatesMap);
   };
 
   useEffect(() => {

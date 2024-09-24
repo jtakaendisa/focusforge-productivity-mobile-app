@@ -22,7 +22,7 @@ const HabitsScreen = () => {
   return (
     <Container>
       <SearchBarSpacer isExpanded={pathname === 'habits' && isSearchBarOpen} />
-      <HabitList isSearchBarOpen={isSearchBarOpen} />
+      <HabitList pathname={pathname} isSearchBarOpen={isSearchBarOpen} />
       <NewActivityButton onPress={toggleNewActivityModal} />
       <NewActivityModal newActivityModalRef={newActivityModalRef} />
     </Container>

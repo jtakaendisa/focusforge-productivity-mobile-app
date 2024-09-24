@@ -16,12 +16,15 @@ const useFormHandler = <T extends FieldValues>({
   const {
     control,
     handleSubmit,
+    watch,
     reset,
     formState: { errors },
   } = useForm<T>({
     defaultValues,
     resolver: zodResolver(schema),
   });
+
+  const watchAllFields = watch();
 
   const handleFormSubmit = handleSubmit(async (data) => {
     try {
@@ -35,6 +38,7 @@ const useFormHandler = <T extends FieldValues>({
   return {
     control,
     errors,
+    watchAllFields,
     handleFormSubmit,
   };
 };

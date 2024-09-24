@@ -6,7 +6,6 @@ import useActivityList from '@/app/hooks/useActivityList';
 import useListModals from '@/app/hooks/useListModals';
 import useSearchBarFilters from '@/app/hooks/useSearchBarFilters';
 import { useActivityStore } from '@/app/store';
-import { usePathname } from 'expo-router';
 import { styled, View } from 'tamagui';
 import ChecklistModalModule from '../modals/ChecklistModalModule';
 import DeleteModalModule from '../modals/DeleteModalModule';
@@ -16,12 +15,11 @@ import TaskListItem from '../tasks/TaskListItem';
 import ActivityListPlaceholder from './ActivityListPlaceholder';
 
 interface Props {
+  pathname: TabRoute;
   isSearchBarOpen: boolean;
 }
 
-const ActivityList = ({ isSearchBarOpen }: Props) => {
-  const pathname = (usePathname().substring(1) || 'home') as TabRoute;
-
+const ActivityList = ({ pathname, isSearchBarOpen }: Props) => {
   const selectedDate = useActivityStore((s) => s.selectedDate);
 
   const [selectedTask, setSelectedTask] = useState<Activity | null>(null);

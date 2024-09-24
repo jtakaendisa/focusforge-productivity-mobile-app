@@ -1,6 +1,7 @@
 import { BarGraphFilter } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 import ArrowLeftSvg from '../../icons/ArrowLeftSvg';
 import ArrowRightSvg from '../../icons/ArrowRightSvg';
 
@@ -19,7 +20,7 @@ const BarGraphPeriodSelector = ({
 }: Props) => {
   const isFilterSetToMonth = barGraphFilter === 'month';
 
-  const customRed2 = getTokenValue('$customRed2');
+  const { customRed2 } = useCustomColors();
 
   return (
     <Container isContentCentered={!isFilterSetToMonth}>

@@ -1,25 +1,18 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { useRef } from 'react';
+import { Controller, SubmitHandler } from 'react-hook-form';
+import { styled, Text, View } from 'tamagui';
 
+import { categoryColorMap } from '@/app/constants';
 import { Activity, NewActivityData } from '@/app/entities';
+import useActivityModals from '@/app/hooks/useActivityModals';
+import useCompletionDates from '@/app/hooks/useCompletionDates';
+import useCustomColors from '@/app/hooks/useCustomColors';
+import useDatePicker from '@/app/hooks/useDatePicker';
+import useFormHandler from '@/app/hooks/useFormHandler';
 import { useActivityStore } from '@/app/store';
-import {
-  generateCompletionDates,
-  getCompletionDatesFromStorage,
-  mergeCompletionDates,
-  setCompletionDatesInStorage,
-  toCleanedObject,
-  toFormattedDateString,
-  toTruncatedText,
-} from '@/app/utils';
+import { toCleanedObject, toFormattedDateString, toTruncatedText } from '@/app/utils';
 import { activitySchema } from '@/app/validationSchemas';
-import {
-  DateTimePickerAndroid,
-  DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import BellSvg from '../../icons/BellSvg';
 import BinSvg from '../../icons/BinSvg';
@@ -39,7 +32,6 @@ import TextModalModule from '../modals/TextModalModule';
 import RippleButton from '../RippleButton';
 import FrequencyBadge from './FrequencyBadge';
 import FrequencyListModule from './FrequencyListModule';
-import { categoryColorMap } from '@/app/constants';
 
 interface Props {
   activities: Activity[];
@@ -51,70 +43,37 @@ const SVG_SIZE = 22;
 const EditHabit = ({ activities, selectedHabit }: Props) => {
   const setActivities = useActivityStore((s) => s.setActivities);
 
-  const [isTitleModalOpen, setIsTitleModalOpen] = useState(false);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
-  const [isRemindersModalOpen, setIsRemindersModalOpen] = useState(false);
-  const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
-  const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
+  const {
+    isTitleModalOpen,
+    isCategoryModalOpen,
+    isFrequencyModalOpen,
+    isNoteModalOpen,
+    isPriorityModalOpen,
+    isRemindersModalOpen,
+    toggleTitleModal,
+    toggleCategoryModal,
+    toggleFrequencyModal,
+    toggleNoteModal,
+    togglePriorityModal,
+    toggleRemindersModal,
+  } = useActivityModals();
+
+  const { customBlack1, customGray1, customRed1 } = useCustomColors();
 
   const setStartDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setEndDateRef = useRef<((...event: any[]) => void) | null>(null);
 
+  const { handleStartDateSelect, handleEndDateSelect, handleEndDateClear } =
+    useDatePicker(setStartDateRef, setEndDateRef, true);
+
   const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { isSubmitSuccessful },
-  } = useForm<NewActivityData>({
-    defaultValues: {
-      ...selectedHabit,
-    },
-    resolver: zodResolver(activitySchema),
-  });
+    completionDatesMap,
+    generateCompletionDates,
+    mergeCompletionDates,
+    updateCompletionDatesMap,
+  } = useCompletionDates();
 
-  const watchAllFields = watch();
-
-  const { title, category, note, priority, frequency, startDate, endDate, reminders } =
-    watchAllFields;
-
-  const handleDelete = () => {
-    const filteredActivities = activities.filter(
-      (activity) => activity.id !== selectedHabit.id
-    );
-    setActivities(filteredActivities);
-    router.replace('/habits');
-  };
-
-  const handleEndDateClear = () => setEndDateRef.current?.();
-
-  const handleDateSelect = (
-    event: DateTimePickerEvent,
-    selectedDate: Date | undefined,
-    mode: 'start' | 'end'
-  ) => {
-    if (selectedDate) {
-      if (mode === 'start') {
-        setStartDateRef.current?.(selectedDate);
-      } else {
-        if (toFormattedDateString(selectedDate) !== toFormattedDateString(new Date())) {
-          setEndDateRef.current?.(selectedDate);
-        } else {
-          setEndDateRef.current?.();
-        }
-      }
-    }
-  };
-
-  const showDatePicker = (mode: 'start' | 'end') => {
-    DateTimePickerAndroid.open({
-      value: new Date(),
-      onChange: (e, date) => handleDateSelect(e, date, mode),
-      is24Hour: true,
-      minimumDate: new Date(),
-    });
-  };
+  const navigateBack = () => router.replace('/habits');
 
   const onSubmit: SubmitHandler<NewActivityData> = async (data) => {
     const updatedHabit: Activity = {
@@ -123,7 +82,7 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
     };
 
     // Retrieve the current completion dates map from storage
-    const currentCompletionDatesMap = await getCompletionDatesFromStorage();
+    const currentCompletionDatesMap = { ...completionDatesMap };
 
     // Retrieve existing completion dates for the selected habit
     const existingCompletionDates = currentCompletionDatesMap[selectedHabit.id];
@@ -145,42 +104,33 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
     currentCompletionDatesMap[selectedHabit.id] = mergedCompletionDates;
 
     // Store the updated map back to local storage
-    await setCompletionDatesInStorage(currentCompletionDatesMap);
+    await updateCompletionDatesMap(currentCompletionDatesMap);
 
     const updatedActivities = activities.map((activity) =>
       activity.id === selectedHabit.id ? toCleanedObject(updatedHabit) : activity
     );
     setActivities(updatedActivities);
+    navigateBack();
   };
 
-  const handleStartDateSelect = () => showDatePicker('start');
+  const { control, watchAllFields, handleFormSubmit } = useFormHandler({
+    schema: activitySchema,
+    defaultValues: {
+      ...selectedHabit,
+    },
+    onSubmit,
+  });
 
-  const handleEndDateSelect = () => showDatePicker('end');
+  const { title, category, note, priority, frequency, startDate, endDate, reminders } =
+    watchAllFields;
 
-  const handleCancel = () => router.replace('/habits');
-
-  const toggleTitleModal = () => setIsTitleModalOpen((prev) => !prev);
-
-  const toggleCategoryModal = () => setIsCategoryModalOpen((prev) => !prev);
-
-  const toggleNoteModal = () => setIsNoteModalOpen((prev) => !prev);
-
-  const toggleRemindersModal = () => setIsRemindersModalOpen((prev) => !prev);
-
-  const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
-
-  const toggleFrequencyModal = () => setIsFrequencyModalOpen((prev) => !prev);
-
-  useEffect(() => {
-    if (!isSubmitSuccessful) return;
-
-    reset();
-    router.replace('/habits');
-  }, [isSubmitSuccessful]);
-
-  const customBlack1 = getTokenValue('$customBlack1');
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
+  const handleDelete = () => {
+    const filteredActivities = activities.filter(
+      (activity) => activity.id !== selectedHabit.id
+    );
+    setActivities(filteredActivities);
+    navigateBack();
+  };
 
   return (
     <Container>
@@ -323,12 +273,12 @@ const EditHabit = ({ activities, selectedHabit }: Props) => {
       </RippleButton>
 
       <ButtonsContainer>
-        <RippleButton flex onPress={handleCancel}>
+        <RippleButton flex onPress={navigateBack}>
           <Button>
             <ButtonText>CANCEL</ButtonText>
           </Button>
         </RippleButton>
-        <RippleButton flex onPress={handleSubmit(onSubmit)}>
+        <RippleButton flex onPress={handleFormSubmit}>
           <Button>
             <ButtonText color="$customRed1">CONFIRM</ButtonText>
           </Button>

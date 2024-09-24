@@ -1,7 +1,8 @@
 import { Reminder } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { toFormattedTimeString } from '@/app/utils';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 import AlarmClockSvg from '../../icons/AlarmClockSvg';
 import BellSvg from '../../icons/BellSvg';
 import BinSvg from '../../icons/BinSvg';
@@ -16,8 +17,7 @@ interface Props {
 const ReminderListItem = ({ listItem, isLastIndex, onDelete }: Props) => {
   const { id, time, type } = listItem;
 
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
+  const { customGray1, customRed1 } = useCustomColors();
 
   const handleDeleteReminder = () => onDelete(id);
 

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { View, Text, styled, getTokenValue } from 'tamagui';
+import { Text, View, styled } from 'tamagui';
 
 import Animated, {
   SharedValue,
@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { HabitActiveTab, TaskActiveTab } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import RippleButton from '../RippleButton';
 
 interface HabitProps {
@@ -28,13 +29,13 @@ interface TaskProps {
 type Props = HabitProps | TaskProps;
 
 const TabBar = ({ mode, activeTab, onSelect }: Props) => {
+  const { customGray1 } = useCustomColors();
+
   const isTaskMode = mode === 'task';
 
   const isCalendarSelected = useSharedValue(0);
   const isStatisticsSelected = useSharedValue(0);
   const isEditSelected = useSharedValue(0);
-
-  const customGray1 = getTokenValue('$customGray1');
 
   const textColorAnimation = (activeTab: SharedValue<number>) => {
     return useAnimatedStyle(() => ({

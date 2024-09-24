@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
 import { SCREEN_WIDTH } from '@/app/constants';
-import SquareCheckbox from '../SquareCheckbox';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import RippleButton from '../RippleButton';
+import SquareCheckbox from '../SquareCheckbox';
 
 interface Props {
   day: string;
@@ -13,9 +14,9 @@ interface Props {
 }
 
 const WeekdayCard = ({ day, isSelected, onSelect }: Props) => {
-  const isChecked = useSharedValue(isSelected ? 1 : 0);
+  const { customGray1 } = useCustomColors();
 
-  const customGray1 = getTokenValue('$customGray1');
+  const isChecked = useSharedValue(isSelected ? 1 : 0);
 
   const handleDaySelect = () => onSelect(day);
 

@@ -1,11 +1,12 @@
-import { Category } from '@/app/entities';
-import { styled, View, Text, getTokenValue } from 'tamagui';
-import CategoryIcon from './CategoryIcon';
-import RippleButton from './RippleButton';
-import CircularCheckbox from './CircularCheckbox';
-import { useSharedValue } from 'react-native-reanimated';
-import { useEffect } from 'react';
 import { categoryColorMap } from '@/app/constants';
+import { Category } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
+import { useEffect } from 'react';
+import { useSharedValue } from 'react-native-reanimated';
+import { styled, Text, View } from 'tamagui';
+import CategoryIcon from './CategoryIcon';
+import CircularCheckbox from './CircularCheckbox';
+import RippleButton from './RippleButton';
 
 interface Props {
   category: Category;
@@ -22,7 +23,7 @@ const SearchBarCategoryCard = ({
 }: Props) => {
   const isChecked = useSharedValue(isSelected ? 1 : 0);
 
-  const customBlack1 = getTokenValue('$customBlack1');
+  const { customBlack1 } = useCustomColors();
 
   const handleSelect = () => onSelect(category);
 

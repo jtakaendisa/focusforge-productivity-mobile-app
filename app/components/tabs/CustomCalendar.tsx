@@ -1,10 +1,10 @@
 import { CompletionDate } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { toFormattedDateString } from '@/app/utils';
 import { startOfDay } from 'date-fns';
 import { StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Theme } from 'react-native-calendars/src/types';
-import { getTokenValue } from 'tamagui';
 import CalendarArrowIcon from './CalendarArrowIcon';
 import CustomCalendarDay from './CustomCalendarDay';
 import CustomCalendarTitle from './CustomCalendarTitle';
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const CustomCalendar = ({ completionDates, onComplete }: Props) => {
-  const customRed2 = getTokenValue('$customRed2');
+  const { customRed2 } = useCustomColors();
 
   return (
     <Calendar

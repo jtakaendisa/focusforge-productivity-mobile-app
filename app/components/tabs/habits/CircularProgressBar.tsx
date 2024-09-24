@@ -1,5 +1,6 @@
 import { SCREEN_WIDTH } from '@/app/constants';
 import { CompletionDate } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { calculateHabitScore } from '@/app/utils';
 import { useEffect, useMemo } from 'react';
 import Animated, {
@@ -11,7 +12,7 @@ import Animated, {
 import { ReText } from 'react-native-redash';
 import { Circle, Svg } from 'react-native-svg';
 
-import { getTokenValue, styled, View } from 'tamagui';
+import { styled, View } from 'tamagui';
 
 const CONTAINER_WIDTH = SCREEN_WIDTH;
 const CONTAINER_HEIGHT = CONTAINER_WIDTH * 0.6;
@@ -23,6 +24,8 @@ interface Props {
 }
 
 const CircularProgressBar = ({ completionDates }: Props) => {
+  const { customGray2, customRed2 } = useCustomColors();
+
   const habitScore = useMemo(
     () => calculateHabitScore(completionDates),
 
@@ -30,9 +33,6 @@ const CircularProgressBar = ({ completionDates }: Props) => {
   );
 
   const score = useSharedValue(0);
-
-  const customGray2 = getTokenValue('$customGray2');
-  const customRed2 = getTokenValue('$customRed2');
 
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: CIRCLE_CIRCUMFERENCE * (1 - score.value),

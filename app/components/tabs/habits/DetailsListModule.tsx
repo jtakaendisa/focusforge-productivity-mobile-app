@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Control, Controller } from 'react-hook-form';
 import { TextInput } from 'react-native';
 import Animated, {
   interpolateColor,
@@ -6,17 +7,19 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Control, Controller } from 'react-hook-form';
-import { styled, View, Text, getTokenValue } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/app/constants';
 import { NewActivityData } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 
 interface Props {
   control: Control<NewActivityData>;
 }
 
 const DetailsListModule = ({ control }: Props) => {
+  const { customGray1, customRed1 } = useCustomColors();
+
   const [inputFocusState, setInputFocusState] = useState({
     isTitleFocused: false,
     isNoteFocused: false,
@@ -26,9 +29,6 @@ const DetailsListModule = ({ control }: Props) => {
 
   const sharedIsTitleFocused = useSharedValue(isTitleFocused ? 1 : 0);
   const sharedIsNoteFocused = useSharedValue(isNoteFocused ? 1 : 0);
-
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
 
   const titleFieldColorAnimation = useAnimatedStyle(() => ({
     borderColor: interpolateColor(

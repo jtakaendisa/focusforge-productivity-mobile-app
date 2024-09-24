@@ -1,6 +1,6 @@
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
-import { getTokenValue } from 'tamagui';
 
 interface Props {
   children: ReactNode;
@@ -19,7 +19,7 @@ const RippleButton = ({
   disabled,
   onPress,
 }: Props) => {
-  const customGray2 = getTokenValue('$customGray2');
+  const { customGray2 } = useCustomColors();
 
   return (
     <Pressable

@@ -1,10 +1,11 @@
+import useCustomColors from '@/app/hooks/useCustomColors';
 import Animated, {
   SharedValue,
   interpolate,
   interpolateColor,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { View, getTokenValue, styled } from 'tamagui';
+import { View, styled } from 'tamagui';
 import CheckSvg from '../icons/CheckSvg';
 import LockSvg from '../icons/LockSvg';
 
@@ -14,8 +15,7 @@ interface Props {
 }
 
 const CircularCheckbox = ({ isChecked, isDisabled }: Props) => {
-  const customGray1 = getTokenValue('$customGray1');
-  const customGreen1 = getTokenValue('$customGreen1');
+  const { customGray1, customGreen1 } = useCustomColors();
 
   const checkboxAnimation = useAnimatedStyle(() => ({
     borderColor: interpolateColor(isChecked.value, [0, 1], [customGray1, customGreen1]),

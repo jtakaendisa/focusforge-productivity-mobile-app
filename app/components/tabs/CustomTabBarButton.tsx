@@ -4,9 +4,10 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
 import { TabRoute } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import TabBarIcon from './TabBarIcon';
 
 interface Props {
@@ -27,8 +28,7 @@ const CustomTabBarButton = ({ accessibilityState, to, onPress }: Props) => {
 
   const isSelected = accessibilityState?.selected;
 
-  const customRed1 = getTokenValue('$customRed1');
-  const customGray1 = getTokenValue('$customGray1');
+  const { customRed1, customGray1 } = useCustomColors();
 
   const color = isSelected ? customRed1 : customGray1;
 

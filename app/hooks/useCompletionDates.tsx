@@ -73,7 +73,7 @@ const generateCompletionDates = (
   return dates;
 };
 
-export const mergeCompletionDates = (
+const mergeCompletionDates = (
   existingCompletionDates: CompletionDate[],
   newCompletionDates: CompletionDate[]
 ) => {
@@ -101,11 +101,11 @@ const getLastUpdateDate = async () => {
   return lastUpdate ? new Date(lastUpdate) : null;
 };
 
-export const setLastUpdateDate = async (date: Date) => {
+const setLastUpdateDate = async (date: Date) => {
   await AsyncStorage.setItem('lastCompletionDateUpdate', date.toISOString());
 };
 
-export const extendCompletionDates = async (
+const extendCompletionDates = async (
   activities: Activity[],
   completionDatesMap: CompletionDatesMap
 ) => {
@@ -187,6 +187,8 @@ const useCompletionDates = () => {
     completionDatesMap,
     fetchCompletionDatesMap,
     updateCompletionDatesMap,
+    generateCompletionDates,
+    mergeCompletionDates,
   };
 };
 

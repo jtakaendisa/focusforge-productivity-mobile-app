@@ -9,16 +9,17 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Text, View, getTokenValue, styled } from 'tamagui';
+import { Text, View, styled } from 'tamagui';
 
+import { categoryColorMap } from '@/app/constants';
 import { Activity, ChecklistItem } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { toTruncatedText } from '@/app/utils';
 import CategoryIcon from '../CategoryIcon';
 import CircularCheckbox from '../CircularCheckbox';
 import RippleButton from '../RippleButton';
 import TaskItemLeftActions from './TaskItemLeftActions';
 import TaskItemRightActions from './TaskItemRightActions';
-import { categoryColorMap } from '@/app/constants';
 
 interface Props {
   task: Activity;
@@ -46,12 +47,11 @@ const TaskListItem = ({
 }: Props) => {
   const { type, title, note, category, checklist } = task;
 
+  const { customBlack1, customGray1 } = useCustomColors();
+
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const isChecked = useSharedValue(isCompleted ? 1 : 0);
-
-  const customBlack1 = getTokenValue('$customBlack1');
-  const customGray1 = getTokenValue('$customGray1');
 
   const textColorAnimation = useAnimatedStyle(() => ({
     color: interpolateColor(isChecked.value, [0, 1], ['white', customGray1]),

@@ -3,6 +3,7 @@ import { DateData } from 'react-native-calendars';
 import { DayState } from 'react-native-calendars/src/types';
 import { setDateToMidnight } from '@/app/utils';
 import { UTCDate } from '@date-fns/utc';
+import useCustomColors from '@/app/hooks/useCustomColors';
 
 interface Props {
   date?: DateData;
@@ -21,6 +22,16 @@ const CustomCalendarDay = ({
   isPassedDeadline,
   onComplete,
 }: Props) => {
+  const {
+    customGreen3,
+    customYellow2,
+    customRed8,
+    customGray2,
+    customGreen2,
+    customYellow1,
+    customRed7,
+  } = useCustomColors();
+
   const startOfCurrentDate = setDateToMidnight(new UTCDate());
   const parsedDate = date ? new Date(date.dateString) : undefined;
 
@@ -33,23 +44,23 @@ const CustomCalendarDay = ({
 
   const backgroundColor = isPressable
     ? isCompleted
-      ? '$customGreen3'
+      ? customGreen3
       : isToday
-      ? '$customYellow2'
+      ? customYellow2
       : isPassedDeadline
-      ? '$customRed8'
-      : '$customGray2'
+      ? customRed8
+      : customGray2
     : 'transparent';
 
   const borderColor =
     isPressable && state !== 'disabled'
       ? isCompleted
-        ? '$customGreen2'
+        ? customGreen2
         : isToday
-        ? '$customYellow1'
+        ? customYellow1
         : isPassedDeadline
-        ? '$customRed7'
-        : '$customGray2'
+        ? customRed7
+        : customGray2
       : 'transparent';
 
   const handleComplete = () => onComplete(date?.dateString);

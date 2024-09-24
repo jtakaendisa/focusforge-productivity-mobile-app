@@ -24,7 +24,7 @@ const HomeScreen = () => {
     <Container>
       <SearchBarSpacer isExpanded={pathname === 'home' && isSearchBarOpen} />
       <DateCarousel />
-      <ActivityList isSearchBarOpen={isSearchBarOpen} />
+      <ActivityList pathname={pathname} isSearchBarOpen={isSearchBarOpen} />
       <NewActivityButton onPress={toggleNewActivityModal} />
       <NewActivityModal newActivityModalRef={newActivityModalRef} />
     </Container>

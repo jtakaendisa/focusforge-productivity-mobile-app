@@ -1,3 +1,4 @@
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { useEffect } from 'react';
 import Animated, {
   interpolateColor,
@@ -5,7 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 import AlarmClockSvg from '../../icons/AlarmClockSvg';
 import BellSvg from '../../icons/BellSvg';
 
@@ -16,11 +17,9 @@ interface Props {
 }
 
 const ReminderButton = ({ variant, isSelected, onSelect }: Props) => {
-  const sharedIsSelected = useSharedValue(isSelected ? 1 : 0);
+  const { customGray1, customGray2, customRed1 } = useCustomColors();
 
-  const customGray1 = getTokenValue('$customGray1');
-  const customGray2 = getTokenValue('$customGray2');
-  const customRed1 = getTokenValue('$customRed1');
+  const sharedIsSelected = useSharedValue(isSelected ? 1 : 0);
 
   const backgroundColorAnimation = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(

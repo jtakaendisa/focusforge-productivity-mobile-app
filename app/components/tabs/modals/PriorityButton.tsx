@@ -5,9 +5,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { styled, View, Text, getTokenValue } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
 import { Priority } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 
 interface Props {
   priority: Priority;
@@ -18,9 +19,7 @@ interface Props {
 const PriorityButton = ({ priority, currentPriority, onChange }: Props) => {
   const isSelected = useSharedValue(priority === currentPriority ? 1 : 0);
 
-  const customGray1 = getTokenValue('$customGray1');
-  const customGray2 = getTokenValue('$customGray2');
-  const customRed1 = getTokenValue('$customRed1');
+  const { customGray1, customGray2, customRed1 } = useCustomColors();
 
   const backgroundColorAnimation = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(

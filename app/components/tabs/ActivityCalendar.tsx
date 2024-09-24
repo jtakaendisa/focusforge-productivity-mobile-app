@@ -1,6 +1,7 @@
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
 import { Activity, CompletionDate } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import LinkSvg from '../icons/LinkSvg';
 import PenToSquareSvg from '../icons/PenToSquareSvg';
 import ActivityInfoPanel from './ActivityInfoPanel';
@@ -21,7 +22,7 @@ const ActivityCalendar = ({
 }: Props) => {
   const { type, note } = selectedActivity;
 
-  const customRed2 = getTokenValue('$customRed2');
+  const { customRed2 } = useCustomColors();
 
   return (
     <Container>

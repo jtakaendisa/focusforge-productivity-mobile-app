@@ -1,4 +1,6 @@
-import { BarGraphFilter, CompletionDate } from '@/app/entities';
+import { CompletionDate } from '@/app/entities';
+import useBarGraph from '@/app/hooks/useBarGraph';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { parseDate } from '@/app/utils';
 import {
   LinearGradient,
@@ -7,9 +9,9 @@ import {
   vec,
 } from '@shopify/react-native-skia';
 import { getYear } from 'date-fns';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 import { Bar, CartesianChart, useChartPressState } from 'victory-native';
 import BarGraphPeriodSelector from './BarGraphPeriodSelector';
 
@@ -17,21 +19,99 @@ interface Props {
   completionDates: CompletionDate[];
 }
 
+// Helper functions to generate data
+
+const generateMonthlyData = (
+  completionDates: CompletionDate[],
+  selectedYear: number
+) => {
+  // Initialize the data structure with all months and zero counts
+  const monthlyData = [
+    { xKey: 'Jan', timesCompleted: 0 },
+    { xKey: 'Feb', timesCompleted: 0 },
+    { xKey: 'Mar', timesCompleted: 0 },
+    { xKey: 'Apr', timesCompleted: 0 },
+    { xKey: 'May', timesCompleted: 0 },
+    { xKey: 'Jun', timesCompleted: 0 },
+    { xKey: 'Jul', timesCompleted: 0 },
+    { xKey: 'Aug', timesCompleted: 0 },
+    { xKey: 'Sep', timesCompleted: 0 },
+    { xKey: 'Oct', timesCompleted: 0 },
+    { xKey: 'Nov', timesCompleted: 0 },
+    { xKey: 'Dec', timesCompleted: 0 },
+  ];
+
+  // Iterate over each completion date
+  completionDates.forEach(({ date, isCompleted }) => {
+    if (isCompleted) {
+      // Extract the year and month from the date string
+      const [dayStr, monthStr, yearStr] = date.split(' ');
+      const year = parseInt(yearStr, 10);
+
+      // Only consider the dates that match the selectedYear
+      if (year === selectedYear) {
+        // Find the corresponding month in the monthlyData array
+        const monthIndex = parseDate(date).getMonth();
+        if (monthIndex >= 0) {
+          monthlyData[monthIndex].timesCompleted += 1;
+        }
+      }
+    }
+  });
+
+  return monthlyData;
+};
+
+const generateYearlyData = (completionDates: CompletionDate[]) => {
+  const currentYear = getYear(new Date());
+  const yearRange = [
+    currentYear - 2,
+    currentYear - 1,
+    currentYear,
+    currentYear + 1,
+    currentYear + 2,
+  ];
+
+  const yearMap: Record<number, number> = yearRange.reduce(
+    (acc, year) => ({ ...acc, [year]: 0 }),
+    {}
+  );
+
+  completionDates.forEach(({ date, isCompleted }) => {
+    if (isCompleted) {
+      const year = getYear(parseDate(date));
+      if (yearMap[year] !== undefined) {
+        yearMap[year]++;
+      }
+    }
+  });
+
+  return yearRange.map((year) => ({
+    xKey: year.toString(),
+    timesCompleted: yearMap[year],
+  }));
+};
+
 const CustomBarGraph = ({ completionDates }: Props) => {
   const font = useFont(require('@tamagui/font-inter/otf/Inter-Medium.otf'), 12);
-  const currentYear = getYear(new Date());
 
-  const [barGraphFilter, setBarGraphFilter] = useState<BarGraphFilter>('month');
-  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const {
+    currentYear,
+    selectedYear,
+    barGraphFilter,
+    handleYearChange,
+    handleFilterSelect,
+  } = useBarGraph();
+
+  const { customGray2, customRed2, customRed3 } = useCustomColors();
 
   const { state, isActive } = useChartPressState({
     x: barGraphFilter === 'month' ? 'Jan' : (currentYear - 2).toString(),
     y: { timesCompleted: 0 },
   });
 
-  const customGray2 = getTokenValue('$customGray2');
-  const customRed2 = getTokenValue('$customRed2');
-  const customRed3 = getTokenValue('$customRed3');
+  const isFilterSetToMonth = barGraphFilter === 'month';
+  const isFilterSetToYear = barGraphFilter === 'year';
 
   const data = useMemo(
     () =>
@@ -56,14 +136,6 @@ const CustomBarGraph = ({ completionDates }: Props) => {
 
     return state.x.position.value - font.measureText(value.value).width / 2;
   }, [state, font]);
-
-  const isFilterSetToMonth = barGraphFilter === 'month';
-  const isFilterSetToYear = barGraphFilter === 'year';
-
-  const handleFilterSelect = (filter: BarGraphFilter) => setBarGraphFilter(filter);
-
-  const handleYearChange = (direction: 'left' | 'right') =>
-    setSelectedYear((prev) => (direction === 'left' ? prev - 1 : prev + 1));
 
   return (
     <Container>
@@ -137,79 +209,6 @@ const CustomBarGraph = ({ completionDates }: Props) => {
       </Buttons>
     </Container>
   );
-};
-
-// Helper functions to generate data
-
-const generateMonthlyData = (
-  completionDates: CompletionDate[],
-  selectedYear: number
-) => {
-  // Initialize the data structure with all months and zero counts
-  const monthlyData = [
-    { xKey: 'Jan', timesCompleted: 0 },
-    { xKey: 'Feb', timesCompleted: 0 },
-    { xKey: 'Mar', timesCompleted: 0 },
-    { xKey: 'Apr', timesCompleted: 0 },
-    { xKey: 'May', timesCompleted: 0 },
-    { xKey: 'Jun', timesCompleted: 0 },
-    { xKey: 'Jul', timesCompleted: 0 },
-    { xKey: 'Aug', timesCompleted: 0 },
-    { xKey: 'Sep', timesCompleted: 0 },
-    { xKey: 'Oct', timesCompleted: 0 },
-    { xKey: 'Nov', timesCompleted: 0 },
-    { xKey: 'Dec', timesCompleted: 0 },
-  ];
-
-  // Iterate over each completion date
-  completionDates.forEach(({ date, isCompleted }) => {
-    if (isCompleted) {
-      // Extract the year and month from the date string
-      const [dayStr, monthStr, yearStr] = date.split(' ');
-      const year = parseInt(yearStr, 10);
-
-      // Only consider the dates that match the selectedYear
-      if (year === selectedYear) {
-        // Find the corresponding month in the monthlyData array
-        const monthIndex = parseDate(date).getMonth();
-        if (monthIndex >= 0) {
-          monthlyData[monthIndex].timesCompleted += 1;
-        }
-      }
-    }
-  });
-
-  return monthlyData;
-};
-
-const generateYearlyData = (completionDates: CompletionDate[]) => {
-  const currentYear = getYear(new Date());
-  const yearRange = [
-    currentYear - 2,
-    currentYear - 1,
-    currentYear,
-    currentYear + 1,
-    currentYear + 2,
-  ];
-
-  const yearMap: Record<number, number> = yearRange.reduce(
-    (acc, year) => ({ ...acc, [year]: 0 }),
-    {}
-  );
-
-  completionDates.forEach(({ date, isCompleted }) => {
-    if (isCompleted) {
-      const year = getYear(parseDate(date));
-      if (yearMap[year] !== undefined) {
-        yearMap[year]++;
-      }
-    }
-  });
-
-  return yearRange.map((year) => ({
-    xKey: year.toString(),
-    timesCompleted: yearMap[year],
-  }));
 };
 
 const Container = styled(View, {

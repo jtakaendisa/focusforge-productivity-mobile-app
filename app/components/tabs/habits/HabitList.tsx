@@ -7,7 +7,6 @@ import { Activity, TabRoute } from '@/app/entities';
 import useHabitList from '@/app/hooks/useHabitList';
 import useListModals from '@/app/hooks/useListModals';
 import useSearchBarFilters from '@/app/hooks/useSearchBarFilters';
-import { usePathname } from 'expo-router';
 import ActivityListPlaceholder from '../home/ActivityListPlaceholder';
 import DeleteModalModule from '../modals/DeleteModalModule';
 import ModalContainer from '../modals/ModalContainer';
@@ -15,12 +14,11 @@ import ActivityOptionsModal from './ActivityOptionsModal';
 import HabitListItem from './HabitListItem';
 
 interface Props {
+  pathname: TabRoute;
   isSearchBarOpen: boolean;
 }
 
-const HabitList = ({ isSearchBarOpen }: Props) => {
-  const pathname = (usePathname().substring(1) || 'home') as TabRoute;
-
+const HabitList = ({ pathname, isSearchBarOpen }: Props) => {
   const [selectedHabit, setSelectedHabit] = useState<Activity | null>(null);
 
   const listRef = useRef<FlashList<Activity> | null>(null);

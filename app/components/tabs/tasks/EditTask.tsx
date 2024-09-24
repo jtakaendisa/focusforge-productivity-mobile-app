@@ -1,31 +1,24 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import React, { useEffect, useRef } from 'react';
+import { Controller, SubmitHandler } from 'react-hook-form';
 
+import { categoryColorMap } from '@/app/constants';
 import { Activity, NewActivityData } from '@/app/entities';
+import useActivityModals from '@/app/hooks/useActivityModals';
+import useCompletionDates from '@/app/hooks/useCompletionDates';
+import useCustomColors from '@/app/hooks/useCustomColors';
+import useDatePicker from '@/app/hooks/useDatePicker';
+import useFormHandler from '@/app/hooks/useFormHandler';
 import { useActivityStore } from '@/app/store';
-import {
-  generateCompletionDates,
-  getCompletionDatesFromStorage,
-  mergeCompletionDates,
-  setCompletionDatesInStorage,
-  toCleanedObject,
-  toFormattedDateString,
-  toTruncatedText,
-} from '@/app/utils';
+import { toCleanedObject, toFormattedDateString, toTruncatedText } from '@/app/utils';
 import { activitySchema } from '@/app/validationSchemas';
-import {
-  DateTimePickerAndroid,
-  DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
 import Animated, {
   FadeIn,
   FadeOut,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Text, View, getTokenValue, styled } from 'tamagui';
+import { Text, View, styled } from 'tamagui';
 import BellSvg from '../../icons/BellSvg';
 import BinSvg from '../../icons/BinSvg';
 import CalendarEndSvg from '../../icons/CalendarEndSvg';
@@ -49,7 +42,6 @@ import ModalContainer from '../modals/ModalContainer';
 import PriorityModalModule from '../modals/PriorityModalModule';
 import RemindersModalModule from '../modals/RemindersModalModule';
 import TextModalModule from '../modals/TextModalModule';
-import { categoryColorMap } from '@/app/constants';
 
 interface Props {
   activities: Activity[];
@@ -62,90 +54,40 @@ const SVG_SIZE = 22;
 const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
   const setActivities = useActivityStore((s) => s.setActivities);
 
-  const [isTitleModalOpen, setIsTitleModalOpen] = useState(false);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
-  const [isRemindersModalOpen, setIsRemindersModalOpen] = useState(false);
-  const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
-  const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
-  const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
+  const {
+    isTitleModalOpen,
+    isCategoryModalOpen,
+    isChecklistModalOpen,
+    isFrequencyModalOpen,
+    isNoteModalOpen,
+    isPriorityModalOpen,
+    isRemindersModalOpen,
+    toggleTitleModal,
+    toggleCategoryModal,
+    toggleChecklistModal,
+    toggleFrequencyModal,
+    toggleNoteModal,
+    togglePriorityModal,
+    toggleRemindersModal,
+  } = useActivityModals();
+
+  const { customBlack1, customGray1, customRed1 } = useCustomColors();
 
   const setStartDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setEndDateRef = useRef<((...event: any[]) => void) | null>(null);
   const setIsCarriedOverRef = useRef<((...event: any[]) => void) | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { isSubmitSuccessful },
-  } = useForm<NewActivityData>({
-    defaultValues: {
-      ...selectedTask,
-    },
-    resolver: zodResolver(activitySchema),
-  });
-
-  const watchAllFields = watch();
+  const { handleStartDateSelect, handleEndDateSelect, handleEndDateClear } =
+    useDatePicker(setStartDateRef, setEndDateRef, isRecurring);
 
   const {
-    title,
-    category,
-    startDate,
-    endDate,
-    checklist,
-    priority,
-    note,
-    isCarriedOver,
-    frequency,
-    reminders,
-  } = watchAllFields;
+    completionDatesMap,
+    updateCompletionDatesMap,
+    generateCompletionDates,
+    mergeCompletionDates,
+  } = useCompletionDates();
 
-  const isChecked = useSharedValue(isCarriedOver ? 1 : 0);
-
-  const customBlack1 = getTokenValue('$customBlack1');
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
-
-  const handleDateSelect = (
-    event: DateTimePickerEvent,
-    selectedDate: Date | undefined,
-    mode: 'start' | 'end'
-  ) => {
-    if (selectedDate) {
-      if (mode === 'start') {
-        setStartDateRef.current?.(selectedDate);
-      } else {
-        if (isRecurring) {
-          if (
-            toFormattedDateString(selectedDate) !== toFormattedDateString(new Date())
-          ) {
-            setEndDateRef.current?.(selectedDate);
-          } else {
-            setEndDateRef.current?.();
-          }
-        } else {
-          setEndDateRef.current?.(selectedDate);
-        }
-      }
-    }
-  };
-
-  const showDatePicker = (mode: 'start' | 'end') => {
-    DateTimePickerAndroid.open({
-      value: new Date(),
-      onChange: (e, date) => handleDateSelect(e, date, mode),
-      is24Hour: true,
-      minimumDate: new Date(),
-    });
-  };
-
-  const handleStartDateSelect = () => showDatePicker('start');
-
-  const handleEndDateSelect = () => showDatePicker('end');
-
-  const handleEndDateClear = () => setEndDateRef.current?.();
+  const navigateBack = () => router.replace('/tasks');
 
   const onSubmit: SubmitHandler<NewActivityData> = async (data) => {
     const updatedTask: Activity = {
@@ -155,7 +97,7 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
 
     if (isRecurring) {
       // Retrieve the current completion dates map from storage
-      const currentCompletionDatesMap = await getCompletionDatesFromStorage();
+      const currentCompletionDatesMap = { ...completionDatesMap };
 
       // Retrieve existing completion dates for the selected habit
       const existingCompletionDates = currentCompletionDatesMap[selectedTask.id];
@@ -177,43 +119,44 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
       currentCompletionDatesMap[selectedTask.id] = mergedCompletionDates;
 
       // Store the updated map back to local storage
-      await setCompletionDatesInStorage(currentCompletionDatesMap);
+      await updateCompletionDatesMap(currentCompletionDatesMap);
     }
 
     const updatedActivities = activities.map((activity) =>
       activity.id === selectedTask.id ? toCleanedObject(updatedTask) : activity
     );
     setActivities(updatedActivities);
+    navigateBack();
   };
 
-  const handleCancel = () => router.replace('/tasks');
+  const { control, watchAllFields, handleFormSubmit } = useFormHandler({
+    schema: activitySchema,
+    defaultValues: {
+      ...selectedTask,
+    },
+    onSubmit,
+  });
+
+  const {
+    title,
+    category,
+    startDate,
+    endDate,
+    checklist,
+    priority,
+    note,
+    isCarriedOver,
+    frequency,
+    reminders,
+  } = watchAllFields;
+
+  const isChecked = useSharedValue(isCarriedOver ? 1 : 0);
 
   const togglePendingTaskOption = () => setIsCarriedOverRef.current?.(!isCarriedOver);
-
-  const toggleTitleModal = () => setIsTitleModalOpen((prev) => !prev);
-
-  const toggleCategoryModal = () => setIsCategoryModalOpen((prev) => !prev);
-
-  const toggleNoteModal = () => setIsNoteModalOpen((prev) => !prev);
-
-  const toggleRemindersModal = () => setIsRemindersModalOpen((prev) => !prev);
-
-  const toggleChecklistModal = () => setIsChecklistModalOpen((prev) => !prev);
-
-  const togglePriorityModal = () => setIsPriorityModalOpen((prev) => !prev);
-
-  const toggleFrequencyModal = () => setIsFrequencyModalOpen((prev) => !prev);
 
   useEffect(() => {
     isChecked.value = isCarriedOver ? withTiming(1) : withTiming(0);
   }, [isCarriedOver]);
-
-  useEffect(() => {
-    if (!isSubmitSuccessful) return;
-
-    reset();
-    router.replace('/tasks');
-  }, [isSubmitSuccessful]);
 
   return (
     <Container>
@@ -402,12 +345,12 @@ const EditTask = ({ activities, selectedTask, isRecurring }: Props) => {
       )}
 
       <ButtonsContainer>
-        <RippleButton flex onPress={handleCancel}>
+        <RippleButton flex onPress={navigateBack}>
           <Button>
             <ButtonText>CANCEL</ButtonText>
           </Button>
         </RippleButton>
-        <RippleButton flex onPress={handleSubmit(onSubmit)}>
+        <RippleButton flex onPress={handleFormSubmit}>
           <Button>
             <ButtonText color="$customRed1">CONFIRM</ButtonText>
           </Button>

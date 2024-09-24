@@ -1,8 +1,9 @@
 import { CompletionDate } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
 import { Path, Text as SkiaText, useFont } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
-import { getTokenValue, styled, Text, View } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 import { Pie, type PieSliceData, PolarChart, useSlicePath } from 'victory-native';
 
 interface CustomPieChartProps {
@@ -14,12 +15,13 @@ interface CustomPieSliceProps {
 }
 
 const CustomPieChart = ({ completionDates }: CustomPieChartProps) => {
+  const { customGreen2, customRed2 } = useCustomColors();
+
+  const rotation = useSharedValue(0);
+
   const totalEntries = completionDates.length;
   const completedEntries = completionDates.filter((entry) => entry.isCompleted).length;
   const failedEntries = totalEntries - completedEntries;
-
-  const customGreen2 = getTokenValue('$customGreen2');
-  const customRed2 = getTokenValue('$customRed2');
 
   const chartData = [
     {
@@ -33,8 +35,6 @@ const CustomPieChart = ({ completionDates }: CustomPieChartProps) => {
       label: 'failed',
     },
   ];
-
-  const rotation = useSharedValue(0);
 
   const rotationGesture = Gesture.Rotation().onUpdate((event) => {
     rotation.value = event.rotation;

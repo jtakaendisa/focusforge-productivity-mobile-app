@@ -1,8 +1,9 @@
-import { useMemo, useRef } from 'react';
-import { TextInput } from 'react-native';
-import { Control, Controller } from 'react-hook-form';
-import { Text, View, getTokenValue, styled } from 'tamagui';
 import { NewActivityData } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
+import { useMemo, useRef } from 'react';
+import { Control, Controller } from 'react-hook-form';
+import { TextInput } from 'react-native';
+import { Text, View, styled } from 'tamagui';
 import RippleButton from '../RippleButton';
 
 interface Props {
@@ -14,9 +15,10 @@ interface Props {
 
 const TextModalModule = ({ control, name, initialText, closeModal }: Props) => {
   const memoizedInitialText = useMemo(() => initialText, []);
-  const setInputRef = useRef<((...event: any[]) => void) | null>(null);
 
-  const customGray7 = getTokenValue('$customGray7');
+  const { customGray7 } = useCustomColors();
+
+  const setInputRef = useRef<((...event: any[]) => void) | null>(null);
 
   const handleCancel = () => {
     setInputRef.current?.(memoizedInitialText);

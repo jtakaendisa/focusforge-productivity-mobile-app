@@ -1,27 +1,23 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { AnimatedFlashList, FlashList, ViewToken } from '@shopify/flash-list';
+import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useRef } from 'react';
+import { SubmitHandler } from 'react-hook-form';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 import { Text, View, styled } from 'tamagui';
 
-import { BackHandler } from 'react-native';
 import Dot from './components/tabs/habits/Dot';
 import NewHabitListItem from './components/tabs/habits/NewHabitListItem';
 import AbortActionModalModule from './components/tabs/modals/AbortActionModalModule';
 import ModalContainer from './components/tabs/modals/ModalContainer';
 import { SCREEN_WIDTH } from './constants';
 import { Activity, NewActivityData } from './entities';
+import useCompletionDates from './hooks/useCompletionDates';
+import useFormHandler from './hooks/useFormHandler';
+import useListNavigationWithAbortModal from './hooks/useListNavigationWithAbortModal';
 import { useActivityStore } from './store';
-import {
-  generateCompletionDates,
-  getCompletionDatesFromStorage,
-  setCompletionDatesInStorage,
-  toCleanedObject,
-} from './utils';
+import { toCleanedObject } from './utils';
 import { activitySchema } from './validationSchemas';
 
 type SearchParams = {
@@ -36,64 +32,23 @@ const NewHabitScreen = () => {
   const activities = useActivityStore((s) => s.activities);
   const setActivities = useActivityStore((s) => s.setActivities);
 
-  const [listIndex, setListIndex] = useState(0);
-  const [isAbortActionModalOpen, setIsAbortActionModalOpen] = useState(false);
-
   const listRef = useRef<FlashList<typeof listItems> | null>(null);
 
-  const isFirstIndex = listIndex === 0;
-  const isLastIndex = listIndex === listItems.length - 1;
-
   const {
-    control,
-    watch,
-    handleSubmit,
-    reset,
-    formState: { isSubmitSuccessful },
-  } = useForm<NewActivityData>({
-    defaultValues: {
-      title: '',
-      category: 'Task',
-      startDate: new Date(),
-      priority: 'Normal',
-      frequency: {
-        type: 'daily',
-      },
-    },
-    resolver: zodResolver(activitySchema),
-  });
+    listIndex,
+    isFirstIndex,
+    isLastIndex,
+    isAbortActionModalOpen,
+    handleViewableItemChange,
+    navigateBackward,
+    navigateForward,
+    toggleAbortActionModal,
+  } = useListNavigationWithAbortModal(listRef, listItems);
 
-  const watchAllFields = watch();
+  const { completionDatesMap, generateCompletionDates, updateCompletionDatesMap } =
+    useCompletionDates();
 
-  const handleViewableItemChange = ({
-    viewableItems,
-  }: {
-    viewableItems: ViewToken[];
-  }) => {
-    if (viewableItems[0] && viewableItems[0].index !== null) {
-      setListIndex(viewableItems[0].index);
-    }
-  };
-
-  const navigateBackward = () => {
-    if (!isFirstIndex) {
-      listRef.current?.scrollToIndex({
-        index: listIndex - 1,
-        animated: true,
-      });
-    } else {
-      toggleAbortActionModal();
-    }
-  };
-
-  const navigateForward = async () => {
-    if (listIndex < listItems.length - 1) {
-      listRef.current?.scrollToIndex({
-        index: listIndex + 1,
-        animated: true,
-      });
-    }
-  };
+  const navigateBackToOrigin = () => router.replace(origin);
 
   const onSubmit: SubmitHandler<NewActivityData> = async (data) => {
     const newHabit: Activity = {
@@ -104,7 +59,7 @@ const NewHabitScreen = () => {
     };
 
     // Retrieve the current completion dates map from storage
-    const currentCompletionDatesMap = await getCompletionDatesFromStorage();
+    const currentCompletionDatesMap = { ...completionDatesMap };
 
     // Generate completion dates
     const initialCompletionDates = generateCompletionDates(
@@ -117,38 +72,25 @@ const NewHabitScreen = () => {
     currentCompletionDatesMap[newHabit.id] = initialCompletionDates;
 
     // Store the updated map back to local storage
-    await setCompletionDatesInStorage(currentCompletionDatesMap);
+    await updateCompletionDatesMap(currentCompletionDatesMap);
 
     setActivities([...activities, toCleanedObject(newHabit)]);
+    navigateBackToOrigin();
   };
 
-  const handleAbortAction = () => {
-    reset();
-    router.replace(origin);
-  };
-
-  const toggleAbortActionModal = useCallback(
-    () => setIsAbortActionModalOpen((prev) => !prev),
-    []
-  );
-
-  useEffect(() => {
-    const backAction = () => {
-      setIsAbortActionModalOpen(true);
-      return true;
-    };
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-    return () => backHandler.remove();
-  }, []);
-
-  useEffect(() => {
-    if (!isSubmitSuccessful) return;
-
-    reset();
-    router.replace('/habits');
-  }, [isSubmitSuccessful]);
+  const { control, watchAllFields, handleFormSubmit } = useFormHandler({
+    schema: activitySchema,
+    defaultValues: {
+      title: '',
+      category: 'Task',
+      startDate: new Date(),
+      priority: 'Normal',
+      frequency: {
+        type: 'daily',
+      },
+    },
+    onSubmit,
+  });
 
   return (
     <Container>
@@ -183,7 +125,7 @@ const NewHabitScreen = () => {
           </ButtonRow>
         </Button>
         <Button
-          onPress={isLastIndex ? handleSubmit(onSubmit) : navigateForward}
+          onPress={isLastIndex ? handleFormSubmit : navigateForward}
           disabled={isFirstIndex}
         >
           {!isFirstIndex && (
@@ -197,7 +139,7 @@ const NewHabitScreen = () => {
         closeModal={toggleAbortActionModal}
       >
         <AbortActionModalModule
-          onAbort={handleAbortAction}
+          onAbort={navigateBackToOrigin}
           closeModal={toggleAbortActionModal}
         />
       </ModalContainer>

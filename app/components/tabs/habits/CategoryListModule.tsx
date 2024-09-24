@@ -1,5 +1,5 @@
 import { Control, Controller } from 'react-hook-form';
-import { View, Text, styled, getTokenValue } from 'tamagui';
+import { styled, Text, View } from 'tamagui';
 
 import {
   categories,
@@ -7,8 +7,9 @@ import {
   SCREEN_HEIGHT,
   SCREEN_WIDTH,
 } from '@/app/constants';
-import CategoryIcon from '../CategoryIcon';
 import { NewActivityData } from '@/app/entities';
+import useCustomColors from '@/app/hooks/useCustomColors';
+import CategoryIcon from '../CategoryIcon';
 
 interface Props {
   control: Control<NewActivityData>;
@@ -16,7 +17,7 @@ interface Props {
 }
 
 const CategoryListModule = ({ control, navigateForward }: Props) => {
-  const customBlack1 = getTokenValue('$customBlack1');
+  const { customBlack1 } = useCustomColors();
 
   return (
     <Container>

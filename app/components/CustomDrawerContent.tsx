@@ -5,8 +5,8 @@ import {
 } from '@react-navigation/drawer';
 import { router, usePathname } from 'expo-router';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { getTokenValue } from 'tamagui';
 import { TabRoute } from '../entities';
+import useCustomColors from '../hooks/useCustomColors';
 import { useAuthStore } from '../store';
 import DrawerItemIcon from './tabs/DrawerItemIcon';
 
@@ -14,6 +14,8 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   const pathname = (usePathname().substring(1) || 'home') as TabRoute;
 
   const authUser = useAuthStore((s) => s.authUser);
+
+  const { customGray1, customRed1, customRed4 } = useCustomColors();
 
   const routes = [
     {
@@ -47,10 +49,6 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
       onNavigate: () => router.push('/(drawer)/(tabs)/settings'),
     },
   ] as const;
-
-  const customGray1 = getTokenValue('$customGray1');
-  const customRed1 = getTokenValue('$customRed1');
-  const customRed4 = getTokenValue('$customRed4');
 
   return (
     <DrawerContentScrollView {...props}>
